@@ -3284,8 +3284,13 @@ GenTree* Lowering::LowerDirectCall(GenTreeCall* call)
         {
             // Non-virtual direct calls to addresses accessed by
             // a single indirection.
+#if defined(FEATURE_READYTORUN_COMPILER) && defined(TARGET_ARMARCH)
+            GenTree* cellAddr = PhysReg(REG_R2R_INDIRECT_PARAM);
+            cellAddr->SetContained();
+#else
             GenTree* cellAddr = AddrGen(addr);
-            GenTree* indir    = Ind(cellAddr);
+#endif
+            GenTree* indir = Ind(cellAddr);
             result            = indir;
             break;
         }

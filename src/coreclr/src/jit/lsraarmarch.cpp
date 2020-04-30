@@ -72,7 +72,7 @@ int LinearScan::BuildIndir(GenTreeIndir* indirTree)
     }
 #endif
 
-    if (addr->isContained())
+    if (addr->isContained() && !addr->OperIs(GT_PHYSREG))
     {
         assert(addr->OperGet() == GT_LEA);
         GenTreeAddrMode* lea = addr->AsAddrMode();

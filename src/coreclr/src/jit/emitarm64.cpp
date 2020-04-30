@@ -12716,7 +12716,7 @@ void emitter::emitInsLoadStoreOp(instruction ins, emitAttr attr, regNumber dataR
 {
     GenTree* addr = indir->Addr();
 
-    if (addr->isContained())
+    if (addr->isContained() && !addr->OperIs(GT_PHYSREG))
     {
         assert(addr->OperGet() == GT_LCL_VAR_ADDR || addr->OperGet() == GT_LEA);
 
@@ -12816,7 +12816,10 @@ void emitter::emitInsLoadStoreOp(instruction ins, emitAttr attr, regNumber dataR
     else // addr is not contained, so we evaluate it into a register
     {
         // Then load/store dataReg from/to [addrReg]
-        emitIns_R_R(ins, attr, dataReg, addr->GetRegNum());
+        // If this is PhysReg, then get that srcReg.
+        regNumber addrReg =
+            addr->OperIs(GT_PHYSREG) ? addr->AsPhysReg()->gtSrcReg : addr->GetRegNum();
+        emitIns_R_R(ins, attr, dataReg, addrReg);
     }
 }
 

@@ -882,6 +882,8 @@ void Lowering::ContainCheckHWIntrinsic(GenTreeHWIntrinsic* node)
     switch (intrin.id)
     {
         case NI_AdvSimd_Extract:
+        case NI_Vector64_GetElement:
+        case NI_Vector128_GetElement:
             if (intrin.op2->IsCnsIntOrI())
             {
                 MakeSrcContained(node, intrin.op2);

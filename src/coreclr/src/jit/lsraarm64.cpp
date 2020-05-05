@@ -1017,6 +1017,8 @@ int LinearScan::BuildHWIntrinsic(GenTreeHWIntrinsic* intrinsicTree)
         {
             case NI_AdvSimd_Extract:
             case NI_AdvSimd_Insert:
+            case NI_Vector64_GetElement:
+            case NI_Vector128_GetElement:
                 needBranchTargetReg = !intrin.op2->isContainedIntOrIImmed();
                 break;
 

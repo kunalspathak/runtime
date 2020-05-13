@@ -3298,11 +3298,11 @@ GenTree* Lowering::LowerDirectCall(GenTreeCall* call)
             {
                 cellAddr = AddrGen(addr);
             }
-#else
-            cellAddr = AddrGen(addr);
-#endif
+#else  // !(FEATURE_READYTORUN_COMPILER && TARGET_ARMARCH)
+            cellAddr              = AddrGen(addr);
+#endif // FEATURE_READYTORUN_COMPILER && TARGET_ARMARCH
             GenTree* indir = Ind(cellAddr);
-            result            = indir;
+            result         = indir;
             break;
         }
 

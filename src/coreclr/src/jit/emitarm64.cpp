@@ -12817,8 +12817,7 @@ void emitter::emitInsLoadStoreOp(instruction ins, emitAttr attr, regNumber dataR
     {
         // Then load/store dataReg from/to [addrReg]
         // If this is PhysReg, then get that srcReg.
-        regNumber addrReg =
-            addr->OperIs(GT_PHYSREG) ? addr->AsPhysReg()->gtSrcReg : addr->GetRegNum();
+        regNumber addrReg = addr->OperIs(GT_PHYSREG) ? addr->AsPhysReg()->gtSrcReg : addr->GetRegNum();
         emitIns_R_R(ins, attr, dataReg, addrReg);
     }
 }

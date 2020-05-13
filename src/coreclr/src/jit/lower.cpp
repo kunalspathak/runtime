@@ -3284,11 +3284,22 @@ GenTree* Lowering::LowerDirectCall(GenTreeCall* call)
         {
             // Non-virtual direct calls to addresses accessed by
             // a single indirection.
+            GenTree* cellAddr;
 #if defined(FEATURE_READYTORUN_COMPILER) && defined(TARGET_ARMARCH)
-            GenTree* cellAddr = PhysReg(REG_R2R_INDIRECT_PARAM);
-            cellAddr->SetContained();
+            if (call->IsR2RRelativeIndir())
+            {
+                cellAddr = PhysReg(REG_R2R_INDIRECT_PARAM);
+                // Need to mark it contained so lsra don't assign
+                // new register and we end up with "mov reg, r11"
+                // which we want to avoid.
+                cellAddr->SetContained();
+            }
+            else
+            {
+                cellAddr = AddrGen(addr);
+            }
 #else
-            GenTree* cellAddr = AddrGen(addr);
+            cellAddr = AddrGen(addr);
 #endif
             GenTree* indir = Ind(cellAddr);
             result            = indir;

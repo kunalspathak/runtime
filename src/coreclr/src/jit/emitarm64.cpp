@@ -12813,7 +12813,7 @@ void emitter::emitInsLoadStoreOp(instruction ins, emitAttr attr, regNumber dataR
             }
         }
     }
-    else // addr is not contained, so we evaluate it into a register
+    else // addr is not contained or is in PhysReg, so we evaluate it into a register
     {
         // Then load/store dataReg from/to [addrReg]
         // If this is PhysReg, then get that srcReg.

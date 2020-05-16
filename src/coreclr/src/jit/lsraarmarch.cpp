@@ -149,6 +149,7 @@ int LinearScan::BuildCall(GenTreeCall* call)
 
     GenTree*  ctrlExpr           = call->gtControlExpr;
     regMaskTP ctrlExprCandidates = RBM_NONE;
+
     if (call->gtCallType == CT_INDIRECT)
     {
         // either gtControlExpr != null or gtCallAddr != null.
@@ -173,13 +174,20 @@ int LinearScan::BuildCall(GenTreeCall* call)
             ctrlExprCandidates = RBM_FASTTAILCALL_TARGET;
         }
     }
+#ifdef TARGET_ARM64
+    else if (call->IsR2RRelativeIndir())
+    {
+        buildInternalIntRegisterDefForNode(call);
+    }
+#endif 
+
 #ifdef TARGET_ARM
     else
     {
         buildInternalIntRegisterDefForNode(call);
     }
 
-    if (call->NeedsNullCheck())
+    if (call->NeedsNullCheck()) //TODO: Don't do it again.
     {
         buildInternalIntRegisterDefForNode(call);
     }

@@ -12818,6 +12818,11 @@ void emitter::emitInsLoadStoreOp(instruction ins, emitAttr attr, regNumber dataR
         // Then load/store dataReg from/to [addrReg]
         // If this is PhysReg, then get that srcReg.
         regNumber addrReg = addr->OperIs(GT_PHYSREG) ? addr->AsPhysReg()->gtSrcReg : addr->GetRegNum();
+        if ((strcmp(this->emitComp->info.compMethodName, "AdjustMemberObject") == 0) && (addr->OperIs(GT_PHYSREG)) &&
+            (dataReg == REG_R2))
+        {
+            printf("[INFO] ~~~~~~~emitInsLoadStoreOp: indir: %x, addr: %x.\n", indir, addr);
+        }
         emitIns_R_R(ins, attr, dataReg, addrReg);
     }
 }

@@ -3285,6 +3285,7 @@ GenTree* Lowering::LowerDirectCall(GenTreeCall* call)
             // Non-virtual direct calls to addresses accessed by
             // a single indirection.
             GenTree* cellAddr;
+            GenTree* indir;
 #if defined(FEATURE_READYTORUN_COMPILER) && defined(TARGET_ARMARCH)
             if (call->IsR2RRelativeIndir())
             {
@@ -3293,15 +3294,21 @@ GenTree* Lowering::LowerDirectCall(GenTreeCall* call)
                 // new register and we end up with "mov reg, r11"
                 // which we want to avoid.
                 cellAddr->SetContained();
+                indir = Ind(cellAddr);
+                if ((strcmp(this->comp->info.compMethodName, "AdjustMemberObject") == 0) && (call->gtCallType == CT_HELPER))
+                {
+                    printf("[INFO] Lowering for call: %x, indir: %x, addr: %x.\n", call, indir, cellAddr);
+                }
             }
             else
             {
                 cellAddr = AddrGen(addr);
+                indir    = Ind(cellAddr);
             }
 #else  // !(FEATURE_READYTORUN_COMPILER && TARGET_ARMARCH)
             cellAddr              = AddrGen(addr);
+            indir = Ind(cellAddr);
 #endif // FEATURE_READYTORUN_COMPILER && TARGET_ARMARCH
-            GenTree* indir = Ind(cellAddr);
             result         = indir;
             break;
         }

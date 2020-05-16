@@ -896,6 +896,11 @@ bool GenTreeCall::HasSideEffects(Compiler* compiler, bool ignoreExceptions, bool
         return true;
     }
 
+     if ((strcmp(compiler->info.compMethodName, "AdjustMemberObject") == 0))
+    {
+         printf("[INFO] .......HasSideEffects call: %x\n", this);
+    }
+
     CorInfoHelpFunc       helper           = compiler->eeGetHelperNum(gtCallMethHnd);
     HelperCallProperties& helperProperties = compiler->s_helperCallProperties;
 
@@ -8029,6 +8034,10 @@ void Compiler::gtUpdateSideEffects(Statement* stmt, GenTree* tree)
 
 void Compiler::gtUpdateTreeAncestorsSideEffects(GenTree* tree)
 {
+    if ((strcmp(this->info.compMethodName, "AdjustMemberObject") == 0))
+    {
+        printf(".....................gtUpdateTreeAncestorsSideEffects tree=%x\n", tree);
+    }
     assert(fgStmtListThreaded);
     while (tree != nullptr)
     {
@@ -8061,6 +8070,10 @@ void Compiler::gtUpdateStmtSideEffects(Statement* stmt)
 
 void Compiler::gtUpdateNodeOperSideEffects(GenTree* tree)
 {
+    if ((strcmp(this->info.compMethodName, "AdjustMemberObject") == 0))
+    {
+        printf(".....................gtUpdateNodeOperSideEffects tree=%x\n", tree);
+    }
     if (tree->OperMayThrow(this))
     {
         tree->gtFlags |= GTF_EXCEPT;
@@ -8106,6 +8119,10 @@ void Compiler::gtUpdateNodeOperSideEffects(GenTree* tree)
 
 void Compiler::gtUpdateNodeSideEffects(GenTree* tree)
 {
+    if ((strcmp(this->info.compMethodName, "AdjustMemberObject") == 0))
+    {
+        printf(".....................gtUpdateNodeSideEffects tree=%x\n", tree);
+    }
     gtUpdateNodeOperSideEffects(tree);
     unsigned nChildren = tree->NumChildren();
     for (unsigned childNum = 0; childNum < nChildren; childNum++)
@@ -15388,6 +15405,10 @@ GenTree* Compiler::gtNewRefCOMfield(GenTree*                objPtr,
 
 bool Compiler::gtNodeHasSideEffects(GenTree* tree, unsigned flags)
 {
+    if ((strcmp(this->info.compMethodName, "AdjustMemberObject") == 0))
+    {
+        printf(".....................gtNodeHasSideEffects tree=%x\n", tree);
+    }
     if (flags & GTF_ASG)
     {
         // TODO-Cleanup: This only checks for GT_ASG but according to OperRequiresAsgFlag there
@@ -15464,6 +15485,11 @@ bool Compiler::gtNodeHasSideEffects(GenTree* tree, unsigned flags)
 
 bool Compiler::gtTreeHasSideEffects(GenTree* tree, unsigned flags /* = GTF_SIDE_EFFECT*/)
 {
+    if ((strcmp(this->info.compMethodName, "AdjustMemberObject") == 0))
+    {
+        printf(".....................gtTreeHasSideEffects tree=%x\n", tree);
+    }
+
     // These are the side effect flags that we care about for this tree
     unsigned sideEffectFlags = tree->gtFlags & flags;
 
@@ -15583,6 +15609,10 @@ void Compiler::gtExtractSideEffList(GenTree*  expr,
                                     unsigned  flags /* = GTF_SIDE_EFFECT*/,
                                     bool      ignoreRoot /* = false */)
 {
+    if ((strcmp(this->info.compMethodName, "AdjustMemberObject") == 0))
+    {
+        printf(".....................gtExtractSideEffList expr=%x\n", expr);
+    }
     class SideEffectExtractor final : public GenTreeVisitor<SideEffectExtractor>
     {
     public:

@@ -1808,7 +1808,16 @@ void Compiler::fgComputeLifeLIR(VARSET_TP& life, BasicBlock* block, VARSET_VALAR
                     JITDUMP("Removing dead call:\n");
                     DISPNODE(call);
 
-                    node->VisitOperands([](GenTree* operand) -> GenTree::VisitResult {
+#if defined(FEATURE_READYTORUN_COMPILER) && defined(TARGET_ARMARCH)
+                    // Note: There can be cases where this should be handled even for callTypes other than CT_HELPER,
+                    // but haven't seen any evidence that it would happen. So, try to be conservative and just handle
+                    // for CT_HELPER.
+                    bool isR2RIndirectCall = (call->IsR2RRelativeIndir()) && (call->gtCallType == CT_HELPER);
+#else // !(FEATURE_READYTORUN_COMPILER && TARGET_ARMARCH)
+                    bool isR2RIndirectCall = false;
+#endif // FEATURE_READYTORUN_COMPILER && TARGET_ARMARCH
+
+                    node->VisitOperands([isR2RIndirectCall](GenTree* operand) -> GenTree::VisitResult {
                         if (operand->IsValue())
                         {
                             operand->SetUnusedValue();
@@ -1821,6 +1830,17 @@ void Compiler::fgComputeLifeLIR(VARSET_TP& life, BasicBlock* block, VARSET_VALAR
                             operand->AsPutArgStk()->gtOp1->SetUnusedValue();
                             operand->gtBashToNOP();
                         }
+
+#if defined(FEATURE_READYTORUN_COMPILER) && defined(TARGET_ARMARCH)
+                        if (isR2RIndirectCall && operand->OperIs(GT_IND))
+                        {
+                            if (operand->AsIndir()->gtOp1->OperIs(GT_PHYSREG))
+                            {
+                                GenTree* physReg = operand->AsIndir()->gtOp1->AsPhysReg();
+                                physReg->SetUnusedValue();
+                            }
+                        }
+#endif // FEATURE_READYTORUN_COMPILER && TARGET_ARMARCH
 
                         return GenTree::VisitResult::Continue;
                     });

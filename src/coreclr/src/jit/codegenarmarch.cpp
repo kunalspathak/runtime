@@ -2465,6 +2465,10 @@ void CodeGen::genRegCopy(GenTree* treeNode)
 void CodeGen::genCallInstruction(GenTreeCall* call)
 {
     gtCallTypes callType = (gtCallTypes)call->gtCallType;
+    if ((strcmp(this->compiler->info.compMethodName, "AdjustMemberObject") == 0))
+    {
+        printf("[INFO] *******genCallInstruction : call: %x, indir: %x\n", call, call->gtControlExpr);
+    }
 
     IL_OFFSETX ilOffset = BAD_IL_OFFSET;
 

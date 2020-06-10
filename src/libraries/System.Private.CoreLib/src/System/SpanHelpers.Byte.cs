@@ -376,20 +376,19 @@ namespace System
                 if (offset < (nuint)(uint)length)
                 {
                     lengthToExamine = GetByteVector128SpanLength(offset, length);
-                    Internal.Console.WriteLine($"[IndexOf(byte)] searchSpace: {searchSpace}, value: {value}, lengthToExamine: {lengthToExamine}, length: {length}, offset: {offset}");
 
                     Vector128<byte> mask = Vector128.Create((byte)0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                     Vector128<byte> values = Vector128.Create(value);
                     while (lengthToExamine > offset)
                     {
                         Vector128<byte> search = LoadVector128(ref searchSpace, offset);
-
                         Vector128<byte> compareResult = AdvSimd.CompareEqual(values, search);
+                        Internal.Console.WriteLine($"[IndexOf(byte)]\tsearch: {search}, compareResult: {compareResult}");
+
                         if (AdvSimd.Arm64.MaxAcross(compareResult).ToScalar() == 0)
                         {
                             // Zero flags set so no matches
                             offset += (nuint)Vector128<byte>.Count;
-                            Internal.Console.WriteLine($"[IndexOf(byte)]\toffset: {offset}, compareResult: {compareResult}");
                             continue;
                         }
 

@@ -376,6 +376,7 @@ namespace System
                 if (offset < (nuint)(uint)length)
                 {
                     lengthToExamine = GetByteVector128SpanLength(offset, length);
+                    Internal.Console.WriteLine($"[IndexOf(byte)] searchSpace: {searchSpace}, value: {value}, lengthToExamine: {lengthToExamine}, length: {length}, offset: {offset}");
 
                     Vector128<byte> mask = Vector128.Create((byte)0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                     Vector128<byte> values = Vector128.Create(value);
@@ -388,6 +389,7 @@ namespace System
                         {
                             // Zero flags set so no matches
                             offset += (nuint)Vector128<byte>.Count;
+                            Internal.Console.WriteLine($"[IndexOf(byte)]\toffset: {offset}, compareResult: {compareResult}");
                             continue;
                         }
 
@@ -395,7 +397,9 @@ namespace System
                         Vector128<byte> invertedCompareResult = AdvSimd.Not(compareResult);
                         Vector128<byte> selectedLanes = AdvSimd.Or(invertedCompareResult, mask);
                         byte firstIndexMatch = AdvSimd.Arm64.MinAcross(selectedLanes).ToScalar();
-                        return (int)(offset + firstIndexMatch);
+                        int answer = (int)(offset + firstIndexMatch);
+                        Internal.Console.WriteLine($"[IndexOf(byte)] : searchSpace: {searchSpace}, value: {value}, length: {length}, offset: {offset}, matchedLane: {firstIndexMatch}, answer: {answer}");
+                        return answer;
                     }
 
                     if (offset < (nuint)(uint)length)

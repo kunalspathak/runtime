@@ -413,6 +413,7 @@ namespace System
             {
                 if (offset < length)
                 {
+                    Internal.Console.WriteLine($"[IndexOf(char)] searchSpace: {searchSpace}, value: {value}, length: {length}, offset: {offset}");
                     Debug.Assert(length - offset >= Vector128<ushort>.Count);
 
                     lengthToExamine = GetCharVector128SpanLength(offset, length);
@@ -432,6 +433,7 @@ namespace System
                                 // Zero flags set so no matches
                                 offset += Vector128<ushort>.Count;
                                 lengthToExamine -= Vector128<ushort>.Count;
+                                Internal.Console.WriteLine($"[IndexOf(char)]\toffset: {offset}, lengthToExamine: {lengthToExamine}, compareResult: {compareResult}");
                                 continue;
                             }
 
@@ -439,7 +441,9 @@ namespace System
                             Vector128<ushort> invertedCompareResult = AdvSimd.Not(compareResult);
                             Vector128<ushort> selectedLanes = AdvSimd.Or(invertedCompareResult, mask);
                             ushort firstIndexMatch = AdvSimd.Arm64.MinAcross(selectedLanes).ToScalar();
-                            return (int)(offset + firstIndexMatch);
+                            int answer = (int)(offset + firstIndexMatch);
+                            Internal.Console.WriteLine($"[IndexOf(char)]\toffset: {offset}, matchedLane: {firstIndexMatch}, answer: {answer}");
+                            return answer;
                         } while (lengthToExamine > 0);
                     }
 

@@ -1552,6 +1552,46 @@ namespace System
                     goto NotEqual;
                 }
             }
+            else if (AdvSimd.Arm64.IsSupported)
+            {
+                // Use Vector128.Size as Vector128<byte>.Count doesn't inline at R2R time
+                // https://github.com/dotnet/runtime/issues/32714
+                if (length >= Vector128.Size)
+                {
+                    Vector128<byte> vecResult;
+                    nuint offset = 0;
+                    nuint lengthToExamine = length - Vector128.Size;
+                    // Unsigned, so it shouldn't have overflowed larger than length (rather than negative)
+                    Debug.Assert(lengthToExamine < length);
+                    if (lengthToExamine != 0)
+                    {
+                        do
+                        {
+                            vecResult = AdvSimd.CompareEqual(LoadVector128(ref first, offset), LoadVector128(ref second, offset));
+
+                            // Compare with " == 0" instead of " != ulong.MaxValue" so crossgen generates single "cbz" which is optimal inside loop.
+                            if (AdvSimd.Arm64.MinPairwise(vecResult, vecResult).AsUInt64().ToScalar() == 0)
+                            {
+                                goto NotEqual;
+                            }
+
+                            offset += Vector128.Size;
+                        } while (lengthToExamine > offset);
+                    }
+
+                    // Do final compare as Vector128<byte>.Count from end rather than start
+                    vecResult = AdvSimd.CompareEqual(LoadVector128(ref first, lengthToExamine), LoadVector128(ref second, lengthToExamine));
+
+                    if (AdvSimd.Arm64.MinPairwise(vecResult, vecResult).AsUInt64().ToScalar() == ulong.MaxValue)
+                    {
+                        // C# compiler inverts this test, making the outer goto the conditional jmp.
+                        goto Equal;
+                    }
+
+                    // This becomes a conditional jmp foward to not favor it.
+                    goto NotEqual;
+                }
+            }
             else if (Vector.IsHardwareAccelerated && length >= (nuint)Vector<byte>.Count)
             {
                 nuint offset = 0;
@@ -1582,7 +1622,7 @@ namespace System
             }
 
 #if TARGET_64BIT
-            if (Sse2.IsSupported)
+            if (Sse2.IsSupported || AdvSimd.Arm64.IsSupported)
             {
                 Debug.Assert(length <= (nuint)sizeof(nuint) * 2);
 

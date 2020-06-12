@@ -1569,8 +1569,7 @@ namespace System
                         {
                             vecResult = AdvSimd.CompareEqual(LoadVector128(ref first, offset), LoadVector128(ref second, offset));
 
-                            // Compare with " == 0" instead of " != ulong.MaxValue" so crossgen generates single "cbz" which is optimal inside loop.
-                            if (AdvSimd.Arm64.MinPairwise(vecResult, vecResult).AsUInt64().ToScalar() == 0)
+                            if (AdvSimd.Arm64.MinPairwise(vecResult, vecResult).AsUInt64().ToScalar() != ulong.MaxValue)
                             {
                                 goto NotEqual;
                             }
@@ -1823,6 +1822,61 @@ namespace System
 
                     int result = Unsafe.AddByteOffset(ref first, offset).CompareTo(Unsafe.AddByteOffset(ref second, offset));
                     Debug.Assert(result != 0);
+
+                    return result;
+                }
+            }
+            else if (AdvSimd.Arm64.IsSupported)
+            {
+                if (lengthToExamine >= (nuint)Vector128<byte>.Count)
+                {
+                    lengthToExamine -= (nuint)Vector128<byte>.Count;
+
+                    int misMatchedLane = 0;
+
+                    // Mask to help find the first lane in compareResult that is set.
+                    // LSB 0x01 corresponds to lane 0, 0x10 - to lane 1, and so on.
+                    Vector128<byte> mask = Vector128.Create((ushort)0x1001).AsByte();
+                    Vector128<byte> vecResult;
+
+                    while (lengthToExamine > offset)
+                    {
+                        //Internal.Console.WriteLine("[AdvSimdIsSupported]:Main:: offset=" + offset);
+                        vecResult = AdvSimd.CompareEqual(LoadVector128(ref first, offset), LoadVector128(ref second, offset));
+
+                        if (AdvSimd.Arm64.MinPairwise(vecResult, vecResult).AsUInt64().ToScalar() == ulong.MaxValue)
+                        {
+                            // All matched
+                            offset += (nuint)Vector128<byte>.Count;
+                            continue;
+                        }
+
+                        Vector128<byte> maskedSelectedLanes = AdvSimd.And(AdvSimd.Not(vecResult), mask);
+                        ulong selectedLanes = AdvSimd.Arm64.AddPairwise(maskedSelectedLanes, maskedSelectedLanes).AsUInt64().ToScalar();
+
+                        // Find the first lane that is set inside compareResult.
+                        misMatchedLane = BitOperations.TrailingZeroCount(selectedLanes) >> 2;
+
+                        goto Difference;
+                    }
+                    // Move to Vector length from end for final compare
+                    offset = lengthToExamine;
+
+                    // Do final compare as Vector128<byte>.Count from end rather than start
+                    // Complement the result to find the first mismatch, if exists. That optimizes code for mismatch scenarios.
+                    vecResult = AdvSimd.CompareEqual(LoadVector128(ref first, offset), LoadVector128(ref second, offset));
+
+                    if (!TryFindFirstMatchedLane(mask, AdvSimd.Not(vecResult), ref misMatchedLane))
+                    {
+                        goto Equal;
+                    }
+
+                Difference:
+                    // Add the first lane to current offset
+                    offset += (uint)misMatchedLane;
+
+                    int result = Unsafe.AddByteOffset(ref first, offset).CompareTo(Unsafe.AddByteOffset(ref second, offset));
+                    //Debug.Assert(result != 0);
 
                     return result;
                 }

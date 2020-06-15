@@ -1422,8 +1422,470 @@ namespace System
 
         // Optimized byte-based SequenceEquals. The "length" parameter for this one is declared a nuint rather than int as we also use it for types other than byte
         // where the length can exceed 2Gb once scaled by sizeof(T).
+        public static unsafe bool Kunal_after(ref byte first, ref byte second, nuint length)
+        {
+            bool result;
+            // Use nint for arithmetic to avoid unnecessary 64->32->64 truncations
+            if (length >= (nuint)sizeof(nuint))
+            {
+                // Conditional jmp foward to favor shorter lengths. (See comment at "Equal:" label)
+                // The longer lengths can make back the time due to branch misprediction
+                // better than shorter lengths.
+                goto Longer;
+            }
+
+#if TARGET_64BIT
+            // On 32-bit, this will always be true since sizeof(nuint) == 4
+            if (length < sizeof(uint))
+#endif
+            {
+                uint differentBits = 0;
+                nuint offset = (length & 2);
+                if (offset != 0)
+                {
+                    differentBits = LoadUShort(ref first);
+                    differentBits -= LoadUShort(ref second);
+                }
+                if ((length & 1) != 0)
+                {
+                    differentBits |= (uint)Unsafe.AddByteOffset(ref first, offset) - (uint)Unsafe.AddByteOffset(ref second, offset);
+                }
+                result = (differentBits == 0);
+                goto Result;
+            }
+#if TARGET_64BIT
+            else
+            {
+                nuint offset = length - sizeof(uint);
+                uint differentBits = LoadUInt(ref first) - LoadUInt(ref second);
+                differentBits |= LoadUInt(ref first, offset) - LoadUInt(ref second, offset);
+                result = (differentBits == 0);
+                goto Result;
+            }
+#endif
+        Longer:
+            // Only check that the ref is the same if buffers are large,
+            // and hence its worth avoiding doing unnecessary comparisons
+            if (!Unsafe.AreSame(ref first, ref second))
+            {
+                // C# compiler inverts this test, making the outer goto the conditional jmp.
+                goto Vector;
+            }
+
+            // This becomes a conditional jmp foward to not favor it.
+            goto Equal;
+
+        Result:
+            return result;
+        // When the sequence is equal; which is the longest execution, we want it to determine that
+        // as fast as possible so we do not want the early outs to be "predicted not taken" branches.
+        Equal:
+            return true;
+
+        Vector:
+            if (Sse2.IsSupported)
+            {
+                if (Avx2.IsSupported && length >= (nuint)Vector256<byte>.Count)
+                {
+                    Vector256<byte> vecResult;
+                    nuint offset = 0;
+                    nuint lengthToExamine = length - (nuint)Vector256<byte>.Count;
+                    // Unsigned, so it shouldn't have overflowed larger than length (rather than negative)
+                    Debug.Assert(lengthToExamine < length);
+                    if (lengthToExamine != 0)
+                    {
+                        do
+                        {
+                            vecResult = Avx2.CompareEqual(LoadVector256(ref first, offset), LoadVector256(ref second, offset));
+                            if (Avx2.MoveMask(vecResult) != -1)
+                            {
+                                goto NotEqual;
+                            }
+                            offset += (nuint)Vector256<byte>.Count;
+                        } while (lengthToExamine > offset);
+                    }
+
+                    // Do final compare as Vector256<byte>.Count from end rather than start
+                    vecResult = Avx2.CompareEqual(LoadVector256(ref first, lengthToExamine), LoadVector256(ref second, lengthToExamine));
+                    if (Avx2.MoveMask(vecResult) == -1)
+                    {
+                        // C# compiler inverts this test, making the outer goto the conditional jmp.
+                        goto Equal;
+                    }
+
+                    // This becomes a conditional jmp foward to not favor it.
+                    goto NotEqual;
+                }
+                // Use Vector128.Size as Vector128<byte>.Count doesn't inline at R2R time
+                // https://github.com/dotnet/runtime/issues/32714
+                else if (length >= Vector128.Size)
+                {
+                    Vector128<byte> vecResult;
+                    nuint offset = 0;
+                    nuint lengthToExamine = length - Vector128.Size;
+                    // Unsigned, so it shouldn't have overflowed larger than length (rather than negative)
+                    Debug.Assert(lengthToExamine < length);
+                    if (lengthToExamine != 0)
+                    {
+                        do
+                        {
+                            // We use instrincs directly as .Equals calls .AsByte() which doesn't inline at R2R time
+                            // https://github.com/dotnet/runtime/issues/32714
+                            vecResult = Sse2.CompareEqual(LoadVector128(ref first, offset), LoadVector128(ref second, offset));
+                            if (Sse2.MoveMask(vecResult) != 0xFFFF)
+                            {
+                                goto NotEqual;
+                            }
+                            offset += Vector128.Size;
+                        } while (lengthToExamine > offset);
+                    }
+
+                    // Do final compare as Vector128<byte>.Count from end rather than start
+                    vecResult = Sse2.CompareEqual(LoadVector128(ref first, lengthToExamine), LoadVector128(ref second, lengthToExamine));
+                    if (Sse2.MoveMask(vecResult) == 0xFFFF)
+                    {
+                        // C# compiler inverts this test, making the outer goto the conditional jmp.
+                        goto Equal;
+                    }
+
+                    // This becomes a conditional jmp foward to not favor it.
+                    goto NotEqual;
+                }
+            }
+            else if (AdvSimd.Arm64.IsSupported)
+            {
+                // Use Vector128.Size as Vector128<byte>.Count doesn't inline at R2R time
+                // https://github.com/dotnet/runtime/issues/32714
+                if (length >= Vector128.Size)
+                {
+                    Vector128<byte> vecResult;
+                    nuint offset = 0;
+                    nuint lengthToExamine = length - Vector128.Size;
+                    // Unsigned, so it shouldn't have overflowed larger than length (rather than negative)
+                    Debug.Assert(lengthToExamine < length);
+                    if (lengthToExamine != 0)
+                    {
+                        do
+                        {
+                            vecResult = AdvSimd.CompareEqual(LoadVector128(ref first, offset), LoadVector128(ref second, offset));
+
+                            // Compare with " == 0" instead of " != ulong.MaxValue" so crossgen generates single "cbz" which is optimal inside loop.
+                            if (AdvSimd.Arm64.MinPairwise(vecResult, vecResult).AsUInt64().ToScalar() == 0)
+                            {
+                                goto NotEqual;
+                            }
+
+                            offset += Vector128.Size;
+                        } while (lengthToExamine > offset);
+                    }
+
+                    // Do final compare as Vector128<byte>.Count from end rather than start
+                    vecResult = AdvSimd.CompareEqual(LoadVector128(ref first, lengthToExamine), LoadVector128(ref second, lengthToExamine));
+
+                    if (AdvSimd.Arm64.MinPairwise(vecResult, vecResult).AsUInt64().ToScalar() == ulong.MaxValue)
+                    {
+                        // C# compiler inverts this test, making the outer goto the conditional jmp.
+                        goto Equal;
+                    }
+
+                    // This becomes a conditional jmp foward to not favor it.
+                    goto NotEqual;
+                }
+            }
+            else if (Vector.IsHardwareAccelerated && length >= (nuint)Vector<byte>.Count)
+            {
+                nuint offset = 0;
+                nuint lengthToExamine = length - (nuint)Vector<byte>.Count;
+                // Unsigned, so it shouldn't have overflowed larger than length (rather than negative)
+                Debug.Assert(lengthToExamine < length);
+                if (lengthToExamine > 0)
+                {
+                    do
+                    {
+                        if (LoadVector(ref first, offset) != LoadVector(ref second, offset))
+                        {
+                            goto NotEqual;
+                        }
+                        offset += (nuint)Vector<byte>.Count;
+                    } while (lengthToExamine > offset);
+                }
+
+                // Do final compare as Vector<byte>.Count from end rather than start
+                if (LoadVector(ref first, lengthToExamine) == LoadVector(ref second, lengthToExamine))
+                {
+                    // C# compiler inverts this test, making the outer goto the conditional jmp.
+                    goto Equal;
+                }
+
+                // This becomes a conditional jmp foward to not favor it.
+                goto NotEqual;
+            }
+
+#if TARGET_64BIT
+            if (Sse2.IsSupported || AdvSimd.Arm64.IsSupported)
+            {
+                Debug.Assert(length <= (nuint)sizeof(nuint) * 2);
+
+                nuint offset = length - (nuint)sizeof(nuint);
+                nuint differentBits = LoadNUInt(ref first) - LoadNUInt(ref second);
+                differentBits |= LoadNUInt(ref first, offset) - LoadNUInt(ref second, offset);
+                result = (differentBits == 0);
+                goto Result;
+            }
+            else
+#endif
+            {
+                Debug.Assert(length >= (nuint)sizeof(nuint));
+                {
+                    nuint offset = 0;
+                    nuint lengthToExamine = length - (nuint)sizeof(nuint);
+                    // Unsigned, so it shouldn't have overflowed larger than length (rather than negative)
+                    Debug.Assert(lengthToExamine < length);
+                    if (lengthToExamine > 0)
+                    {
+                        do
+                        {
+                            // Compare unsigned so not do a sign extend mov on 64 bit
+                            if (LoadNUInt(ref first, offset) != LoadNUInt(ref second, offset))
+                            {
+                                goto NotEqual;
+                            }
+                            offset += (nuint)sizeof(nuint);
+                        } while (lengthToExamine > offset);
+                    }
+
+                    // Do final compare as sizeof(nuint) from end rather than start
+                    result = (LoadNUInt(ref first, lengthToExamine) == LoadNUInt(ref second, lengthToExamine));
+                    goto Result;
+                }
+            }
+
+        // As there are so many true/false exit points the Jit will coalesce them to one location.
+        // We want them at the end so the conditional early exit jmps are all jmp forwards so the
+        // branch predictor in a uninitialized state will not take them e.g.
+        // - loops are conditional jmps backwards and predicted
+        // - exceptions are conditional fowards jmps and not predicted
+        NotEqual:
+            return false;
+        }
+
+        // Optimized byte-based SequenceEquals. The "length" parameter for this one is declared a nuint rather than int as we also use it for types other than byte
+        // where the length can exceed 2Gb once scaled by sizeof(T).
+        public static unsafe bool Kunal_before(ref byte first, ref byte second, nuint length)
+        {
+            bool result;
+            // Use nint for arithmetic to avoid unnecessary 64->32->64 truncations
+            if (length >= (nuint)sizeof(nuint))
+            {
+                // Conditional jmp foward to favor shorter lengths. (See comment at "Equal:" label)
+                // The longer lengths can make back the time due to branch misprediction
+                // better than shorter lengths.
+                goto Longer;
+            }
+
+#if TARGET_64BIT
+            // On 32-bit, this will always be true since sizeof(nuint) == 4
+            if (length < sizeof(uint))
+#endif
+            {
+                uint differentBits = 0;
+                nuint offset = (length & 2);
+                if (offset != 0)
+                {
+                    differentBits = LoadUShort(ref first);
+                    differentBits -= LoadUShort(ref second);
+                }
+                if ((length & 1) != 0)
+                {
+                    differentBits |= (uint)Unsafe.AddByteOffset(ref first, offset) - (uint)Unsafe.AddByteOffset(ref second, offset);
+                }
+                result = (differentBits == 0);
+                goto Result;
+            }
+#if TARGET_64BIT
+            else
+            {
+                nuint offset = length - sizeof(uint);
+                uint differentBits = LoadUInt(ref first) - LoadUInt(ref second);
+                differentBits |= LoadUInt(ref first, offset) - LoadUInt(ref second, offset);
+                result = (differentBits == 0);
+                goto Result;
+            }
+#endif
+        Longer:
+            // Only check that the ref is the same if buffers are large,
+            // and hence its worth avoiding doing unnecessary comparisons
+            if (!Unsafe.AreSame(ref first, ref second))
+            {
+                // C# compiler inverts this test, making the outer goto the conditional jmp.
+                goto Vector;
+            }
+
+            // This becomes a conditional jmp foward to not favor it.
+            goto Equal;
+
+        Result:
+            return result;
+        // When the sequence is equal; which is the longest execution, we want it to determine that
+        // as fast as possible so we do not want the early outs to be "predicted not taken" branches.
+        Equal:
+            return true;
+
+        Vector:
+            if (Sse2.IsSupported)
+            {
+                if (Avx2.IsSupported && length >= (nuint)Vector256<byte>.Count)
+                {
+                    Vector256<byte> vecResult;
+                    nuint offset = 0;
+                    nuint lengthToExamine = length - (nuint)Vector256<byte>.Count;
+                    // Unsigned, so it shouldn't have overflowed larger than length (rather than negative)
+                    Debug.Assert(lengthToExamine < length);
+                    if (lengthToExamine != 0)
+                    {
+                        do
+                        {
+                            vecResult = Avx2.CompareEqual(LoadVector256(ref first, offset), LoadVector256(ref second, offset));
+                            if (Avx2.MoveMask(vecResult) != -1)
+                            {
+                                goto NotEqual;
+                            }
+                            offset += (nuint)Vector256<byte>.Count;
+                        } while (lengthToExamine > offset);
+                    }
+
+                    // Do final compare as Vector256<byte>.Count from end rather than start
+                    vecResult = Avx2.CompareEqual(LoadVector256(ref first, lengthToExamine), LoadVector256(ref second, lengthToExamine));
+                    if (Avx2.MoveMask(vecResult) == -1)
+                    {
+                        // C# compiler inverts this test, making the outer goto the conditional jmp.
+                        goto Equal;
+                    }
+
+                    // This becomes a conditional jmp foward to not favor it.
+                    goto NotEqual;
+                }
+                // Use Vector128.Size as Vector128<byte>.Count doesn't inline at R2R time
+                // https://github.com/dotnet/runtime/issues/32714
+                else if (length >= Vector128.Size)
+                {
+                    Vector128<byte> vecResult;
+                    nuint offset = 0;
+                    nuint lengthToExamine = length - Vector128.Size;
+                    // Unsigned, so it shouldn't have overflowed larger than length (rather than negative)
+                    Debug.Assert(lengthToExamine < length);
+                    if (lengthToExamine != 0)
+                    {
+                        do
+                        {
+                            // We use instrincs directly as .Equals calls .AsByte() which doesn't inline at R2R time
+                            // https://github.com/dotnet/runtime/issues/32714
+                            vecResult = Sse2.CompareEqual(LoadVector128(ref first, offset), LoadVector128(ref second, offset));
+                            if (Sse2.MoveMask(vecResult) != 0xFFFF)
+                            {
+                                goto NotEqual;
+                            }
+                            offset += Vector128.Size;
+                        } while (lengthToExamine > offset);
+                    }
+
+                    // Do final compare as Vector128<byte>.Count from end rather than start
+                    vecResult = Sse2.CompareEqual(LoadVector128(ref first, lengthToExamine), LoadVector128(ref second, lengthToExamine));
+                    if (Sse2.MoveMask(vecResult) == 0xFFFF)
+                    {
+                        // C# compiler inverts this test, making the outer goto the conditional jmp.
+                        goto Equal;
+                    }
+
+                    // This becomes a conditional jmp foward to not favor it.
+                    goto NotEqual;
+                }
+            }
+            else if (Vector.IsHardwareAccelerated && length >= (nuint)Vector<byte>.Count)
+            {
+                nuint offset = 0;
+                nuint lengthToExamine = length - (nuint)Vector<byte>.Count;
+                // Unsigned, so it shouldn't have overflowed larger than length (rather than negative)
+                Debug.Assert(lengthToExamine < length);
+                if (lengthToExamine > 0)
+                {
+                    do
+                    {
+                        if (LoadVector(ref first, offset) != LoadVector(ref second, offset))
+                        {
+                            goto NotEqual;
+                        }
+                        offset += (nuint)Vector<byte>.Count;
+                    } while (lengthToExamine > offset);
+                }
+
+                // Do final compare as Vector<byte>.Count from end rather than start
+                if (LoadVector(ref first, lengthToExamine) == LoadVector(ref second, lengthToExamine))
+                {
+                    // C# compiler inverts this test, making the outer goto the conditional jmp.
+                    goto Equal;
+                }
+
+                // This becomes a conditional jmp foward to not favor it.
+                goto NotEqual;
+            }
+
+#if TARGET_64BIT
+            if (Sse2.IsSupported)
+            {
+                Debug.Assert(length <= (nuint)sizeof(nuint) * 2);
+
+                nuint offset = length - (nuint)sizeof(nuint);
+                nuint differentBits = LoadNUInt(ref first) - LoadNUInt(ref second);
+                differentBits |= LoadNUInt(ref first, offset) - LoadNUInt(ref second, offset);
+                result = (differentBits == 0);
+                goto Result;
+            }
+            else
+#endif
+            {
+                Debug.Assert(length >= (nuint)sizeof(nuint));
+                {
+                    nuint offset = 0;
+                    nuint lengthToExamine = length - (nuint)sizeof(nuint);
+                    // Unsigned, so it shouldn't have overflowed larger than length (rather than negative)
+                    Debug.Assert(lengthToExamine < length);
+                    if (lengthToExamine > 0)
+                    {
+                        do
+                        {
+                            // Compare unsigned so not do a sign extend mov on 64 bit
+                            if (LoadNUInt(ref first, offset) != LoadNUInt(ref second, offset))
+                            {
+                                goto NotEqual;
+                            }
+                            offset += (nuint)sizeof(nuint);
+                        } while (lengthToExamine > offset);
+                    }
+
+                    // Do final compare as sizeof(nuint) from end rather than start
+                    result = (LoadNUInt(ref first, lengthToExamine) == LoadNUInt(ref second, lengthToExamine));
+                    goto Result;
+                }
+            }
+
+        // As there are so many true/false exit points the Jit will coalesce them to one location.
+        // We want them at the end so the conditional early exit jmps are all jmp forwards so the
+        // branch predictor in a uninitialized state will not take them e.g.
+        // - loops are conditional jmps backwards and predicted
+        // - exceptions are conditional fowards jmps and not predicted
+        NotEqual:
+            return false;
+        }
+
+
+        // Optimized byte-based SequenceEquals. The "length" parameter for this one is declared a nuint rather than int as we also use it for types other than byte
+        // where the length can exceed 2Gb once scaled by sizeof(T).
         public static unsafe bool SequenceEqual(ref byte first, ref byte second, nuint length)
         {
+            //Kunal_before(ref first, ref second, length);
+            //Kunal_after(ref first, ref second, length);
+
             bool result;
             // Use nint for arithmetic to avoid unnecessary 64->32->64 truncations
             if (length >= (nuint)sizeof(nuint))

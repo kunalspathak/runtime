@@ -388,6 +388,10 @@ PCODE MethodDesc::PrepareILBasedCode(PrepareCodeConfig* pConfig)
         }
 #endif // FEATURE_READYTORUN
 
+        if ((strcmp(this->m_pszDebugMethodName, "Kunal1") == 0) || strcmp(this->m_pszDebugMethodName, "Kunal2") == 0)
+        {
+            printf("here");
+        }
         if (pCode == NULL)
             pCode = GetPrecompiledCode(pConfig);
 

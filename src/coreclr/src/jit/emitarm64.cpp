@@ -4003,6 +4003,9 @@ void emitter::emitIns_R_R(
     emitAttr  size     = EA_SIZE(attr);
     emitAttr  elemsize = EA_UNKNOWN;
     insFormat fmt      = IF_NONE;
+    instrDesc* lastInsDesc = emitLastIns;
+    //insFormat  fmt         = lastInsDesc->idInsFmt();
+    regNumber  prevDst = REG_NA, prevSrc = REG_NA;
 
     /* Figure out the encoding format of the instruction */
     switch (ins)
@@ -4023,6 +4026,15 @@ void emitter::emitIns_R_R(
                 {
                     return;
                 }
+            }
+
+            // Check if we did same move in prev instruction except dst/src were switched.
+            prevDst = lastInsDesc->idReg1();
+            prevSrc = lastInsDesc->idReg2();
+
+            if ((prevDst == reg2) && (prevSrc == reg1))
+            {
+                printf("\n -- suppressing \"mov %d %d\" as previous instruction was \"mov %d %d\" .\n", reg1, reg2, prevDst, prevSrc);
             }
 
             // Check for the 'mov' aliases for the vector registers

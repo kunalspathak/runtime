@@ -49,15 +49,15 @@
              AssemblyFile="$(InstallerTasksAssemblyPath)" />
   <Target Name="CreateHostMachineInfoFile"
           AfterTargets="DispatchToInnerBuilds">
-    <GetTargetMachineInfo>
-      <Output PropertyName="HostMachineRid" TaskParameter="RuntimeIdentifier" />
-    </GetTargetMachineInfo>
+    <!-- <GetTargetMachineInfo> -->
+      <!-- <Output PropertyName="HostMachineRid" TaskParameter="RuntimeIdentifier" /> -->
+    <!-- </GetTargetMachineInfo> -->
 
     <PropertyGroup>
       <HostMachineInfoPropsContent>
 &lt;Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"&gt;
   &lt;PropertyGroup&gt;
-    &lt;HostMachineRid&gt;$(HostMachineRid)&lt;/HostMachineRid&gt;
+    &lt;HostMachineRid&gt;win-x64&lt;/HostMachineRid&gt;
   &lt;/PropertyGroup&gt;
 &lt;/Project&gt;
       </HostMachineInfoPropsContent>

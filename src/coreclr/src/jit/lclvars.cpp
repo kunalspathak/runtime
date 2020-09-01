@@ -7340,7 +7340,7 @@ void Compiler::lvaTableDump(FrameLayoutState curState)
 
     if (curState >= TENTATIVE_FRAME_LAYOUT)
     {
-        printf(";\n");
+        // printf(";\n");
         printf("; Lcl frame size = %d\n", compLclFrameSize);
     }
 }

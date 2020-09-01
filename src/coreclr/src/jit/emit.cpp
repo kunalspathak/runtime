@@ -3318,10 +3318,10 @@ void emitter::emitDispIG(insGroup* ig, insGroup* igPrev, bool verbose)
     {
         printf("offs=%06XH, size=%04XH", ig->igOffs, ig->igSize);
 
-        if (emitComp->compCodeGenDone)
+        /*if (emitComp->compCodeGenDone)
         {
             printf(", bbWeight=%s PerfScore %.2f", refCntWtd2str(ig->igWeight), ig->igPerfScore);
-        }
+        }*/
 
         if (ig->igFlags & IGF_GC_VARS)
         {
@@ -4918,7 +4918,7 @@ unsigned emitter::emitEndCodeGen(Compiler* comp,
             }
             else
             {
-                printf("\nG_M%03u_IG%02u:\n", emitComp->compMethodID, ig->igNum);
+                //printf("\nG_M%03u_IG%02u:\n", emitComp->compMethodID, ig->igNum);
             }
         }
 #endif // DEBUG
@@ -5010,10 +5010,10 @@ unsigned emitter::emitEndCodeGen(Compiler* comp,
         }
 
 #ifdef DEBUG
-        if (emitComp->opts.disAsm || emitComp->opts.dspEmit || emitComp->verbose)
+       /* if (emitComp->opts.disAsm || emitComp->opts.dspEmit || emitComp->verbose)
         {
             printf("\t\t\t\t\t\t;; bbWeight=%s PerfScore %.2f", refCntWtd2str(ig->igWeight), ig->igPerfScore);
-        }
+        }*/
 #endif // DEBUG
 
         emitCurIG = nullptr;

@@ -141,6 +141,7 @@ CONFIG_METHODSET(JitDisasm, W("JitDisasm"))                  // Dumps disassembl
 CONFIG_STRING(JitDisasmAssemblies, W("JitDisasmAssemblies")) // Only show JitDisasm and related info for methods
                                                              // from this semicolon-delimited list of assemblies.
 CONFIG_METHODSET(JitDump, W("JitDump"))                      // Dumps trees for specified method
+CONFIG_METHODSET(JitIRDump, W("JitIRDump"))                  // Dumps uniform IR nodes
 CONFIG_METHODSET(JitEHDump, W("JitEHDump"))                  // Dump the EH table for the method, as reported to the VM
 CONFIG_METHODSET(JitExclude, W("JitExclude"))
 CONFIG_METHODSET(JitForceProcedureSplitting, W("JitForceProcedureSplitting"))

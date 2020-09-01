@@ -509,6 +509,11 @@ const bool dspGCtbls = true;
         if (JitTls::GetCompiler()->verbose)                                                                            \
             logf(__VA_ARGS__);                                                                                         \
     }
+#define JITIRDUMP(...)                                                                                                   \
+    {                                                                                                                  \
+        if (JitTls::GetCompiler()->verboseIR)                                                                            \
+            logf(__VA_ARGS__);                                                                                         \
+    }
 #define JITLOG(x)                                                                                                      \
     {                                                                                                                  \
         JitLogEE x;                                                                                                    \
@@ -538,6 +543,7 @@ const bool dspGCtbls = true;
     if (JitTls::GetCompiler()->verbose)                                                                                \
         JitTls::GetCompiler()->gtDispTreeRange(range, t);
 #define VERBOSE JitTls::GetCompiler()->verbose
+#define VERBOSEIR JitTls::GetCompiler()->verboseIR
 #else // !DEBUG
 #define JITDUMP(...)
 #define JITLOG(x)

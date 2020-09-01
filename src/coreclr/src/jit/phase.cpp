@@ -186,7 +186,7 @@ void Phase::PostPhase(PhaseStatus status)
 
     if (VERBOSE)
     {
-        if (comp->compIsForInlining())
+        if (comp->compIsForInlining() && !VERBOSEIR)
         {
             printf("\n*************** Inline @[%06u] Finishing PHASE %s%s\n",
                    Compiler::dspTreeID(comp->impInlineInfo->iciCall), m_name, statusMessage);
@@ -198,13 +198,26 @@ void Phase::PostPhase(PhaseStatus status)
 
         if (doPostPhase)
         {
-            printf("Trees after %s\n", m_name);
+            printf("`Trees after %s\n", m_name);
             comp->fgDispBasicBlocks(true);
         }
 
 #if DUMP_FLOWGRAPHS
         comp->fgDumpFlowGraph(m_phase);
 #endif // DUMP_FLOWGRAPHS
+    }
+    else if (VERBOSEIR)
+    {
+        if (madeChanges)
+        {
+            printf("\n*************** Starting PHASE %s\n", m_name);
+            if (doPostPhase)
+            {
+                //printf("Trees after %s\n", m_name);
+                comp->fgDispBasicBlocks(true);
+            }
+            printf("\n*************** Finishing PHASE %s\n", m_name);
+        }
     }
 
     if (doPostPhase)

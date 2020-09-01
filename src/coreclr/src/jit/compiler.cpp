@@ -2548,10 +2548,12 @@ void Compiler::compInitOptions(JitFlags* jitFlags)
     if (compIsForInlining())
     {
         verbose = impInlineInfo->InlinerCompiler->verbose;
+        verboseIR = impInlineInfo->InlinerCompiler->verboseIR;
     }
     else
     {
         verbose = false;
+        verboseIR = false;
         codeGen->setVerbose(false);
     }
     verboseTrees     = verbose && shouldUseVerboseTrees();
@@ -2698,6 +2700,10 @@ void Compiler::compInitOptions(JitFlags* jitFlags)
                 if (JitConfig.JitDump().contains(info.compMethodName, info.compClassName, &info.compMethodInfo->args))
                 {
                     verboseDump = true;
+                }
+                if (JitConfig.JitIRDump().contains(info.compMethodName, info.compClassName, &info.compMethodInfo->args))
+                {
+                    verboseIR = true;
                 }
                 unsigned jitHashDumpVal = (unsigned)JitConfig.JitHashDump();
                 if ((jitHashDumpVal != (DWORD)-1) && (jitHashDumpVal == info.compMethodHash()))
@@ -2953,7 +2959,7 @@ void Compiler::compInitOptions(JitFlags* jitFlags)
         }
     }
 
-    if (verbose)
+    if (verbose || verboseIR)
     {
         printf("****** START compiling %s (MethodHash=%08x)\n", info.compFullName, info.compMethodHash());
         printf("Generating code for %s %s\n", Target::g_tgtPlatformName, Target::g_tgtCPUName);
@@ -5722,7 +5728,7 @@ void Compiler::compCompileFinish()
         printf(""); // in our logic this causes a flush
     }
 
-    if (verbose)
+    if (verbose || verboseIR)
     {
         printf("****** DONE compiling %s\n", info.compFullName);
         printf(""); // in our logic this causes a flush

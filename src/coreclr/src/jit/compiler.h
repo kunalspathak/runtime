@@ -2103,6 +2103,7 @@ public:
 
 #ifdef DEBUG
     bool verbose;
+    bool verboseIR;
     bool verboseTrees;
     bool shouldUseVerboseTrees();
     bool asciiTrees; // If true, dump trees using only ASCII characters

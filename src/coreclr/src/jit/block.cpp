@@ -405,7 +405,15 @@ unsigned BasicBlock::dspPreds()
             printf(",");
             count += 1;
         }
-        printf(FMT_BB, pred->flBlock->bbNum);
+
+        if (VERBOSEIR)
+        {
+            printf(FMT_BB_IR, pred->flBlock->bbNum);
+        }
+        else
+        {
+            printf(FMT_BB, pred->flBlock->bbNum);
+        }
         count += 4;
 
         // Account for %02u only handling 2 digits, but we can display more than that.
@@ -441,7 +449,15 @@ unsigned BasicBlock::dspCheapPreds()
             printf(",");
             count += 1;
         }
-        printf(FMT_BB, pred->block->bbNum);
+        if (VERBOSEIR)
+        {
+            printf(FMT_BB_IR, pred->block->bbNum);
+        }
+        else
+        {
+            printf(FMT_BB, pred->block->bbNum);
+        }
+        
         count += 4;
 
         // Account for %02u only handling 2 digits, but we can display more than that.
@@ -467,7 +483,15 @@ unsigned BasicBlock::dspSuccs(Compiler* compiler)
     for (unsigned i = 0; i < numSuccs; i++)
     {
         printf("%s", (count == 0) ? "" : ",");
-        printf(FMT_BB, GetSucc(i, compiler)->bbNum);
+        if (VERBOSEIR)
+        {
+            printf(FMT_BB_IR, GetSucc(i, compiler)->bbNum);
+        }
+        else
+        {
+            printf(FMT_BB, GetSucc(i, compiler)->bbNum);
+        }
+        
         count++;
     }
     return count;
@@ -553,7 +577,14 @@ void BasicBlock::dspBlockHeader(Compiler* compiler,
                                 bool      showFlags /*= false*/,
                                 bool      showPreds /*= true*/)
 {
-    printf(FMT_BB " ", bbNum);
+    if (VERBOSEIR)
+    {
+        printf(FMT_BLOCK_HEADER_IR " ", bbNum);
+    }
+    else
+    {
+        printf(FMT_BB " ", bbNum);
+    }
     dspBlockILRange();
     if (showKind)
     {

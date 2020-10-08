@@ -383,6 +383,10 @@ void BasicBlock::dspFlags()
     {
         printf("cfe ");
     }
+    if (bbFlags & BBF_FIRST_BLOCK_IN_INNERLOOP)
+    {
+        printf("finnerloop ");
+    }
 }
 
 /*****************************************************************************

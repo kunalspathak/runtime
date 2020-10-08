@@ -445,6 +445,7 @@ struct BasicBlock : private LIR::Range
 #define BBF_BACKWARD_JUMP_TARGET          0x1000000000 // Block is a target of a backward jump
 #define BBF_PATCHPOINT                    0x2000000000 // Block is a patchpoint
 #define BBF_HAS_SUPPRESSGC_CALL           0x4000000000 // BB contains a call to a method with SuppressGCTransitionAttribute
+#define BBF_FIRST_BLOCK_IN_INNERLOOP      0x8000000000 // Block is lexically the fist block within the innermost loop.
 
 // clang-format on
 

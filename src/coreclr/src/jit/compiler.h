@@ -2232,6 +2232,7 @@ public:
 
     unsigned compJitAlignLoopMinBlockWeight;
     unsigned compJitAlignLoopMaxCodeSize;
+    bool     compJitAlignLoopWith32BPadding;
 
 #ifdef DEBUG
     bool verbose;

@@ -5044,7 +5044,8 @@ unsigned emitter::emitEndCodeGen(Compiler* comp,
 #define DEFAULT_CODE_BUFFER_INIT 0xcc
 
 #ifdef DEBUG
-    *instrCount = 0;
+    *instrCount      = 0;
+    bool isColdBlock = false;
 #endif
     for (insGroup* ig = emitIGlist; ig != nullptr; ig = ig->igNext)
     {
@@ -5056,7 +5057,8 @@ unsigned emitter::emitEndCodeGen(Compiler* comp,
             assert(emitCurCodeOffs(cp) == emitTotalHotCodeSize);
 
             assert(coldCodeBlock);
-            cp = coldCodeBlock;
+            cp          = coldCodeBlock;
+            isColdBlock = true;
 #ifdef DEBUG
             if (emitComp->opts.disAsm || emitComp->verbose)
             {
@@ -5093,7 +5095,7 @@ unsigned emitter::emitEndCodeGen(Compiler* comp,
                 printf("\nG_M%03u_IG%02u:", emitComp->compMethodID, ig->igNum);
                 if (emitComp->opts.disAddr)
                 {
-                    printf("\t\t;; offset=%04XH", ig->igOffs);
+                    printf("              ;; offset=%04XH", (cp - (isColdBlock ? coldCodeBlock : codeBlock)));
                 }
                 printf("\n");
             }

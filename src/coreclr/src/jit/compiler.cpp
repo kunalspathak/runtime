@@ -2539,6 +2539,9 @@ void Compiler::compInitOptions(JitFlags* jitFlags)
     compJitAlignLoopMaxCodeSize    = JitConfig.JitAlignLoopMaxCodeSize();
     compJitAlignLoopBoundary       = ReinterpretHexAsDecimal(JitConfig.JitAlignLoopBoundary());
     compJitAlignLoopForJcc         = JitConfig.JitAlignLoopForJcc() == 1;
+    compJitAlignLoopAdaptive       = JitConfig.JitAlignLoopAdaptive() == 1;
+    assert(isPow2(compJitAlignLoopBoundary));
+
 
 #if REGEN_SHORTCUTS || REGEN_CALLPAT
     // We never want to have debugging enabled when regenerating GC encoding patterns
@@ -3851,6 +3854,7 @@ _SetMinOpts:
         else
         {
             codeGen->SetAlignLoops(opts.jitFlags->IsSet(JitFlags::JIT_FLAG_ALIGN_LOOPS));
+            //codeGen->SetAlignLoops(true);
         }
     }
 

@@ -12660,7 +12660,7 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
                     if (minBlocksNeededForLoop > maxBlocksAllowedForLoop)
                     {
                         skipPadding = true;
-
+#if DEBUG
                         if (emitComp->opts.disAsm)
                         {
                             printf("; ~~~~~~~~~~~~~~~~~~~~~~ Skipping because maxBlocksAllowed. loopSize= %d, "
@@ -12669,6 +12669,7 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
                                    loopSize, minBlocksNeededForLoop, alignmentBoundary, nPaddingBytes, nMaxPaddingBytes,
                                    emitComp->info.compMethodName);
                         }
+#endif
                     }
                     else if (nPaddingBytes > nMaxPaddingBytes)
                     {
@@ -12680,7 +12681,7 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
                         if (nPaddingBytes > nMaxPaddingBytes)
                         {
                             skipPadding = true;
-
+#if DEBUG
                             if (emitComp->opts.disAsm)
                             {
                                 printf("; ~~~~~~~~~~~~~~~~~~~~~~ Skipping because maxPaddingAllowed. loopSize= %d, "
@@ -12689,6 +12690,7 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
                                        loopSize, minBlocksNeededForLoop, alignmentBoundary, nPaddingBytes,
                                        nMaxPaddingBytes, emitComp->info.compMethodName);
                             }
+#endif
                         }
                     }
 
@@ -12702,19 +12704,20 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
                         if (currentOffset <= extraBytesNotInLoop)
                         {
                             skipPadding = true;
-
+#if DEBUG
                             if (emitComp->opts.disAsm)
                             {
                                 printf("; ~~~~~~~~~~~~~~~~~~~~~~ Skipping because (currentOffset < "
                                        "extraBytesNotInLoop) in (%s)\n",
                                        emitComp->info.compMethodName);
                             }
+#endif
                         }
                         else
                         {
                             dst = emitOutputNOP(dst, nPaddingBytes);
                             assert(((size_t)dst & (alignmentBoundary - 1)) == 0);
-
+#if DEBUG
                             if (emitComp->opts.disAsm)
                             {
                                 printf("; ~~~~~~~~~~~~~~~~~~~~~~ alignment= %d bytes, loopsize= %d bytes, "
@@ -12722,6 +12725,7 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
                                        nPaddingBytes, loopSize, minBlocksNeededForLoop, extraBytesNotInLoop, alignmentBoundary,
                                        emitComp->info.compMethodName);
                             }
+#endif
                         }
                     }
 
@@ -12788,13 +12792,14 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
                         // Otherwise, the loop just fits in minBlocksNeededForLoop and so no alignment needed.
                         if (currentOffset <= extraBytesNotInLoop)
                         {
+#if DEBUG
                             if (emitComp->opts.disAsm)
                             {
                                 printf("; ~~~~~~~~~~~~~~~~~~~~~~ Skipping because (currentOffset < "
                                        "extraBytesNotInLoop) in (%s)\n",
                                        emitComp->info.compMethodName);
                             }
-
+#endif
                             if (nextId->idIns() == INS_align)
                             {
                                 assert(emitComp->compJitAlignLoopBoundary > 16);
@@ -12821,7 +12826,7 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
 #endif
                                 }
                             }
-
+#if DEBUG
                             if (emitComp->opts.disAsm)
                             {
                                 printf("; ~~~~~~~~~~~~~~~~~~~~~~ alignment= %d bytes, loopsize= %d bytes, "
@@ -12829,19 +12834,21 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
                                        nBytes, loopSize, minimumBlocksNeeded, extraBytesNotInLoop,
                                        emitComp->info.compMethodName);
                             }
-
+#endif
                             // In the end dst should be at alignment boundary
                             assert(((size_t)dst & (alignmentBoundary - 1)) == 0);
                         }
                     }
                     else
                     {
+#if DEBUG
                         if (emitComp->opts.disAsm)
                         {
                             printf("; ~~~~~~~~~~~~~~~~~~~~~~ Skipping because threshold. loopSize= %d, "
                                    "emitComp->compJitAlignLoopMaxCodeSize= %d in (%s)\n",
                                    loopSize, emitComp->compJitAlignLoopMaxCodeSize, emitComp->info.compMethodName);
                         }
+#endif
                         // If next instruction is align, skip it so
                         // we do not check the heuristics again.
                         if (nextId->idIns() == INS_align)

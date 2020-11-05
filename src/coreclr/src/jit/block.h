@@ -448,7 +448,7 @@ struct BasicBlock : private LIR::Range
 
 #define BBF_BACKWARD_JUMP_TARGET           MAKE_BBFLAG(36) // Block is a target of a backward jump
 #define BBF_PATCHPOINT                     MAKE_BBFLAG(37) // Block is a patchpoint
-#define BBF_FIRST_BLOCK_IN_INNERLOOP      0x8000000000 // Block is lexically the fist block within the innermost loop.
+#define BBF_FIRST_BLOCK_IN_INNERLOOP       MAKE_BBFLAG(38) // Block is lexically the fist block within the innermost loop.
 
 // clang-format on
 

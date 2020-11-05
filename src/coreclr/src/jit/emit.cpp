@@ -5058,8 +5058,7 @@ unsigned emitter::emitEndCodeGen(Compiler* comp,
 #define DEFAULT_CODE_BUFFER_INIT 0xcc
 
 #ifdef DEBUG
-    *instrCount      = 0;
-    bool isColdBlock = false;
+    *instrCount = 0;
 #endif
     for (insGroup* ig = emitIGlist; ig != nullptr; ig = ig->igNext)
     {
@@ -5071,8 +5070,7 @@ unsigned emitter::emitEndCodeGen(Compiler* comp,
             assert(emitCurCodeOffs(cp) == emitTotalHotCodeSize);
 
             assert(coldCodeBlock);
-            cp          = coldCodeBlock;
-            isColdBlock = true;
+            cp = coldCodeBlock;
 #ifdef DEBUG
             if (emitComp->opts.disAsm || emitComp->verbose)
             {

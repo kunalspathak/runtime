@@ -3627,21 +3627,6 @@ void emitter::emitIns(instruction ins)
 
 /*****************************************************************************
  *
- *  Add a NOP instructions to pad the instruction stream by (size / 4) bytes.
- */
-
-void emitter::emitLoopAlign()
-{
-    // Max out at 28 bytes of nop...
-    // 32 is the largest method entry alignment we support.
-    for (unsigned i = 0; i < 4; i++)
-    {
-        emitIns(INS_nop);
-    }
-}
-
-/*****************************************************************************
- *
  *  Add an instruction with a single immediate value.
  */
 
@@ -11477,7 +11462,7 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
     size_t expected = emitSizeOfInsDsc(id);
     assert(sz == expected);
 
-    if (emitComp->opts.disAsm || emitComp->verbose)
+    if (emitComp->opts.disAsm || emitComp->opts.dspEmit || emitComp->verbose)
     {
         emitDispIns(id, false, dspOffs, true, emitCurCodeOffs(odst), *dp, (dst - *dp), ig);
     }
@@ -12122,14 +12107,12 @@ void emitter::emitDispIns(
     if (pCode == NULL)
         sz = 0;
 
-    if (!isNew && !asmfm && sz)
-    {
+    if (!emitComp->opts.dspEmit && !isNew && !asmfm && sz)
         doffs = true;
-    }
 
     /* Display the instruction offset */
 
-    emitDispInsOffs(offset, doffs, pCode);
+    emitDispInsOffs(offset, doffs);
 
     /* Display the instruction hex code */
 

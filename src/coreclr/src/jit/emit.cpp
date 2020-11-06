@@ -5212,7 +5212,7 @@ unsigned emitter::emitEndCodeGen(Compiler* comp,
             
             if ((emitComp->opts.disAsm || emitComp->verbose) && emitComp->opts.disAddr)
             {
-                size_t lastBoundaryAddr = (size_t)cp & ~((size_t)emitComp->compJitAlignLoopBoundary - 1);
+                size_t lastBoundaryAddr = (size_t)cp & ~((size_t)emitComp->opts.compJitAlignLoopBoundary - 1);
 
                 // draw boundary if lastCp was before the lastBoundary.
                 if (lastCp < lastBoundaryAddr)
@@ -5247,7 +5247,7 @@ unsigned emitter::emitEndCodeGen(Compiler* comp,
                     {
                         printf("...............................");
                     }
-                    printf(" %dB boundary ...............................\n", (emitComp->compJitAlignLoopBoundary));
+                    printf(" %dB boundary ...............................\n", (emitComp->opts.compJitAlignLoopBoundary));
                 }
             }
 #endif

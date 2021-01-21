@@ -1777,7 +1777,7 @@ void LinearScan::identifyCandidates()
 
             if (varDsc->lvLiveInOutOfHndlr)
             {
-                newInt->isWriteThru = true;
+                newInt->isWriteThru = varDsc->lvSingleDef;
                 setIntervalAsSpilled(newInt);
             }
 

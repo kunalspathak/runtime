@@ -887,6 +887,17 @@ void LinearScan::setBlockSequence()
             }
         }
 
+#if defined(FEATURE_EH_FUNCLETS) && defined(TARGET_ARM)
+        // For ARM, if this block is BBCallAlwaysPairTail, then it won't have any preds
+        // since we use "lr" mechanism to jump to the block that is executed after try block is done.
+        // In such case, mark that we do not want to insert resolution moves in it.
+        /*if (block->bbPreds == nullptr && block->isBBCallAlwaysPairTail())
+        {
+            blockInfo[block->bbNum].hasEHBoundaryIn  = true;
+            blockInfo[block->bbNum].hasEHBoundaryOut = true;
+        }*/
+#endif
+
         // Determine which block to schedule next.
 
         // First, update the NORMAL successors of the current block, adding them to the worklist
@@ -8583,7 +8594,6 @@ void LinearScan::resolveEdges()
         }
 
         unsigned    succCount       = block->NumSucc(compiler);
-        flowList*   preds           = block->bbPreds;
         BasicBlock* uniquePredBlock = block->GetUniquePred(compiler);
 
         // First, if this block has a single predecessor,
@@ -8800,6 +8810,11 @@ void LinearScan::resolveEdge(BasicBlock*      fromBlock,
             unreached();
             break;
     }
+
+#if defined(FEATURE_EH_FUNCLETS) && defined(TARGET_ARM)
+    // We should never add resolution move inside BBCallAlwaysPairTail.
+    assert(!block->isBBCallAlwaysPairTail());
+#endif
 
 #ifndef TARGET_XARCH
     // We record tempregs for beginning and end of each block.

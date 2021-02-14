@@ -8223,10 +8223,8 @@ void LinearScan::addResolution(
         insertionPointString = "top";
     }
 
-#if defined(FEATURE_EH_FUNCLETS) && defined(TARGET_ARM)
     // We should never add resolution move inside BBCallAlwaysPairTail.
     assert(!block->isBBCallAlwaysPairTail());
-#endif // defined(FEATURE_EH_FUNCLETS) && defined(TARGET_ARM)
 
 #endif // DEBUG
 

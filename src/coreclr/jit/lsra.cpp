@@ -10790,7 +10790,7 @@ void LinearScan::verifyFinalAllocation()
         {
             // Free Registers.
             // We could use the freeRegisters() method, but we'd have to carefully manage the active intervals.
-            for (regNumber reg = REG_FIRST; reg < ACTUAL_REG_COUNT; reg = REG_NEXT(reg))
+            for (regNumber reg = REG_FIRST; reg < ACTUAL_REG_COUNT && regsToFree != RBM_NONE; reg = REG_NEXT(reg))
             {
                 regMaskTP regMask = genRegMask(reg);
                 if ((regsToFree & regMask) != RBM_NONE)
@@ -10926,7 +10926,9 @@ void LinearScan::verifyFinalAllocation()
 
             case RefTypeKill:
                 assert(regRecord != nullptr);
-                assert(regRecord->assignedInterval == nullptr);
+                assert(regRecord->assignedInterval == nullptr ||
+                       (regRecord->assignedInterval->isActive &&
+                        regRecord->assignedInterval->physReg != regRecord->regNum));
                 dumpLsraAllocationEvent(LSRA_EVENT_KEPT_ALLOCATION, nullptr, regRecord->regNum, currentBlock);
                 break;
             case RefTypeFixedReg:

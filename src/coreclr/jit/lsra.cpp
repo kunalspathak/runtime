@@ -10926,9 +10926,7 @@ void LinearScan::verifyFinalAllocation()
 
             case RefTypeKill:
                 assert(regRecord != nullptr);
-                assert(regRecord->assignedInterval == nullptr ||
-                       (regRecord->assignedInterval->isActive &&
-                        regRecord->assignedInterval->physReg != regRecord->regNum));
+                assert(regRecord->assignedInterval == nullptr);
                 dumpLsraAllocationEvent(LSRA_EVENT_KEPT_ALLOCATION, nullptr, regRecord->regNum, currentBlock);
                 break;
             case RefTypeFixedReg:
@@ -10971,6 +10969,7 @@ void LinearScan::verifyFinalAllocation()
                 else if (RefTypeIsDef(currentRefPosition->refType))
                 {
                     interval->isActive = true;
+
                     if (VERBOSE)
                     {
                         if (interval->isConstant && (currentRefPosition->treeNode != nullptr) &&
@@ -11042,11 +11041,17 @@ void LinearScan::verifyFinalAllocation()
                     }
                     else
                     {
-                        if (!currentRefPosition->copyReg)
+                        if (RefTypeIsDef(currentRefPosition->refType))
                         {
-                            interval->physReg     = regNum;
-                            interval->assignedReg = regRecord;
+                            // Interval was assigned to a different register.
+                            // Clear the assigned interval of current register.
+                            if (interval->physReg != REG_NA && interval->physReg != regNum)
+                            {
+                                interval->assignedReg->assignedInterval = nullptr; 
+                            }
                         }
+                        interval->physReg     = regNum;
+                        interval->assignedReg = regRecord;
                         regRecord->assignedInterval = interval;
                     }
                 }

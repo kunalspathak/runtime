@@ -7669,7 +7669,7 @@ void LinearScan::resolveRegisters()
             printf("Resolution Candidates: ");
             dumpConvertedVarSet(compiler, resolutionCandidateVars);
             printf("\n");
-            printf("Has %sCritical Edges\n\n", hasCriticalEdges ? "" : "No");
+            printf("Has %sCritical Edges\n\n", hasCriticalEdges ? "" : "No ");
 
             printf("Prior to Resolution\n");
             foreach_block(compiler, block)
@@ -8317,8 +8317,16 @@ void LinearScan::handleOutgoingCriticalEdges(BasicBlock* block)
     }
 
 #ifdef TARGET_ARM64
-    // Next, if this blocks ends with a JCMP, we have to make sure not to copy
-    // into the register that it uses or modify the local variable it must consume
+    // Next, if this blocks ends with a JCMP, we have to make sure:
+    // 1. Not to copy into the register that JCMP uses
+    //    e.g. JCMP w21, BRANCH
+    // 2. Not to copy into the source of JCMP's operand before it is consumed
+    //    e.g. Should not use w0 since it will contain wrong value after resolution
+    //          call METHOD
+    //          ; mov w0, w19  <-- should not resolve in w0 here.
+    //          mov w21, w0
+    //          JCMP w21, BRANCH
+    // 3. Modify the local variable it must consume
     LclVarDsc* jcmpLocalVarDsc = nullptr;
     if (block->bbJumpKind == BBJ_COND)
     {
@@ -8328,6 +8336,12 @@ void LinearScan::handleOutgoingCriticalEdges(BasicBlock* block)
         {
             GenTree* op1 = lastNode->gtGetOp1();
             switchRegs |= genRegMask(op1->GetRegNum());
+
+            if (op1->OperIs(GT_COPY))
+            {
+                GenTree* srcOp1 = op1->gtGetOp1();
+                switchRegs |= genRegMask(srcOp1->GetRegNum());
+            }
 
             if (op1->IsLocal())
             {
@@ -11046,11 +11060,11 @@ void LinearScan::verifyFinalAllocation()
                             // Clear the assigned interval of current register.
                             if (interval->physReg != REG_NA && interval->physReg != regNum)
                             {
-                                interval->assignedReg->assignedInterval = nullptr; 
+                                interval->assignedReg->assignedInterval = nullptr;
                             }
                         }
-                        interval->physReg     = regNum;
-                        interval->assignedReg = regRecord;
+                        interval->physReg           = regNum;
+                        interval->assignedReg       = regRecord;
                         regRecord->assignedInterval = interval;
                     }
                 }

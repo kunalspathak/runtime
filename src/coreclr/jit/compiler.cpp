@@ -6978,6 +6978,7 @@ int jitNativeCode(CORINFO_METHOD_HANDLE methodHnd,
                   CORINFO_METHOD_INFO*  methodInfo,
                   void**                methodCodePtr,
                   uint32_t*             methodCodeSize,
+                  double*               perfScore,
                   JitFlags*             compileFlags,
                   void*                 inlineInfoPtr)
 {
@@ -7024,6 +7025,7 @@ START:
         uint32_t*             methodCodeSize;
         JitFlags*             compileFlags;
         InlineInfo*           inlineInfo;
+        double                perfScore;
 #if MEASURE_CLRAPI_CALLS
         WrapICorJitInfo* wrapCLR;
 #endif
@@ -7041,6 +7043,7 @@ START:
     param.methodCodeSize     = methodCodeSize;
     param.compileFlags       = compileFlags;
     param.inlineInfo         = inlineInfo;
+    param.perfScore          = 0.0;
 #if MEASURE_CLRAPI_CALLS
     param.wrapCLR = nullptr;
 #endif
@@ -7096,6 +7099,7 @@ START:
             // Now generate the code
             pParam->result = pParam->pComp->compCompile(pParam->classPtr, pParam->methodCodePtr, pParam->methodCodeSize,
                                                         pParam->compileFlags);
+            pParam->perfScore     = pParam->pComp->info.compPerfScore;
         }
         finallyErrorTrap()
         {
@@ -7135,6 +7139,11 @@ START:
     endErrorTrap()
 
         result = param.result;
+
+    if (perfScore != nullptr)
+    {
+        *perfScore = param.perfScore;
+    }
 
     if (!inlineInfo &&
         (result == CORJIT_INTERNALERROR || result == CORJIT_RECOVERABLEERROR || result == CORJIT_IMPLLIMITATION) &&

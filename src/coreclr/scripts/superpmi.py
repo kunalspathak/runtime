@@ -22,6 +22,7 @@ import datetime
 import locale
 import logging
 import os
+import math
 import multiprocessing
 import platform
 import shutil
@@ -355,7 +356,10 @@ merge_mch_parser.add_argument("-pattern", required=True, help=merge_mch_pattern_
 
 perfScore = 0.0
 perfScoreDiff = 0.0
-perfScorePattern = re.compile('.*PerfScore (\d+.\d+), PerfScore2 (\d+.\d+).*')
+relPerfScore = 0.0
+lPerfScore = 0.0
+totalMethods = 0
+perfScorePattern = re.compile('.*Jitted (\d+).*PerfScore (\d+.\d+) PerfScore2 (\d+.\d+) RelPerfScore (-?\d+.\d+) LPerfScore (-?((\d+.\d+)|inf))')
 
 ################################################################################
 # Helper functions
@@ -680,14 +684,22 @@ def run_and_log(command, log_level=logging.DEBUG):
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     stdout_output, _ = proc.communicate()
     for line in stdout_output.decode('utf-8', errors='replace').splitlines():  # There won't be any stderr output since it was piped to stdout
-        if "PerfScore " in line:
+        if "LPerfScore" in line:
             match_pair = perfScorePattern.match(line)
-            global perfScore, perfScoreDiff
-            this_perfScore = float(match_pair.group(1))
-            this_perfScore2 =  float(match_pair.group(2))
+            if match_pair is None:
+                print("This is the one: {}".format(line))
+            global perfScore, perfScoreDiff, relPerfScore, lPerfScore, totalMethods
+            this_methodCount = float(match_pair.group(1))
+            this_perfScore = float(match_pair.group(2))
+            this_perfScore2 =  float(match_pair.group(3))
+            this_relPerfScore =  float(match_pair.group(4))
+            this_lPerfScore =  float(match_pair.group(5))
 
+            totalMethods += this_methodCount
             perfScore += this_perfScore
             perfScoreDiff += (this_perfScore2 - this_perfScore)
+            relPerfScore += this_relPerfScore
+            lPerfScore += this_lPerfScore
         logging.log(log_level, line)
     return proc.returncode
 
@@ -2069,7 +2081,8 @@ class SuperPMIReplayAsmDiffs:
             ################################################################################################ end of for mch_file in self.mch_files
 
         logging.info("Asm diffs summary:")
-        logging.info("PerfScore diff: {}".format(perfScoreDiff))
+        geoMean = math.exp(1/totalMethods * lPerfScore)
+        logging.info("Diff: {}, Rel: {}, Geo: {}".format(perfScoreDiff, relPerfScore, geoMean))
         logging.info("")
 
         if len(files_with_replay_failures) != 0:

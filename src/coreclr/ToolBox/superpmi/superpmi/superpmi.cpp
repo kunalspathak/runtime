@@ -26,7 +26,7 @@ extern int doParallelSuperPMI(CommandLine::Options& o);
 // to parse the string fully.
 const char* const g_AllFormatStringFixedPrefix  = "Loaded ";
 const char* const g_SummaryFormatString         = "Loaded %d  Jitted %d  FailedCompile %d Excluded %d Missing %d PerfScore %f";
-const char* const g_AsmDiffsSummaryFormatString = "Loaded %d  Jitted %d  FailedCompile %d Excluded %d Missing %d Diffs %d, PerfScore %f, PerfScore2 %f";
+const char* const g_AsmDiffsSummaryFormatString = "Loaded %d  Jitted %d  FailedCompile %d Excluded %d Missing %d Diffs %d PerfScore %lf PerfScore2 %lf RelPerfScore %lf LPerfScore %lf";
 
 //#define SuperPMI_ChewMemory 0x7FFFFFFF //Amount of address space to consume on startup
 
@@ -249,7 +249,10 @@ int __cdecl main(int argc, char* argv[])
     int index             = 0;
     int excludedCount     = 0;
     double totalPerfScore    = 0;
-    double totalPerfScore2    = 0;
+    double totalPerfScore2   = 0;
+    double relPerfScore      = 0;
+    double lPerfScore        = 0;
+    double geoMeanPerfScore  = 0;
 
     st1.Start();
     NearDiffer nearDiffer(o.targetArchitecture, o.useCoreDisTools);
@@ -357,11 +360,11 @@ int __cdecl main(int argc, char* argv[])
         }
 
         jittedCount++;
-        double perfScore = 0.0;
+        double perfScore1 = 0.0;
         st3.Start();
-        res = jit->CompileMethod(mc, reader->GetMethodContextIndex(), collectThroughput, &perfScore);
+        res = jit->CompileMethod(mc, reader->GetMethodContextIndex(), collectThroughput, &perfScore1);
         st3.Stop();
-        totalPerfScore += perfScore;
+        totalPerfScore += perfScore1;
         LogDebug("Method %d compiled in %fms, result %d", reader->GetMethodContextIndex(), st3.GetMilliseconds(), res);
 
         if ((res == JitInstance::RESULT_SUCCESS) && Logger::IsLogLevelEnabled(LOGLEVEL_DEBUG))
@@ -377,11 +380,13 @@ int __cdecl main(int argc, char* argv[])
             crl    = mc->cr;
             mc->cr = new CompileResult();
 
-            perfScore = 0.0;
+            double perfScore2 = 0.0;
             st4.Start();
-            res2 = jit2->CompileMethod(mc, reader->GetMethodContextIndex(), collectThroughput, &perfScore);
+            res2 = jit2->CompileMethod(mc, reader->GetMethodContextIndex(), collectThroughput, &perfScore2);
             st4.Stop();
-            totalPerfScore2 += perfScore;
+            totalPerfScore2 += perfScore2;
+            relPerfScore += ((perfScore2 - perfScore1) / perfScore1);
+            lPerfScore += log(perfScore2 / perfScore1);
             LogDebug("Method %d compiled by JIT2 in %fms, result %d", reader->GetMethodContextIndex(),
                      st4.GetMilliseconds(), res2);
 
@@ -595,11 +600,11 @@ int __cdecl main(int argc, char* argv[])
     if (o.applyDiff)
     {
         LogInfo(g_AsmDiffsSummaryFormatString, loadedCount, jittedCount, failToReplayCount, excludedCount, missingCount,
-                jittedCount - failToReplayCount - matchCount, totalPerfScore, totalPerfScore2);
+                jittedCount - failToReplayCount - matchCount, totalPerfScore, totalPerfScore2, relPerfScore, lPerfScore);
 
         LogIssue(ISSUE_ASM_DIFF, g_AsmDiffsSummaryFormatString, loadedCount, jittedCount, failToReplayCount,
                  excludedCount, missingCount,
-                jittedCount - failToReplayCount - matchCount, totalPerfScore, totalPerfScore2);
+                jittedCount - failToReplayCount - matchCount, totalPerfScore, totalPerfScore2, relPerfScore, lPerfScore);
     }
     else
     {

@@ -10412,59 +10412,59 @@ GenTree* Compiler::fgMorphPromoteLocalInitBlock(GenTreeLclVar* destLclNode, GenT
             }
         }
     }
-#ifdef TARGET_64BIT
-    else
-    {
-        for (unsigned i = 0; i < destLclVar->lvFieldCnt; ++i)
-        {
-            unsigned   fieldLclNum = destLclVar->lvFieldLclStart + i;
-            LclVarDsc* fieldDesc   = lvaGetDesc(fieldLclNum);
-            GenTree*   dest        = gtNewLclvNode(fieldLclNum, fieldDesc->TypeGet());
-
-            if (!varTypeIsIntegral(fieldDesc->TypeGet()))
-            {
-                allIntegerFields = false;
-                break;
-            }
-
-            if (fieldDesc->TypeGet() == TYP_LONG)
-            {
-                biggestSize = TYP_LONG;
-            }
-
-        }
-
-        if (allIntegerFields)
-        {
-
-            unsigned lclNum = lvaGrabTemp(true, "zero init");
-            commonSrc       = gtNewTempAssign(lclNum, (biggestSize == TYP_INT) ? gtNewIconNode(0) : gtNewLconNode(0));
-            tree            = commonSrc;
-
-
-            for (unsigned i = 0; i < destLclVar->lvFieldCnt; ++i)
-            {
-                unsigned   fieldLclNum = destLclVar->lvFieldLclStart + i;
-                LclVarDsc* fieldDesc   = lvaGetDesc(fieldLclNum);
-                GenTree*   dest        = gtNewLclvNode(fieldLclNum, fieldDesc->TypeGet());
-
-                GenTree* zeroTmpLcl = gtNewLclvNode(lclNum, biggestSize);
-
-                GenTree* asg = gtNewAssignNode(dest, zeroTmpLcl);
-//#if LOCAL_ASSERTION_PROP
-//                if (optLocalAssertionProp)
-//                {
-//                    optAssertionGen(asg);
-//                }
-//#endif // LOCAL_ASSERTION_PROP
-
-                tree = gtNewOperNode(GT_COMMA, TYP_VOID, tree, asg);
-            }
-        }
-
-        return tree;
-    }
-#endif
+//#ifdef TARGET_64BIT
+//    else
+//    {
+//        for (unsigned i = 0; i < destLclVar->lvFieldCnt; ++i)
+//        {
+//            unsigned   fieldLclNum = destLclVar->lvFieldLclStart + i;
+//            LclVarDsc* fieldDesc   = lvaGetDesc(fieldLclNum);
+//            GenTree*   dest        = gtNewLclvNode(fieldLclNum, fieldDesc->TypeGet());
+//
+//            if (!varTypeIsIntegral(fieldDesc->TypeGet()))
+//            {
+//                allIntegerFields = false;
+//                break;
+//            }
+//
+//            if (fieldDesc->TypeGet() == TYP_LONG)
+//            {
+//                biggestSize = TYP_LONG;
+//            }
+//
+//        }
+//
+//        if (allIntegerFields)
+//        {
+//
+//            unsigned lclNum = lvaGrabTemp(true, "zero init");
+//            commonSrc       = gtNewTempAssign(lclNum, (biggestSize == TYP_INT) ? gtNewIconNode(0) : gtNewLconNode(0));
+//            tree            = commonSrc;
+//
+//
+//            for (unsigned i = 0; i < destLclVar->lvFieldCnt; ++i)
+//            {
+//                unsigned   fieldLclNum = destLclVar->lvFieldLclStart + i;
+//                LclVarDsc* fieldDesc   = lvaGetDesc(fieldLclNum);
+//                GenTree*   dest        = gtNewLclvNode(fieldLclNum, fieldDesc->TypeGet());
+//
+//                GenTree* zeroTmpLcl = gtNewLclvNode(lclNum, biggestSize);
+//
+//                GenTree* asg = gtNewAssignNode(dest, zeroTmpLcl);
+////#if LOCAL_ASSERTION_PROP
+////                if (optLocalAssertionProp)
+////                {
+////                    optAssertionGen(asg);
+////                }
+////#endif // LOCAL_ASSERTION_PROP
+//
+//                tree = gtNewOperNode(GT_COMMA, TYP_VOID, tree, asg);
+//            }
+//        }
+//
+//        return tree;
+//    }
+//#endif
 
     JITDUMP(" using field by field initialization.\n");
 

@@ -7649,7 +7649,7 @@ inline unsigned int GenTree::GetRegSpillFlagByIdx(int regIndex) const
         // At this time, the only multi-reg HW intrinsics all return the type of their
         // arguments. If this changes, we will need a way to record or determine this.
         assert(TypeGet() == TYP_STRUCT);
-        return gtGetOp1()->GetRegSpillFlagByIdx(regIndex);
+        return gtGetOp1()->TypeGet();
     }
 #endif
     if (OperIs(GT_LCL_VAR, GT_STORE_LCL_VAR))

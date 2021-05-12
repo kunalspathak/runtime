@@ -3175,7 +3175,7 @@ int LinearScan::BuildBinaryUses(GenTreeOp* node, regMaskTP candidates)
 // Notes:
 //    This takes an index to enable building multiple defs for a multi-reg local.
 //
-void LinearScan::BuildStoreLocDef(GenTreeLclVarCommon* storeLoc,
+RefPosition* LinearScan::BuildStoreLocDef(GenTreeLclVarCommon* storeLoc,
                                   LclVarDsc*           varDsc,
                                   RefPosition*         singleUseRef,
                                   int                  index)
@@ -3236,6 +3236,7 @@ void LinearScan::BuildStoreLocDef(GenTreeLclVarCommon* storeLoc,
         varDefInterval->isPartiallySpilled = false;
     }
 #endif // FEATURE_PARTIAL_SIMD_CALLEE_SAVE
+    return def;
 }
 
 //------------------------------------------------------------------------
@@ -3434,7 +3435,11 @@ int LinearScan::BuildStoreLoc(GenTreeLclVarCommon* storeLoc)
     // Add the lclVar to currentLiveVars (if it will remain live)
     if (isCandidateVar(varDsc))
     {
-        BuildStoreLocDef(storeLoc, varDsc, singleUseRef, 0);
+        RefPosition* storeDef = BuildStoreLocDef(storeLoc, varDsc, singleUseRef, 0);
+        if (varTypeIsIntegral(storeLoc) && op1->IsCnsIntOrI())
+        {
+            storeDef->isConstStore = true;
+        }
     }
 
     return srcCount;

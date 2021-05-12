@@ -1771,7 +1771,7 @@ private:
     int BuildBlockStore(GenTreeBlk* blkNode);
     int BuildModDiv(GenTree* tree);
     int BuildIntrinsic(GenTree* tree);
-    void BuildStoreLocDef(GenTreeLclVarCommon* storeLoc, LclVarDsc* varDsc, RefPosition* singleUseRef, int index);
+    RefPosition* BuildStoreLocDef(GenTreeLclVarCommon* storeLoc, LclVarDsc* varDsc, RefPosition* singleUseRef, int index);
     int BuildMultiRegStoreLoc(GenTreeLclVar* storeLoc);
     int BuildStoreLoc(GenTreeLclVarCommon* tree);
     int BuildIndir(GenTreeIndir* indirTree);
@@ -2196,6 +2196,8 @@ public:
     // register currently assigned to the Interval.  This happens when we use the assigned
     // register from a predecessor that is not the most recently allocated BasicBlock.
     unsigned char outOfOrder : 1;
+
+    unsigned char isConstStore: 1;
 
 #ifdef DEBUG
     // Minimum number registers that needs to be ensured while

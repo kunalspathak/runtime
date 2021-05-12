@@ -6396,13 +6396,16 @@ void LinearScan::updateAssignedInterval(RegRecord* reg, Interval* interval, Regi
         }
         else
         {
-            if ((compiler->info.compMethodHashPrivate != 275859626) || (interval->intervalIndex == 0))
+            if (compiler->info.compMethodHashPrivate == 275859626)
             {
-                clearConstantReg(reg->regNum, interval->registerType);
+                if (!interval->recentRefPosition->isConstStore)
+                {
+                    clearConstantReg(reg->regNum, interval->registerType);
+                }
             }
             else
             {
-                printf("skip");
+                clearConstantReg(reg->regNum, interval->registerType);
             }
         }
         updateNextIntervalRef(reg->regNum, interval);

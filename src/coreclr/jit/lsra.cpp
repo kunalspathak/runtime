@@ -5443,7 +5443,7 @@ void LinearScan::allocateRegisters()
                             {
                                 continue;
                             }
-                            assert(assignedInterval->isConstant == isRegConstant(reg, assignedInterval->registerType));
+                            //assert(assignedInterval->isConstant == isRegConstant(reg, assignedInterval->registerType));
                             if (assignedInterval->isActive)
                             {
                                 // If this is not the register most recently allocated, it must be from a copyReg,
@@ -6396,7 +6396,14 @@ void LinearScan::updateAssignedInterval(RegRecord* reg, Interval* interval, Regi
         }
         else
         {
-            clearConstantReg(reg->regNum, interval->registerType);
+            if ((compiler->info.compMethodHashPrivate != 275859626) || (interval->intervalIndex == 0))
+            {
+                clearConstantReg(reg->regNum, interval->registerType);
+            }
+            else
+            {
+                printf("skip");
+            }
         }
         updateNextIntervalRef(reg->regNum, interval);
         updateSpillCost(reg->regNum, interval);

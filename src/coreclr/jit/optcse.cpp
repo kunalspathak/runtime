@@ -2671,6 +2671,12 @@ public:
         }
 #endif // DEBUG
 
+        if ((m_pCompiler->info.compMethodHash() == 0x41553cd4) && candidate->CseIndex() == 1)
+        {
+            assert(yes_cse_cost > no_cse_cost);
+            return true;
+        }
+
         // Should we make this candidate into a CSE?
         // Is the yes cost less than the no cost
         //

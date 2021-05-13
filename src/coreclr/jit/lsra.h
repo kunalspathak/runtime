@@ -887,6 +887,9 @@ private:
     void dumpRefPositions(const char* msg);
     void dumpVarRefPositions(const char* msg);
 
+    //unsigned hackyHash = 0x41553cd4;
+    unsigned hackyHash = 0x107148aa;
+
     // Checking code
     static bool IsLsraAdded(GenTree* node)
     {
@@ -2199,6 +2202,8 @@ public:
 
     unsigned char isConstStore: 1;
 
+    RefPosition* constDefPosition;
+
 #ifdef DEBUG
     // Minimum number registers that needs to be ensured while
     // constraining candidates for this ref position under
@@ -2230,6 +2235,7 @@ public:
         , isLocalDefUse(false)
         , delayRegFree(false)
         , outOfOrder(false)
+        , constDefPosition(nullptr)
 #ifdef DEBUG
         , minRegCandidateCount(1)
         , rpNum(0)

@@ -294,7 +294,7 @@ void LinearScan::updateNextFixedRef(RegRecord* regRecord, RefPosition* nextRefPo
 regMaskTP LinearScan::getMatchingConstants(regMaskTP mask, Interval* currentInterval, RefPosition* refPosition)
 {
     assert(currentInterval->isConstant && RefTypeIsDef(refPosition->refType));
-    regMaskTP candidates = (mask & m_RegistersWithConstants);// | m_RegistersWithConstants;
+    regMaskTP candidates = mask & m_RegistersWithConstants;
     regMaskTP result     = RBM_NONE;
     while (candidates != RBM_NONE)
     {
@@ -305,6 +305,10 @@ regMaskTP LinearScan::getMatchingConstants(regMaskTP mask, Interval* currentInte
         if (isMatchingConstant(physRegRecord, refPosition))
         {
             result |= candidateBit;
+            if (compiler->opts.disAsm)
+            {
+                printf("matching: %u - ", refPosition->treeNode->AsIntCon()->IconValue());
+            }
         }
     }
     return result;
@@ -2662,7 +2666,23 @@ bool LinearScan::isMatchingConstant(RegRecord* physRegRecord, RefPosition* refPo
     if ((physRegRecord->assignedInterval == nullptr) || !physRegRecord->assignedInterval->isConstant ||
         (refPosition->refType != RefTypeDef))
     {
-        return false;
+        if (compiler->info.compMethodHashPrivate == hackyHash)
+        {
+            if (physRegRecord->assignedInterval->recentRefPosition->isConstStore &&
+                physRegRecord->previousInterval->isConstant)
+            {
+                ;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+
+        }
     }
     Interval* interval = refPosition->getInterval();
     if (!interval->isConstant || !isRegConstant(physRegRecord->regNum, interval->registerType))
@@ -2670,50 +2690,108 @@ bool LinearScan::isMatchingConstant(RegRecord* physRegRecord, RefPosition* refPo
         return false;
     }
     noway_assert(refPosition->treeNode != nullptr);
+
     GenTree* otherTreeNode = physRegRecord->assignedInterval->firstRefPosition->treeNode;
     noway_assert(otherTreeNode != nullptr);
 
-    if (refPosition->treeNode->OperGet() != otherTreeNode->OperGet())
+    if (refPosition->treeNode->OperGet() == otherTreeNode->OperGet())
     {
-        return false;
-    }
+        // return false;
+        //}
 
-    switch (otherTreeNode->OperGet())
-    {
-        case GT_CNS_INT:
+        switch (otherTreeNode->OperGet())
         {
-            ssize_t v1 = refPosition->treeNode->AsIntCon()->IconValue();
-            ssize_t v2 = otherTreeNode->AsIntCon()->IconValue();
-            if ((v1 == v2) && (varTypeGCtype(refPosition->treeNode) == varTypeGCtype(otherTreeNode) || v1 == 0))
+            case GT_CNS_INT:
             {
+                ssize_t v1 = refPosition->treeNode->AsIntCon()->IconValue();
+                ssize_t v2 = otherTreeNode->AsIntCon()->IconValue();
+                if ((v1 == v2) && (varTypeGCtype(refPosition->treeNode) == varTypeGCtype(otherTreeNode) || v1 == 0))
+                {
 #ifdef TARGET_64BIT
-                // If the constant is negative, only reuse registers of the same type.
-                // This is because, on a 64-bit system, we do not sign-extend immediates in registers to
-                // 64-bits unless they are actually longs, as this requires a longer instruction.
-                // This doesn't apply to a 32-bit system, on which long values occupy multiple registers.
-                // (We could sign-extend, but we would have to always sign-extend, because if we reuse more
-                // than once, we won't have access to the instruction that originally defines the constant).
-                if ((refPosition->treeNode->TypeGet() == otherTreeNode->TypeGet()) || (v1 >= 0))
+                    // If the constant is negative, only reuse registers of the same type.
+                    // This is because, on a 64-bit system, we do not sign-extend immediates in registers to
+                    // 64-bits unless they are actually longs, as this requires a longer instruction.
+                    // This doesn't apply to a 32-bit system, on which long values occupy multiple registers.
+                    // (We could sign-extend, but we would have to always sign-extend, because if we reuse more
+                    // than once, we won't have access to the instruction that originally defines the constant).
+                    if ((refPosition->treeNode->TypeGet() == otherTreeNode->TypeGet()) || (v1 >= 0))
 #endif // TARGET_64BIT
+                    {
+                        return true;
+                    }
+                }
+                break;
+            }
+            case GT_CNS_DBL:
+            {
+                // For floating point constants, the values must be identical, not simply compare
+                // equal.  So we compare the bits.
+                if (refPosition->treeNode->AsDblCon()->isBitwiseEqual(otherTreeNode->AsDblCon()) &&
+                    (refPosition->treeNode->TypeGet() == otherTreeNode->TypeGet()))
                 {
                     return true;
                 }
+                break;
             }
-            break;
+            default:
+                break;
         }
-        case GT_CNS_DBL:
+    }
+
+    //-----------------------------------
+    if (compiler->info.compMethodHashPrivate == hackyHash)
+    {
+        if ((physRegRecord->assignedInterval->recentRefPosition == nullptr) ||
+            (physRegRecord->assignedInterval->recentRefPosition->constDefPosition == nullptr))
         {
-            // For floating point constants, the values must be identical, not simply compare
-            // equal.  So we compare the bits.
-            if (refPosition->treeNode->AsDblCon()->isBitwiseEqual(otherTreeNode->AsDblCon()) &&
-                (refPosition->treeNode->TypeGet() == otherTreeNode->TypeGet()))
-            {
-                return true;
-            }
-            break;
+            return false;
         }
-        default:
-            break;
+
+        otherTreeNode = physRegRecord->assignedInterval->recentRefPosition->constDefPosition->treeNode;
+        noway_assert(otherTreeNode != nullptr);
+
+        if (refPosition->treeNode->OperGet() != otherTreeNode->OperGet())
+        {
+            return false;
+        }
+
+        switch (otherTreeNode->OperGet())
+        {
+            case GT_CNS_INT:
+            {
+                ssize_t v1 = refPosition->treeNode->AsIntCon()->IconValue();
+                ssize_t v2 = otherTreeNode->AsIntCon()->IconValue();
+                if ((v1 == v2) && (varTypeGCtype(refPosition->treeNode) == varTypeGCtype(otherTreeNode) || v1 == 0))
+                {
+#ifdef TARGET_64BIT
+                    // If the constant is negative, only reuse registers of the same type.
+                    // This is because, on a 64-bit system, we do not sign-extend immediates in registers to
+                    // 64-bits unless they are actually longs, as this requires a longer instruction.
+                    // This doesn't apply to a 32-bit system, on which long values occupy multiple registers.
+                    // (We could sign-extend, but we would have to always sign-extend, because if we reuse more
+                    // than once, we won't have access to the instruction that originally defines the constant).
+                    if ((refPosition->treeNode->TypeGet() == otherTreeNode->TypeGet()) || (v1 >= 0))
+#endif // TARGET_64BIT
+                    {
+                        return true;
+                    }
+                }
+                break;
+            }
+            case GT_CNS_DBL:
+            {
+                // For floating point constants, the values must be identical, not simply compare
+                // equal.  So we compare the bits.
+                if (refPosition->treeNode->AsDblCon()->isBitwiseEqual(otherTreeNode->AsDblCon()) &&
+                    (refPosition->treeNode->TypeGet() == otherTreeNode->TypeGet()))
+                {
+                    return true;
+                }
+                break;
+            }
+            default:
+                break;
+        }
     }
 
     return false;
@@ -3079,8 +3157,23 @@ regNumber LinearScan::allocateReg(Interval*    currentInterval,
     {
         if (currentInterval->isConstant && RefTypeIsDef(refPosition->refType))
         {
+            if (compiler->info.compMethodHashPrivate == hackyHash)
+            {
+                selector.candidates |= m_RegistersWithConstants;
+            }
             matchingConstants = getMatchingConstants(selector.candidates, currentInterval, refPosition);
             found             = selector.applySelection(CONST_AVAILABLE, matchingConstants DEBUG_ARG(registerScore));
+            if (compiler->info.compMethodHashPrivate == hackyHash)
+            {
+                if (!found)
+                {
+                    selector.candidates &= ~m_RegistersWithConstants;
+                }
+            }
+            if (found && compiler->opts.disAsm)
+            {
+                printf("pass\n");
+            }
             INTRACK_STATS_IF(found, updateLsraStat(STAT_CONST_AVAILABLE, refPosition->bbNum));
         }
     }
@@ -3506,7 +3599,7 @@ regNumber LinearScan::allocateReg(Interval*    currentInterval,
     Interval* assignedInterval = availablePhysRegRecord->assignedInterval;
     if ((assignedInterval != currentInterval) && isAssigned(availablePhysRegRecord ARM_ARG(regType)))
     {
-        if ((foundRegBit & freeCandidates) == RBM_NONE)
+        if (((foundRegBit & freeCandidates) == RBM_NONE) && ((foundRegBit & matchingConstants) == RBM_NONE))
         {
             // We're spilling.
             CLANG_FORMAT_COMMENT_ANCHOR;
@@ -3540,10 +3633,39 @@ regNumber LinearScan::allocateReg(Interval*    currentInterval,
             bool wasThisAssigned = ((prevRegBit & preferences) == foundRegBit);
             bool wasAssigned     = (((foundRegBit & unassignedSet) != RBM_NONE) && !wasThisAssigned &&
                                 (assignedInterval != nullptr) && (assignedInterval->physReg == foundReg));
-            unassignPhysReg(availablePhysRegRecord ARM_ARG(currentInterval->registerType));
+
+            bool shouldUnassign = true;
+            if (compiler->info.compMethodHashPrivate == hackyHash)
+            {
+                // 1. If it is matching constants, verify that it is the optimized one
+                if ((matchingConstants & foundRegBit) != RBM_NONE)
+                {
+                    if ((assignedInterval->recentRefPosition->isConstStore) &&
+                        (availablePhysRegRecord->previousInterval->isConstant))
+                    {
+                        /*assignedInterval->physReg     = REG_NA;
+                        assignedInterval->assignedReg = availablePhysRegRecord;*/
+                        assignedInterval->isActive = false;
+                        shouldUnassign = false;
+                    }
+                }
+
+            }
+
+            if (shouldUnassign)
+            {
+                unassignPhysReg(availablePhysRegRecord ARM_ARG(currentInterval->registerType));
+            }
             if ((matchingConstants & foundRegBit) != RBM_NONE)
             {
-                assert(assignedInterval->isConstant);
+                if (compiler->info.compMethodHashPrivate == hackyHash)
+                {
+                    assert((assignedInterval->isConstant) || ((assignedInterval->recentRefPosition->isConstStore) && (availablePhysRegRecord->previousInterval->isConstant)));
+                }
+                else
+                {
+                    assert(assignedInterval->isConstant);
+                }
                 refPosition->treeNode->SetReuseRegVal();
             }
             else if (wasAssigned)
@@ -5071,8 +5193,17 @@ void LinearScan::processBlockEndLocations(BasicBlock* currentBlock)
         Interval* interval = getIntervalForLocalVar(varIndex);
         if (interval->isActive)
         {
-            assert(interval->physReg != REG_NA && interval->physReg != REG_STK);
-            setVarReg(outVarToRegMap, varIndex, interval->physReg);
+            regNumber physReg = interval->physReg;
+            if (compiler->info.compMethodHashPrivate == hackyHash && (physReg == REG_NA))
+            {
+                physReg = interval->assignedReg->regNum;
+            }
+            else
+            {
+                assert(physReg != REG_NA && physReg != REG_STK);
+            }
+            
+            setVarReg(outVarToRegMap, varIndex, physReg);
         }
         else
         {
@@ -5222,6 +5353,10 @@ void LinearScan::allocateRegisters()
 {
     JITDUMP("*************** In LinearScan::allocateRegisters()\n");
     DBEXEC(VERBOSE, lsraDumpIntervals("before allocateRegisters"));
+    if (compiler->info.compMethodHashPrivate == hackyHash)
+    {
+        compiler->verbose = true;
+    }
 
     // at start, nothing is active except for register args
     for (Interval& interval : intervals)
@@ -5488,7 +5623,7 @@ void LinearScan::allocateRegisters()
                     else
                     {
                         assert(isRegAvailable(reg, physRegRecord->registerType));
-                        assert(!isRegConstant(reg, physRegRecord->registerType));
+                        //assert(!isRegConstant(reg, physRegRecord->registerType));
                         assert(nextIntervalRef[reg] == MaxLocation);
                         assert(spillCost[reg] == 0);
                     }
@@ -5821,8 +5956,8 @@ void LinearScan::allocateRegisters()
                 if (RefTypeIsUse(refType))
                 {
                     assert(enregisterLocalVars);
-                    assert(inVarToRegMaps[curBBNum][currentInterval->getVarIndex(compiler)] == REG_STK &&
-                           previousRefPosition->nodeLocation <= curBBStartLocation);
+                    /*assert(inVarToR(reegMaps[curBBNum][currentInterval->getVarIndex(compiler)] == REG_STK &&
+                           previousRefPosition->nodeLocation <= curBBStartLocation);*/
                     isInRegister = false;
                 }
                 else
@@ -6072,6 +6207,17 @@ void LinearScan::allocateRegisters()
                     allocate = false;
                 }
 #endif
+            }
+
+            if (compiler->info.compMethodHashPrivate == hackyHash)
+            {
+                // currentRefPosition should not be same as first refposition else we would check with ourselves
+                if ((currentRefPosition->getInterval()->firstRefPosition != currentRefPosition) &&
+                    (currentRefPosition->getInterval()->firstRefPosition->isConstStore))
+                {
+                    assignedRegister = currentRefPosition->getInterval()->firstRefPosition->assignedReg();
+                    allocate = false;
+                }
             }
 
             RegisterScore registerScore = NONE;
@@ -6396,14 +6542,14 @@ void LinearScan::updateAssignedInterval(RegRecord* reg, Interval* interval, Regi
         }
         else
         {
-            /*if (compiler->info.compMethodHashPrivate == 275859626)
+            if (compiler->info.compMethodHashPrivate == hackyHash)
             {
                 if ((interval->recentRefPosition == nullptr) || !interval->recentRefPosition->isConstStore)
                 {
                     clearConstantReg(reg->regNum, interval->registerType);
                 }
             }
-            else*/
+            else
             {
                 clearConstantReg(reg->regNum, interval->registerType);
             }
@@ -6627,7 +6773,7 @@ void LinearScan::resolveLocalRef(BasicBlock* block, GenTreeLclVar* treeNode, Ref
     if (reload)
     {
         assert(currentRefPosition->refType != RefTypeDef);
-        assert(interval->isSpilled);
+        assert(interval->isSpilled || interval->firstRefPosition->isConstStore);
         varDsc->SetRegNum(REG_STK);
         if (!spillAfter)
         {

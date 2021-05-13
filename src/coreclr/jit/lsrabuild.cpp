@@ -2055,10 +2055,10 @@ void LinearScan::buildIntervals()
 
     JITDUMP("\nbuildIntervals ========\n");
 
-    if (compiler->info.compMethodHashPrivate == 275859626)
+    /*if (compiler->info.compMethodHashPrivate == hackyHash)
     {
         compiler->verbose = true;
-    }
+    }*/
 
     // Build (empty) records for all of the physical registers
     buildPhysRegRecords();
@@ -3446,6 +3446,7 @@ int LinearScan::BuildStoreLoc(GenTreeLclVarCommon* storeLoc)
         if (varTypeIsIntegral(storeLoc) && op1->IsCnsIntOrI())
         {
             storeDef->isConstStore = true;
+            storeDef->constDefPosition = &tailRefPosition;
         }
     }
 

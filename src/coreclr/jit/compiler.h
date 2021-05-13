@@ -6599,7 +6599,7 @@ protected:
     //
     static const unsigned MAX_CSE_CNT = EXPSET_SZ;
 
-    static const int MIN_CSE_COST = 1;
+    static const int MIN_CSE_COST = 2;
 
     // BitVec trait information only used by the optCSE_canSwap() method, for the  CSE_defMask and CSE_useMask.
     // This BitVec uses one bit per CSE candidate

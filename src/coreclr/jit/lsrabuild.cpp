@@ -2055,6 +2055,11 @@ void LinearScan::buildIntervals()
 
     JITDUMP("\nbuildIntervals ========\n");
 
+    if (compiler->info.compMethodHashPrivate == 275859626)
+    {
+        compiler->verbose = true;
+    }
+
     // Build (empty) records for all of the physical registers
     buildPhysRegRecords();
 
@@ -3331,6 +3336,8 @@ int LinearScan::BuildStoreLoc(GenTreeLclVarCommon* storeLoc)
     int          srcCount;
     RefPosition* singleUseRef = nullptr;
     LclVarDsc*   varDsc       = compiler->lvaGetDesc(storeLoc->GetLclNum());
+
+    RefPosition& tailRefPosition = refPositions.back();
 
     if (storeLoc->IsMultiRegLclVar())
     {

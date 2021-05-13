@@ -294,7 +294,7 @@ void LinearScan::updateNextFixedRef(RegRecord* regRecord, RefPosition* nextRefPo
 regMaskTP LinearScan::getMatchingConstants(regMaskTP mask, Interval* currentInterval, RefPosition* refPosition)
 {
     assert(currentInterval->isConstant && RefTypeIsDef(refPosition->refType));
-    regMaskTP candidates = (mask & m_RegistersWithConstants);
+    regMaskTP candidates = (mask & m_RegistersWithConstants);// | m_RegistersWithConstants;
     regMaskTP result     = RBM_NONE;
     while (candidates != RBM_NONE)
     {
@@ -6396,14 +6396,14 @@ void LinearScan::updateAssignedInterval(RegRecord* reg, Interval* interval, Regi
         }
         else
         {
-            if (compiler->info.compMethodHashPrivate == 275859626)
+            /*if (compiler->info.compMethodHashPrivate == 275859626)
             {
-                if (!interval->recentRefPosition->isConstStore)
+                if ((interval->recentRefPosition == nullptr) || !interval->recentRefPosition->isConstStore)
                 {
                     clearConstantReg(reg->regNum, interval->registerType);
                 }
             }
-            else
+            else*/
             {
                 clearConstantReg(reg->regNum, interval->registerType);
             }

@@ -7087,7 +7087,9 @@ START:
             // Now generate the code
             pParam->result = pParam->pComp->compCompile(pParam->classPtr, pParam->methodCodePtr, pParam->methodCodeSize,
                                                         pParam->compileFlags);
+#ifdef DEBUG
             pParam->perfScore     = pParam->pComp->info.compPerfScore;
+#endif
         }
         finallyErrorTrap()
         {

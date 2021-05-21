@@ -314,10 +314,6 @@ void Logger::LogExceptionMessage(
 void IssueLogger::LogIssueHelper(
     const char* function, const char* file, int line, IssueType issue, const char* msg, ...)
 {
-    if (issue == ISSUE_ASM_DIFF)
-    {
-        return;
-    }
     std::string fullMsg;
 
     switch (issue)

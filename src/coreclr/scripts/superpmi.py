@@ -685,6 +685,7 @@ def run_and_log(command, log_level=logging.DEBUG):
     stdout_output, _ = proc.communicate()
     for line in stdout_output.decode('utf-8', errors='replace').splitlines():  # There won't be any stderr output since it was piped to stdout
         if "LPerfScore" in line:
+            print("LPerfScore: {}".format(line))
             match_pair = perfScorePattern.match(line)
             if match_pair is None:
                 print("This is the one: {}".format(line))
@@ -2081,6 +2082,10 @@ class SuperPMIReplayAsmDiffs:
             ################################################################################################ end of for mch_file in self.mch_files
 
         logging.info("Asm diffs summary:")
+        logging.info("totalMethods = {}".format(totalMethods))
+        logging.info("lPerfScore = {}".format(lPerfScore))
+        logging.info("perfScoreDiff = {}".format(perfScoreDiff))
+        logging.info("relPerfScore = {}".format(relPerfScore))
         geoMean = math.exp(1/totalMethods * lPerfScore)
         logging.info("Diff: {}, Rel: {}, Geo: {}".format(perfScoreDiff, relPerfScore, geoMean))
         logging.info("")
@@ -2090,12 +2095,12 @@ class SuperPMIReplayAsmDiffs:
             for file in files_with_replay_failures:
                 logging.info("    %s", file)
 
-        if len(files_with_asm_diffs) == 0:
-            logging.info("  No asm diffs")
-        else:
-            logging.info("  Asm diffs in %s MCH files:", len(files_with_asm_diffs))
-            for file in files_with_asm_diffs:
-                logging.info("    %s", file)
+        # if len(files_with_asm_diffs) == 0:
+        #     logging.info("  No asm diffs")
+        # else:
+        #     logging.info("  Asm diffs in %s MCH files:", len(files_with_asm_diffs))
+        #     for file in files_with_asm_diffs:
+        #         logging.info("    %s", file)
 
         return result
         ################################################################################################ end of replay_with_asm_diffs()

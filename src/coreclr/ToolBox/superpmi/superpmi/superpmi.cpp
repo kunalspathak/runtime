@@ -99,8 +99,8 @@ void InvokeNearDiffer(NearDiffer*           nearDiffer,
         }
         else
         {
-            LogIssue(ISSUE_ASM_DIFF, "main method %d of size %d differs", (*pParam->reader)->GetMethodContextIndex(),
-                     (*pParam->mc)->methodSize);
+            /*LogIssue(ISSUE_ASM_DIFF, "main method %d of size %d differs", (*pParam->reader)->GetMethodContextIndex(),
+                     (*pParam->mc)->methodSize);*/
 
             // This is a difference in ASM outputs from Jit1 & Jit2 and not a playback failure
             // We will add this MC to the diffMCList if one is requested

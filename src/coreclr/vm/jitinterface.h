@@ -73,7 +73,8 @@ void InitJITHelpers2();
 PCODE UnsafeJitFunction(PrepareCodeConfig* config,
                         COR_ILMETHOD_DECODER* header,
                         CORJIT_FLAGS flags,
-                        ULONG* sizeOfCode = NULL);
+                        ULONG* sizeOfCode = NULL,
+                        double* perfScore = NULL);
 #endif // CROSSGEN_COMPILE
 
 void getMethodInfoHelper(MethodDesc * ftn,

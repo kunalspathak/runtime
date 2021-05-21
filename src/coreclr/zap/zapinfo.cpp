@@ -505,6 +505,7 @@ void ZapInfo::CompileMethod()
 
     uint8_t *pCode;
     uint32_t cCode;
+    double perfScore;
     bool  doNormalCompile = true;
 
 #ifdef ALLOW_SXS_JIT_NGEN
@@ -524,7 +525,8 @@ void ZapInfo::CompileMethod()
                                                      &m_currentMethodInfo,
                                                      CORJIT_FLAGS::CORJIT_FLAG_CALL_GETJITFLAGS,
                                                      &pCode,
-                                                     &cCode);
+                                                     &cCode,
+                                                     &perfScore);
 
         // The above compileMethod call will typically return CORJIT_SKIPPED
         if (doNormalCompile && FAILED(res))
@@ -546,7 +548,8 @@ void ZapInfo::CompileMethod()
                                        &m_currentMethodInfo,
                                        CORJIT_FLAGS::CORJIT_FLAG_CALL_GETJITFLAGS,
                                        &pCode,
-                                       &cCode);
+                                       &cCode,
+                                       &perfScore);
         if (FAILED(res))
         {
             ThrowExceptionForJitResult(res);

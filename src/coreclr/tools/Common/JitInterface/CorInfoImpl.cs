@@ -96,7 +96,7 @@ namespace Internal.JitInterface
         [DllImport(JitSupportLibrary)]
         private extern static CorJitResult JitCompileMethod(out IntPtr exception,
             IntPtr jit, IntPtr thisHandle, IntPtr callbacks,
-            ref CORINFO_METHOD_INFO info, uint flags, out IntPtr nativeEntry, out uint codeSize);
+            ref CORINFO_METHOD_INFO info, uint flags, out IntPtr nativeEntry, out uint codeSize, out double perfScore);
 
         [DllImport(JitSupportLibrary)]
         private extern static uint GetMaxIntrinsicSIMDVectorLength(IntPtr jit, CORJIT_FLAGS* flags);
@@ -262,9 +262,10 @@ namespace Internal.JitInterface
             IntPtr exception;
             IntPtr nativeEntry;
             uint codeSize;
+            double perfScore;
             var result = JitCompileMethod(out exception,
                     _jit, (IntPtr)Unsafe.AsPointer(ref _this), _unmanagedCallbacks,
-                    ref methodInfo, (uint)CorJitFlag.CORJIT_FLAG_CALL_GETJITFLAGS, out nativeEntry, out codeSize);
+                    ref methodInfo, (uint)CorJitFlag.CORJIT_FLAG_CALL_GETJITFLAGS, out nativeEntry, out codeSize, out perfScore);
             if (exception != IntPtr.Zero)
             {
                 if (_lastException != null)

@@ -12486,7 +12486,8 @@ CorJitResult invokeCompileMethodHelper(EEJitManager *jitMgr,
                                  struct CORINFO_METHOD_INFO *info,
                                  CORJIT_FLAGS jitFlags,
                                  BYTE **nativeEntry,
-                                 uint32_t *nativeSizeOfCode)
+                                 uint32_t *nativeSizeOfCode,
+                                 double* perfScore)
 {
     STATIC_CONTRACT_THROWS;
     STATIC_CONTRACT_GC_TRIGGERS;
@@ -12513,7 +12514,8 @@ CorJitResult invokeCompileMethodHelper(EEJitManager *jitMgr,
                                                      info,
                                                      CORJIT_FLAGS::CORJIT_FLAG_CALL_GETJITFLAGS,
                                                      nativeEntry,
-                                                     nativeSizeOfCode);
+                                                     nativeSizeOfCode,
+                                                     perfScore);
 
 #ifdef FEATURE_STACK_SAMPLING
         if (jitFlags.IsSet(CORJIT_FLAGS::CORJIT_FLAG_SAMPLING_JIT_BACKGROUND))
@@ -12588,7 +12590,8 @@ CorJitResult invokeCompileMethodHelper(EEJitManager *jitMgr,
                                             info,
                                             CORJIT_FLAGS::CORJIT_FLAG_CALL_GETJITFLAGS,
                                             nativeEntry,
-                                            nativeSizeOfCode);
+                                            nativeSizeOfCode,
+                                            perfScore);
     }
 #endif // FEATURE_INTERPRETER
 
@@ -12636,7 +12639,8 @@ CorJitResult invokeCompileMethod(EEJitManager *jitMgr,
                                  struct CORINFO_METHOD_INFO *info,
                                  CORJIT_FLAGS jitFlags,
                                  BYTE **nativeEntry,
-                                 uint32_t *nativeSizeOfCode)
+                                 uint32_t *nativeSizeOfCode,
+                                 double* perfScore)
 {
     CONTRACTL {
         THROWS;
@@ -12649,7 +12653,7 @@ CorJitResult invokeCompileMethod(EEJitManager *jitMgr,
 
     GCX_PREEMP();
 
-    CorJitResult ret = invokeCompileMethodHelper(jitMgr, comp, info, jitFlags, nativeEntry, nativeSizeOfCode);
+    CorJitResult ret = invokeCompileMethodHelper(jitMgr, comp, info, jitFlags, nativeEntry, nativeSizeOfCode, perfScore);
 
     //
     // Verify that we are still in preemptive mode when we return
@@ -12667,6 +12671,7 @@ CorJitResult CallCompileMethodWithSEHWrapper(EEJitManager *jitMgr,
                                 CORJIT_FLAGS flags,
                                 BYTE **nativeEntry,
                                 uint32_t *nativeSizeOfCode,
+                                double* perfScore,
                                 NativeCodeVersion nativeCodeVersion)
 {
     // no dynamic contract here because SEH is used, with a finally clause
@@ -12685,6 +12690,7 @@ CorJitResult CallCompileMethodWithSEHWrapper(EEJitManager *jitMgr,
         CORJIT_FLAGS flags;
         BYTE **nativeEntry;
         uint32_t *nativeSizeOfCode;
+        double* perfScore;
         MethodDesc *ftn;
         CorJitResult res;
     }; Param param;
@@ -12696,6 +12702,7 @@ CorJitResult CallCompileMethodWithSEHWrapper(EEJitManager *jitMgr,
     param.nativeSizeOfCode = nativeSizeOfCode;
     param.ftn = ftn;
     param.res = CORJIT_INTERNALERROR;
+    param.perfScore = perfScore;
 
     PAL_TRY(Param *, pParam, &param)
     {
@@ -12708,7 +12715,9 @@ CorJitResult CallCompileMethodWithSEHWrapper(EEJitManager *jitMgr,
                                            pParam->info,
                                            pParam->flags,
                                            pParam->nativeEntry,
-                                           pParam->nativeSizeOfCode);
+                                           pParam->nativeSizeOfCode,
+                                           pParam->perfScore
+                                           );
     }
     PAL_FINALLY
     {
@@ -13011,7 +13020,8 @@ BOOL g_fAllowRel32 = TRUE;
 PCODE UnsafeJitFunction(PrepareCodeConfig* config,
                         COR_ILMETHOD_DECODER* ILHeader,
                         CORJIT_FLAGS flags,
-                        ULONG * pSizeOfCode)
+                        ULONG * pSizeOfCode,
+                        double* pPerfScore)
 {
     STANDARD_VM_CONTRACT;
 
@@ -13222,6 +13232,7 @@ PCODE UnsafeJitFunction(PrepareCodeConfig* config,
         CorJitResult res;
         PBYTE nativeEntry;
         uint32_t sizeOfCode;
+        double perfScore;
 
         {
             GCX_COOP();
@@ -13245,6 +13256,7 @@ PCODE UnsafeJitFunction(PrepareCodeConfig* config,
                                                   flags,
                                                   &nativeEntry,
                                                   &sizeOfCode,
+                                                  &perfScore,
                                                   nativeCodeVersion);
             LOG((LF_CORDB, LL_EVERYTHING, "Got through CallCompile MethodWithSEHWrapper\n"));
 
@@ -13253,6 +13265,10 @@ PCODE UnsafeJitFunction(PrepareCodeConfig* config,
             if (pSizeOfCode != NULL)
             {
                 *pSizeOfCode = sizeOfCode;
+            }
+            if (pPerfScore != NULL)
+            {
+                *pPerfScore = perfScore;
             }
 #endif
 

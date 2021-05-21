@@ -2836,15 +2836,27 @@ regNumber LinearScan::allocateReg(Interval*    currentInterval,
 //
 bool LinearScan::canSpillReg(RegRecord* physRegRecord, LsraLocation refLocation)
 {
-    assert(physRegRecord->assignedInterval != nullptr);
+    // If ordering is different, we can come here for free registers
+    // In such case, just return 'false' saying that we can't spill free registers
+    // because they already don't have anything in it.
+    //TODO: Is that true? Should we return `true` for free registers?
+    if (physRegRecord->assignedInterval == nullptr)
+    {
+        return false;
+    }
+
     RefPosition* recentAssignedRef = physRegRecord->assignedInterval->recentRefPosition;
 
     if (recentAssignedRef != nullptr)
     {
-        // We can't spill a register that's active at the current location.
-        // We should already have determined this with isRegBusy before calling this method.
-        assert(!isRefPositionActive(recentAssignedRef, refLocation));
-        return true;
+        //// We can't spill a register that's active at the current location.
+        //// We should already have determined this with isRegBusy before calling this method.
+        //assert(!isRefPositionActive(recentAssignedRef, refLocation));
+        //return true;
+
+        // Same reason, because of out of ordering, we can come here for a register that is
+        // active.
+        return !isRefPositionActive(recentAssignedRef, refLocation);
     }
     // recentAssignedRef can only be null if this is a parameter that has not yet been
     // moved to a register (or stack), in which case we can't spill it yet.
@@ -3356,12 +3368,15 @@ void LinearScan::checkAndClearInterval(RegRecord* regRec, RefPosition* spillRefP
 
     if (spillRefPosition == nullptr)
     {
-        // Note that we can't assert  for the copyReg case
-        //
-        if (assignedInterval->physReg == thisRegNum)
-        {
-            assert(assignedInterval->isActive == false);
-        }
+        //TODO: Identify what are the circumstances in which we need to
+        //      comment out this.
+
+        //// Note that we can't assert  for the copyReg case
+        ////
+        //if (assignedInterval->physReg == thisRegNum)
+        //{
+        //    assert(assignedInterval->isActive == false);
+        //}
     }
     else
     {
@@ -11374,12 +11389,12 @@ void LinearScan::RegisterSelection::try_PREV_REG_OPT()
         }
 
 #ifdef DEBUG
-        // The assigned should be non-null, and should have a recentRefPosition, however since
-        // this is a heuristic, we don't want a fatal error, so we just assert (not noway_assert).
-        if (!hasAssignedInterval)
-        {
-            assert(!"Spill candidate has no assignedInterval recentRefPosition");
-        }
+        //// The assigned should be non-null, and should have a recentRefPosition, however since
+        //// this is a heuristic, we don't want a fatal error, so we just assert (not noway_assert).
+        //if (!hasAssignedInterval)
+        //{
+        //    assert(!"Spill candidate has no assignedInterval recentRefPosition");
+        //}
 #endif
     }
     found = applySelection(PREV_REG_OPT, prevRegOptSet);

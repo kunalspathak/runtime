@@ -3003,18 +3003,26 @@ bool LinearScan::isRefPositionActive(RefPosition* refPosition, LsraLocation refL
 //
 bool LinearScan::isSpillCandidate(Interval* current, RefPosition* refPosition, RegRecord* physRegRecord)
 {
-    regMaskTP    candidateBit = genRegMask(physRegRecord->regNum);
+    if (isRegBusy(physRegRecord->regNum, current->registerType) ||
+        isRegInUse(physRegRecord->regNum, current->registerType) ||
+        refPosition->isFixedRefOfRegMask(genRegMask(physRegRecord->regNum)) ||
+        conflictingFixedRegReference(physRegRecord->regNum, refPosition))
+    {
+        return false;
+    }
+
+    //regMaskTP    candidateBit = genRegMask(physRegRecord->regNum);
     LsraLocation refLocation  = refPosition->nodeLocation;
-    // We shouldn't be calling this if we haven't already determined that the register is not
-    // busy until the next kill.
-    assert(!isRegBusy(physRegRecord->regNum, current->registerType));
-    // We should already have determined that the register isn't actively in use.
-    assert(!isRegInUse(physRegRecord->regNum, current->registerType));
-    // We shouldn't be calling this if 'refPosition' is a fixed reference to this register.
-    assert(!refPosition->isFixedRefOfRegMask(candidateBit));
-    // We shouldn't be calling this if there is a fixed reference at the same location
-    // (and it's not due to this reference), as checked above.
-    assert(!conflictingFixedRegReference(physRegRecord->regNum, refPosition));
+    //// We shouldn't be calling this if we haven't already determined that the register is not
+    //// busy until the next kill.
+    //assert(!isRegBusy(physRegRecord->regNum, current->registerType));
+    //// We should already have determined that the register isn't actively in use.
+    //assert(!isRegInUse(physRegRecord->regNum, current->registerType));
+    //// We shouldn't be calling this if 'refPosition' is a fixed reference to this register.
+    //assert(!refPosition->isFixedRefOfRegMask(candidateBit));
+    //// We shouldn't be calling this if there is a fixed reference at the same location
+    //// (and it's not due to this reference), as checked above.
+    //assert(!conflictingFixedRegReference(physRegRecord->regNum, refPosition));
 
     bool canSpill;
 #ifdef TARGET_ARM

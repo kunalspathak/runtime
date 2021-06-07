@@ -86,41 +86,149 @@ enum GCtype : unsigned
 };
 
 #if defined(TARGET_XARCH)
+
+enum EFlags : uint8_t
+{
+    OF = 1 << 0,
+    SF = 1 << 1,
+    ZF = 1 << 2,
+    AF = 1 << 3,
+    PF = 1 << 4,
+    CF = 1 << 5,
+    DF = 1 << 6,
+    EFlags_COUNT = 1 << 7,
+};
+
+enum EFlags_State : uint8_t
+{
+    READ                = 1 << 0,
+    WRITE               = 1 << 1, 
+    SET                 = 1 << 2,
+    RESET               = 1 << 3,
+    UNDEF               = 1 << 4,
+    UNCHNG              = 1 << 5,
+    RESTORE             = 1 << 6,
+    EFlags_State_COUNT  = 1 << 7,
+};
+
+static_assert(EFlags_COUNT <= 256 && EFlags_State_COUNT  <= 256, "No space to save insFlags");
+
+//#define MAKE_FLAG(Flag, State) Flag << 8 | State
+
+#define MAKE_READ_FLAG(Flag)    Flag << 8 | READ
+#define MAKE_WRITE_FLAG(Flag)   Flag << 8 | WRITE
+#define MAKE_RESET_FLAG(Flag)   Flag << 8 | RESET
+#define MAKE_SET_FLAG(Flag)     Flag << 8 | SET
+#define MAKE_UNDEF_FLAG(Flag)   Flag << 8 | UNDEF
+#define MAKE_UNCHNG_FLAG(Flag)  Flag << 8 | UNCHNG
+#define MAKE_RSTR_FLAG(Flag)    Flag << 8 | RESTORE
+
+//enum z
+//{
+//    ReadsCF = MAKE_FLAG(CF, READ),
+//
+//};
+
+
 enum insFlags : uint32_t
 {
     INS_FLAGS_None = 0,
 
+    // Reads
+    Reads_OF = MAKE_READ_FLAG(OF),
+    Reads_SF = MAKE_READ_FLAG(SF),
+    Reads_ZF = MAKE_READ_FLAG(ZF),
+    //Reads_AF = MAKE_READ_FLAG(AF),
+    Reads_PF = MAKE_READ_FLAG(PF),
+    Reads_CF = MAKE_READ_FLAG(CF),
+    Reads_DF = MAKE_READ_FLAG(DF),
+
+    // Writes
+    Writes_OF = MAKE_WRITE_FLAG(OF),
+    Writes_SF = MAKE_WRITE_FLAG(SF),
+    Writes_ZF = MAKE_WRITE_FLAG(ZF),
+    Writes_AF = MAKE_WRITE_FLAG(AF),
+    Writes_PF = MAKE_WRITE_FLAG(PF),
+    Writes_CF = MAKE_WRITE_FLAG(CF),
+    Writes_DF = MAKE_WRITE_FLAG(DF),
+
+    // Resets
+    Resets_OF = MAKE_RESET_FLAG(OF),
+    Resets_SF = MAKE_RESET_FLAG(SF),
+    //Resets_ZF = MAKE_RESET_FLAG(ZF),
+    Resets_AF = MAKE_RESET_FLAG(AF),
+    Resets_PF = MAKE_RESET_FLAG(PF),
+    Resets_CF = MAKE_RESET_FLAG(CF),
+    //Resets_DF = MAKE_RESET_FLAG(DF),
+
+    // Sets
+    //Sets_OF = MAKE_SET_FLAG(OF),
+    //Sets_SF = MAKE_SET_FLAG(SF),
+    //Sets_ZF = MAKE_SET_FLAG(ZF),
+    //Sets_AF = MAKE_SET_FLAG(AF),
+    //Sets_PF = MAKE_SET_FLAG(PF),
+    //Sets_CF = MAKE_SET_FLAG(CF),
+    //Sets_DF = MAKE_SET_FLAG(DF),
+
+    // Undefined
+    Undefined_OF = MAKE_UNDEF_FLAG(OF),
+    Undefined_SF = MAKE_UNDEF_FLAG(SF),
+    Undefined_ZF = MAKE_UNDEF_FLAG(ZF),
+    Undefined_AF = MAKE_UNDEF_FLAG(AF),
+    Undefined_PF = MAKE_UNDEF_FLAG(PF),
+    Undefined_CF = MAKE_UNDEF_FLAG(CF),
+    Undefined_DF = MAKE_UNDEF_FLAG(DF),
+
+    // Unchanged
+    Unchanged_OF = MAKE_UNCHNG_FLAG(OF),
+    Unchanged_SF = MAKE_UNCHNG_FLAG(SF),
+    Unchanged_ZF = MAKE_UNCHNG_FLAG(ZF),
+    Unchanged_AF = MAKE_UNCHNG_FLAG(AF),
+    Unchanged_PF = MAKE_UNCHNG_FLAG(PF),
+    Unchanged_CF = MAKE_UNCHNG_FLAG(CF),
+    Unchanged_DF = MAKE_UNCHNG_FLAG(DF),
+
+    // Restore
+    //Restore_OF = MAKE_RSTR_FLAG(OF),
+    Restore_SF = MAKE_RSTR_FLAG(SF),
+    Restore_ZF = MAKE_RSTR_FLAG(ZF),
+    Restore_AF = MAKE_RSTR_FLAG(AF),
+    Restore_PF = MAKE_RSTR_FLAG(PF),
+    Restore_CF = MAKE_RSTR_FLAG(CF),
+    //Restore_DF = MAKE_RSTR_FLAG(DF),
+
     // Reads EFLAGS
-    INS_FLAGS_ReadsCF = 1 << 0,
+   /* INS_FLAGS_ReadsCF = 1 << 0,
     INS_FLAGS_ReadsPF = 1 << 1,
     INS_FLAGS_ReadsAF = 1 << 2,
     INS_FLAGS_ReadsZF = 1 << 3,
     INS_FLAGS_ReadsSF = 1 << 4,
     INS_FLAGS_ReadsDF = 1 << 5,
-    INS_FLAGS_ReadsOF = 1 << 6,
-    INS_FLAGS_ReadsAllFlagsExceptAF = INS_FLAGS_ReadsCF | INS_FLAGS_ReadsPF | INS_FLAGS_ReadsZF | INS_FLAGS_ReadsSF | INS_FLAGS_ReadsOF,
+    INS_FLAGS_ReadsOF = 1 << 6,*/
+
+    /*INS_FLAGS_ReadsAllFlagsExceptAF = INS_FLAGS_ReadsCF | INS_FLAGS_ReadsPF | INS_FLAGS_ReadsZF | INS_FLAGS_ReadsSF | INS_FLAGS_ReadsOF,
     INS_FLAGS_Reads_CF_ZF_Flags = INS_FLAGS_ReadsCF | INS_FLAGS_ReadsZF,
     INS_FLAGS_Reads_OF_SF_Flags = INS_FLAGS_ReadsOF | INS_FLAGS_ReadsSF,
     INS_FLAGS_Reads_OF_SF_ZF_Flags = INS_FLAGS_ReadsOF | INS_FLAGS_ReadsSF | INS_FLAGS_ReadsZF,
-    INS_FLAGS_ReadsAllFlags = INS_FLAGS_ReadsAF | INS_FLAGS_ReadsAllFlagsExceptAF,
+    INS_FLAGS_ReadsAllFlags = INS_FLAGS_ReadsAF | INS_FLAGS_ReadsAllFlagsExceptAF,*/
 
     // Writes EFLAGS
-    INS_FLAGS_WritesCF = 1 << 7,
-    INS_FLAGS_WritesPF = 1 << 8,
-    INS_FLAGS_WritesAF = 1 << 9,
-    INS_FLAGS_WritesZF = 1 << 10,
-    INS_FLAGS_WritesSF = 1 << 11,
-    INS_FLAGS_WritesDF = 1 << 12,
-    INS_FLAGS_WritesOF = 1 << 13,
-    INS_FLAGS_WritesAllFlagsExceptCF = INS_FLAGS_WritesPF | INS_FLAGS_WritesAF | INS_FLAGS_WritesZF | INS_FLAGS_WritesSF | INS_FLAGS_WritesOF,
-    INS_FLAGS_WritesAllFlagsExceptOF = INS_FLAGS_WritesCF | INS_FLAGS_WritesPF | INS_FLAGS_WritesAF | INS_FLAGS_WritesZF | INS_FLAGS_WritesSF,
-    INS_FLAGS_WritesAllFlags = INS_FLAGS_WritesCF | INS_FLAGS_WritesAllFlagsExceptCF,
+    //INS_FLAGS_WritesCF = 1 << 7,
+    //INS_FLAGS_WritesPF = 1 << 8,
+    //INS_FLAGS_WritesAF = 1 << 9,
+    //INS_FLAGS_WritesZF = 1 << 10,
+    //INS_FLAGS_WritesSF = 1 << 11,
+    //INS_FLAGS_WritesDF = 1 << 12,
+    //INS_FLAGS_WritesOF = 1 << 13,
 
-    // Resets EFLAGS
-    INS_FLAGS_Resets_OF_Flags       = 1 << 14,
-    INS_FLAGS_Resets_CF_OF_Flags    = 1 << 15,
-    INS_FLAGS_Resets_OF_SF_PF_Flags = 1 << 16,
-    INS_FLAGS_ResetsAllFlagsExceptZF = 1 << 17,
+    //// Resets EFLAGS
+    //INS_FLAGS_Resets_CF_Flags       = 1 << 14,
+    //INS_FLAGS_Resets_OF_Flags       = 1 << 15,
+    //INS_FLAGS_Resets_PF_Flags       = 1 << 16,
+    //INS_FLAGS_Resets_SF_Flags       = 1 << 17,
+    //INS_FLAGS_Resets_ZF_Flags       = 1 << 18,
+    //INS_FLAGS_Resets_AF_Flags       = 1 << 19,
+    
 
     // x87 instruction
     INS_FLAGS_x87Instr = 1 << 18,
@@ -132,6 +240,23 @@ enum insFlags : uint32_t
     //  TODO-Cleanup:  Remove this flag and its usage from TARGET_XARCH
     INS_FLAGS_DONT_CARE = 0x00,
 };
+
+
+//#define ALL_FLAGS (OF | SF | ZF | AF | PF | CF | DF)
+//#define INS_FLAGS_ReadsAllFlagsExceptAF         MAKE_FLAG(ALL_FLAGS & ~AF, READ)
+//#define INS_FLAGS_Reads_CF_ZF_Flags             MAKE_FLAG(CF | ZF, READ)
+//#define INS_FLAGS_Reads_OF_SF_Flags             MAKE_FLAG(OF | SF, READ)
+//#define INS_FLAGS_Reads_OF_SF_ZF_Flags          MAKE_FLAG(OF | SF | ZF, READ)
+//#define INS_FLAGS_ReadsAllFlags INS_FLAGS_ReadsAF | INS_FLAGS_ReadsAllFlagsExceptAF
+//
+//#define  INS_FLAGS_WritesAllFlagsExceptCF       MAKE_FLAG(ALL_FLAGS & ~CF, WRITE)
+//#define  INS_FLAGS_WritesAllFlagsExceptOF INS_FLAGS_WritesCF | INS_FLAGS_WritesPF | INS_FLAGS_WritesAF | INS_FLAGS_WritesZF | INS_FLAGS_WritesSF
+//#define  INS_FLAGS_WritesAllFlags INS_FLAGS_WritesCF | INS_FLAGS_WritesAllFlagsExceptCF
+//
+//#define  INS_FLAGS_Resets_CF_OF_Flags    INS_FLAGS_ResetsCF | INS_FLAGS_ResetsOF
+//#define  INS_FLAGS_Resets_OF_SF_PF_Flags INS_FLAGS_ResetsOF | INS_FLAGS_ResetsSF | INS_FLAGS_ResetsPF
+//#define  INS_FLAGS_ResetsAllFlagsExceptZF INS_FLAGS_ResetsCF | INS_FLAGS_ResetsOF | INS_FLAGS_ResetsPF | INS_FLAGS_ResetsSF | INS_FLAGS_ResetsAF
+
 #elif defined(TARGET_ARM) || defined(TARGET_ARM64)
 // TODO-Cleanup: Move 'insFlags' under TARGET_ARM
 enum insFlags: unsigned

@@ -2542,7 +2542,7 @@ void Compiler::lvaSetVarLiveInOutOfHandler(unsigned varNum)
             noway_assert(lvaTable[i].lvIsStructField);
             lvaTable[i].lvLiveInOutOfHndlr = 1;
             // For now, only enregister an EH Var if it is a single def and whose refCnt > 1.
-            if (!lvaEnregEHVars || !lvaTable[i].lvEhWriteThruCandidate || lvaTable[i].lvRefCnt() <= 1)
+            if (!lvaEnregEHVars || !lvaTable[i].lvSingleDefRegCandidate || lvaTable[i].lvRefCnt() <= 1)
             {
                 lvaSetVarDoNotEnregister(i DEBUGARG(DNER_LiveInOutOfHandler));
             }
@@ -2550,7 +2550,7 @@ void Compiler::lvaSetVarLiveInOutOfHandler(unsigned varNum)
     }
 
     // For now, only enregister an EH Var if it is a single def and whose refCnt > 1.
-    if (!lvaEnregEHVars || !varDsc->lvEhWriteThruCandidate || varDsc->lvRefCnt() <= 1)
+    if (!lvaEnregEHVars || !varDsc->lvSingleDefRegCandidate || varDsc->lvRefCnt() <= 1)
     {
         lvaSetVarDoNotEnregister(varNum DEBUGARG(DNER_LiveInOutOfHandler));
     }
@@ -4093,7 +4093,7 @@ void Compiler::lvaMarkLclRefs(GenTree* tree, BasicBlock* block, Statement* stmt,
             }
         }
 
-        if (!varDsc->lvDisqualifyForEhWriteThru) // If this EH var already disqualified, we can skip this
+        if (!varDsc->lvDisqualifySingleDefRegCandidate) // If this var is already disqualified, we can skip this
         {
             if (tree->gtFlags & GTF_VAR_DEF) // Is this is a def of our variable
             {
@@ -4101,25 +4101,25 @@ void Compiler::lvaMarkLclRefs(GenTree* tree, BasicBlock* block, Statement* stmt,
                 bool bbIsReturn            = block->bbJumpKind == BBJ_RETURN;
                 bool needsExplicitZeroInit = fgVarNeedsExplicitZeroInit(lclNum, bbInALoop, bbIsReturn);
 
-                if (varDsc->lvEhWriteThruCandidate || needsExplicitZeroInit)
+                if (varDsc->lvSingleDefRegCandidate || needsExplicitZeroInit)
                 {
 #ifdef DEBUG
                     if (needsExplicitZeroInit)
                     {
-                        varDsc->lvDisqualifyEHVarReason = 'Z';
-                        JITDUMP("EH Var V%02u needs explicit zero init. Disqualified as a register candidate.\n",
+                        varDsc->lvSingleDefDisqualifyReason = 'Z';
+                        JITDUMP("V%02u needs explicit zero init. Disqualified as a single-def register candidate.\n",
                                 lclNum);
                     }
                     else
                     {
-                        varDsc->lvDisqualifyEHVarReason = 'M';
-                        JITDUMP("EH Var V%02u has multiple definitions. Disqualified as a register candidate.\n",
+                        varDsc->lvSingleDefDisqualifyReason = 'M';
+                        JITDUMP("V%02u has multiple definitions. Disqualified as a single-def register candidate.\n",
                                 lclNum);
                     }
 
 #endif // DEBUG
-                    varDsc->lvEhWriteThruCandidate     = false;
-                    varDsc->lvDisqualifyForEhWriteThru = true;
+                    varDsc->lvSingleDefRegCandidate     = false;
+                    varDsc->lvDisqualifySingleDefRegCandidate = true;
                 }
                 else
                 {
@@ -4129,7 +4129,7 @@ void Compiler::lvaMarkLclRefs(GenTree* tree, BasicBlock* block, Statement* stmt,
                     if (!varTypeNeedsPartialCalleeSave(varDsc->lvType))
 #endif
                     {
-                        varDsc->lvEhWriteThruCandidate = true;
+                        varDsc->lvSingleDefRegCandidate = true;
                         JITDUMP("Marking EH Var V%02u as a register candidate.\n", lclNum);
                     }
                 }
@@ -4505,7 +4505,7 @@ void Compiler::lvaComputeRefCounts(bool isRecompute, bool setSlotNumbers)
         if (!isRecompute)
         {
             varDsc->lvSingleDef            = varDsc->lvIsParam;
-            varDsc->lvEhWriteThruCandidate = varDsc->lvIsParam;
+            varDsc->lvSingleDefRegCandidate = varDsc->lvIsParam;
         }
     }
 
@@ -7405,7 +7405,7 @@ void Compiler::lvaDumpEntry(unsigned lclNum, FrameLayoutState curState, size_t r
         }
         if (lvaEnregEHVars && varDsc->lvLiveInOutOfHndlr)
         {
-            printf("%c", varDsc->lvDisqualifyEHVarReason);
+            printf("%c", varDsc->lvDisqualifySingleDefRegCandidate);
         }
         if (varDsc->lvLclFieldExpr)
         {

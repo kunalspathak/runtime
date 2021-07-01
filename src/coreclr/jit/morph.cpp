@@ -17446,6 +17446,7 @@ void Compiler::fgRetypeImplicitByRefArgs()
                 newVarDsc->lvLclFieldExpr     = varDsc->lvLclFieldExpr;
                 newVarDsc->lvVMNeedsStackAddr = varDsc->lvVMNeedsStackAddr;
                 newVarDsc->lvLiveInOutOfHndlr = varDsc->lvLiveInOutOfHndlr;
+                newVarDsc->lvSingleDef             = varDsc->lvSingleDef;
                 newVarDsc->lvSingleDefRegCandidate = varDsc->lvSingleDefRegCandidate;
                 newVarDsc->lvSpillAtSingleDef = varDsc->lvSpillAtSingleDef;
                 newVarDsc->lvLiveAcrossUCall  = varDsc->lvLiveAcrossUCall;

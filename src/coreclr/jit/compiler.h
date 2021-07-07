@@ -6538,6 +6538,7 @@ public:
 #ifdef DEBUG
     unsigned char loopAlignCandidates; // number of loops identified for alignment
     unsigned char loopsAligned;        // number of loops actually aligned
+    unsigned      alignedBytes;        // number of bytes added for alignment (including compensation NOPs)
 #endif                                 // DEBUG
 
     bool optRecordLoop(BasicBlock*   head,

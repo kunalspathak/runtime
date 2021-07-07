@@ -9910,6 +9910,7 @@ BYTE* emitter::emitOutputAlign(insGroup* ig, instrDesc* id, BYTE* dst)
     }
 
     emitComp->loopsAligned++;
+    emitComp->alignedBytes += paddingToAdd;
 #endif
 
     BYTE* dstRW = dst + writeableOffset;
@@ -14351,6 +14352,7 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
             // should never over-estimate align instruction
             assert(id->idIns() != INS_align);
             JITDUMP("Added over-estimation compensation: %d\n", diff);
+            emitComp->alignedBytes += diff;
 
             if (emitComp->opts.disAsm)
             {

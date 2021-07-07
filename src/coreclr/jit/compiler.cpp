@@ -8299,6 +8299,7 @@ void JitTimer::PrintCsvHeader()
 #ifdef DEBUG
             fprintf(s_csvFile, "\"Alignment Candidates\",");
             fprintf(s_csvFile, "\"Loops Aligned\",");
+            fprintf(s_csvFile, "\"Alignment Bytes\",");
 #endif // DEBUG
 #endif // FEATURE_LOOP_ALIGN
             for (int i = 0; i < PHASE_NUMBER_OF; i++)
@@ -8376,6 +8377,7 @@ void JitTimer::PrintCsvMethodStats(Compiler* comp)
 #ifdef DEBUG
     fprintf(s_csvFile, "%u,", comp->loopAlignCandidates);
     fprintf(s_csvFile, "%u,", comp->loopsAligned);
+    fprintf(s_csvFile, "%u,", comp->alignedBytes);
 #endif // DEBUG
 #endif // FEATURE_LOOP_ALIGN
     unsigned __int64 totCycles = 0;

@@ -2403,7 +2403,7 @@ void CodeGen::genEmitMachineCode()
     if (compiler->opts.disAsm || verbose)
     {
         printf("\n; Total bytes of code %d, prolog size %d, PerfScore %.2f, instruction count %d, allocated bytes for "
-               "code %d",
+               "code %d, alignment bytes %d",
                codeSize, prologSize, compiler->info.compPerfScore, instrCount,
                GetEmitter()->emitTotalHotCodeSize + GetEmitter()->emitTotalColdCodeSize);
 

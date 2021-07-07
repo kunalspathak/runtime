@@ -30,6 +30,7 @@ void Compiler::optInit()
 #ifdef DEBUG
     loopAlignCandidates = 0;
     loopsAligned        = 0;
+    alignedBytes        = 0;
 #endif
 
     /* Keep track of the number of calls and indirect calls made by this method */

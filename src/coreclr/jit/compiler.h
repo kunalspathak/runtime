@@ -1030,6 +1030,16 @@ public:
         return GetRegisterType() != TYP_UNDEF;
     }
 
+    //-----------------------------------------------------------------------------
+    //  IsAlwaysAliveInMemory: Determines if this variable's value is always
+    //     up-to-date on stack. This is possible if this is an EH-var or
+    //     we decided to spill after single-def.
+    //
+    bool IsAlwaysAliveInMemory() const
+    {
+        return lvLiveInOutOfHndlr || lvSpillAtSingleDef;
+    }
+
     bool CanBeReplacedWithItsField(Compiler* comp) const;
 
 #ifdef DEBUG

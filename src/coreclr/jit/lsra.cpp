@@ -183,7 +183,54 @@ BasicBlock::weight_t LinearScan::getWeight(RefPosition* refPos)
 {
     BasicBlock::weight_t weight;
     GenTree*             treeNode = refPos->treeNode;
+    Interval* lclVarInterval = (refPos->isIntervalRef() && refPos->getInterval()->isLocalVar) ? refPos->getInterval() : nullptr;
 
+    if (lclVarInterval != nullptr)
+    {
+        if ((refPos->refType == RefTypeZeroInit) || (refPos->refType == RefTypeParamDef))
+        {
+            return blockInfo[refPos->bbNum].weight;
+        }
+        else if (refPos->refType == RefTypeExpUse)
+        {
+            LclVarDsc* intervalVarDsc = lclVarInterval->getLocalVar(compiler);
+            weight                    = intervalVarDsc->lvRefCntWtd();
+
+            if (refPos->getInterval()->isSpilled)
+            {
+                // Decrease the weight if the interval has already been spilled.
+                if (intervalVarDsc->lvLiveInOutOfHndlr || refPos->getInterval()->firstRefPosition->singleDefSpill)
+                {
+                    // An EH var is always spilled at defs, and we'll decrease the weight by half,
+                    // since only the reload is needed.
+                    weight = weight / 2;
+                }
+                else
+                {
+                    weight -= BB_UNITY_WEIGHT;
+                }
+            }
+
+            return weight;
+        }
+    }
+    //// Need to handle for ZEROInit / ExpUse
+    //// TODO: For ParamDef?
+    //if (refPos->refType == RefTypeZeroInit)
+    //{
+    //    if (refPos->isIntervalRef() && refPos->getInterval()->isLocalVar)
+    //    {
+    //        Interval* interval = refPos->getInterval();
+    //    }
+    //    else
+    //    {
+
+    //    }
+    //}
+    //else if (refPos->refType == RefTypeExpUse)
+    //{
+    //    assert(treeNode == nullptr);
+    //}
     if (treeNode != nullptr)
     {
         if (isCandidateLocalRef(treeNode))
@@ -193,6 +240,7 @@ BasicBlock::weight_t LinearScan::getWeight(RefPosition* refPos)
             GenTreeLclVarCommon* lclCommon = treeNode->AsLclVarCommon();
             LclVarDsc*           varDsc    = &(compiler->lvaTable[lclCommon->GetLclNum()]);
             weight                         = varDsc->lvRefCntWtd();
+
             if (refPos->getInterval()->isSpilled)
             {
                 // Decrease the weight if the interval has already been spilled.

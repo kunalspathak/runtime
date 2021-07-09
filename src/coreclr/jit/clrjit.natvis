@@ -47,8 +47,8 @@ The .NET Foundation licenses this file to you under the MIT license.
   </Type>
 
   <Type Name="LclVarDsc">
-    <DisplayString Condition="lvReason==0">[{lvType,en}]</DisplayString>
-    <DisplayString>[{lvType,en}-{lvReason,s}]</DisplayString>
+    <DisplayString Condition="lvReason==0">[{lvType,en} V{lvSlotNum,u}]</DisplayString>
+    <DisplayString>[{lvType,en}-{lvReason,s} V{lvSlotNum,u}]</DisplayString>
   </Type>
 
   <Type Name="GenTreeLclVar" Inheritable="false">

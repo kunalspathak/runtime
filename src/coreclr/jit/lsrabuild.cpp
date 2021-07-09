@@ -1872,6 +1872,7 @@ void LinearScan::insertZeroInitRefPositions()
 
     // insert defs for this, then a block boundary
 
+    GenTree*        firstNode = getNonEmptyBlock(compiler->fgFirstBB)->firstNode();
     VarSetOps::Iter iter(compiler, currentLiveVars);
     unsigned        varIndex = 0;
     while (iter.NextElem(&varIndex))
@@ -1894,7 +1895,6 @@ void LinearScan::insertZeroInitRefPositions()
                 }
 
                 JITDUMP(" creating ZeroInit\n");
-                GenTree*     firstNode = getNonEmptyBlock(compiler->fgFirstBB)->firstNode();
                 RefPosition* pos =
                     newRefPosition(interval, MinLocation, RefTypeZeroInit, firstNode, allRegs(interval->registerType));
                 pos->setRegOptional(true);
@@ -1924,7 +1924,6 @@ void LinearScan::insertZeroInitRefPositions()
                     if (interval->recentRefPosition == nullptr)
                     {
                         JITDUMP(" creating ZeroInit\n");
-                        GenTree*     firstNode = getNonEmptyBlock(compiler->fgFirstBB)->firstNode();
                         RefPosition* pos       = newRefPosition(interval, MinLocation, RefTypeZeroInit, firstNode,
                                                           allRegs(interval->registerType));
                         pos->setRegOptional(true);

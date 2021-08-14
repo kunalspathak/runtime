@@ -713,7 +713,7 @@ insGroup* emitter::emitSavIG(bool emitAdd)
 
     // Do we need space for GC?
 
-    if (!(ig->igFlags & IGF_EXTEND))
+    if (!ig->isExtended())
     {
         // Is the initial set of live GC vars different from the previous one?
 
@@ -819,7 +819,7 @@ insGroup* emitter::emitSavIG(bool emitAdd)
     // block, in which case the GC register sets are inherited from the previous
     // block.
 
-    if (!(ig->igFlags & IGF_EXTEND))
+    if (!ig->isExtended())
     {
         ig->igGCregs = (regMaskSmall)emitInitGCrefRegs;
     }
@@ -3662,7 +3662,7 @@ void emitter::emitDispIG(insGroup* ig, insGroup* igPrev, bool verbose)
             separator = ", ";
         }
 
-        if (!(ig->igFlags & IGF_EXTEND))
+        if (!ig->isExtended())
         {
             printf("%sgcrefRegs=", separator);
             printRegMaskInt(ig->igGCregs);
@@ -5120,9 +5120,15 @@ void emitter::emitLoopAlignAdjustments()
 #endif
                 // Adjust the padding amount in all align instructions in this IG
                 instrDescAlign *alignInstrToAdj = alignInstr, *prevAlignInstr = nullptr;
-                for (; alignInstrToAdj != nullptr && alignInstrToAdj->idaIG == alignInstr->idaIG;
+                for (; alignInstrToAdj != nullptr &&
+                    ((alignInstrToAdj->idaIG == alignInstr->idaIG) ||
+                        ((alignInstrToAdj->idaIG->isExtended()) && (alignInstrToAdj->idaIG->igData != nullptr) &&
+                         ((instrDescAlign*)(alignInstrToAdj->idaIG->igData))->idIns() == INS_align));
                      alignInstrToAdj = alignInstrToAdj->idaNext)
                 {
+                    // Still need some breaking condition.
+                    // COMPlus_JitAlignLoopAdaptive=0
+                    // COMPlus_JitStress=2
                     unsigned newPadding = min(paddingToAdj, MAX_ENCODED_SIZE);
                     alignInstrToAdj->idCodeSize(newPadding);
                     paddingToAdj -= newPadding;
@@ -6074,7 +6080,7 @@ unsigned emitter::emitEndCodeGen(Compiler* comp,
 
         /* Update current GC information for IG's that do not extend the previous IG */
 
-        if (!(ig->igFlags & IGF_EXTEND))
+        if (!ig->isExtended())
         {
             /* Is there a new set of live GC ref variables? */
 

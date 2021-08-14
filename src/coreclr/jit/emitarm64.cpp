@@ -15569,7 +15569,7 @@ bool emitter::IsRedundantMov(instruction ins, emitAttr size, regNumber dst, regN
         }
     }
 
-    bool isFirstInstrInBlock = (emitCurIGinsCnt == 0) && ((emitCurIG->igFlags & IGF_EXTEND) == 0);
+    bool isFirstInstrInBlock = (emitCurIGinsCnt == 0) && !emitCurIG->isExtended();
 
     if (!isFirstInstrInBlock && // Don't optimize if instruction is not the first instruction in IG.
         (emitLastIns != nullptr) &&
@@ -15651,7 +15651,7 @@ bool emitter::IsRedundantMov(instruction ins, emitAttr size, regNumber dst, regN
 bool emitter::IsRedundantLdStr(
     instruction ins, regNumber reg1, regNumber reg2, ssize_t imm, emitAttr size, insFormat fmt)
 {
-    bool isFirstInstrInBlock = (emitCurIGinsCnt == 0) && ((emitCurIG->igFlags & IGF_EXTEND) == 0);
+    bool isFirstInstrInBlock = (emitCurIGinsCnt == 0) && emitCurIG->isExtended();
 
     if (((ins != INS_ldr) && (ins != INS_str)) || (isFirstInstrInBlock) || (emitLastIns == nullptr))
     {

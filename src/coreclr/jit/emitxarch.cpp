@@ -263,7 +263,7 @@ bool emitter::AreUpper32BitsZero(regNumber reg)
     // If there are no instructions in this IG, we can look back at
     // the previous IG's instructions if this IG is an extension.
     //
-    if ((emitCurIGinsCnt == 0) && ((emitCurIG->igFlags & IGF_EXTEND) == 0))
+    if ((emitCurIGinsCnt == 0) && !emitCurIG->isExtended())
     {
         return false;
     }
@@ -339,7 +339,7 @@ bool emitter::AreFlagsSetToZeroCmp(regNumber reg, emitAttr opSize, genTreeOps tr
     assert(reg != REG_NA);
 
     // Don't look back across IG boundaries (possible control flow)
-    if (emitCurIGinsCnt == 0 && ((emitCurIG->igFlags & IGF_EXTEND) == 0))
+    if (emitCurIGinsCnt == 0 && !emitCurIG->isExtended())
     {
         return false;
     }
@@ -4473,7 +4473,7 @@ bool emitter::IsRedundantMov(
         return true;
     }
 
-    bool isFirstInstrInBlock = (emitCurIGinsCnt == 0) && ((emitCurIG->igFlags & IGF_EXTEND) == 0);
+    bool isFirstInstrInBlock = (emitCurIGinsCnt == 0) && !emitCurIG->isExtended();
 
     // TODO-XArch-CQ: Certain instructions, such as movaps vs movups, are equivalent in
     // functionality even if their actual identifier differs and we should optimize these

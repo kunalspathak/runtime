@@ -354,6 +354,11 @@ struct insGroup
         return (igFlags & IGF_LOOP_ALIGN) != 0;
     }
 
+    bool isExtended()
+    {
+        return (igFlags & IGF_EXTEND) != 0;
+    }
+
 }; // end of struct insGroup
 
 //  For AMD64 the maximum prolog/epilog size supported on the OS is 256 bytes

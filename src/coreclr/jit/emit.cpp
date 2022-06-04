@@ -3822,11 +3822,10 @@ void emitter::emitDispIG(insGroup* ig, insGroup* igPrev, bool verbose)
                     instrDesc* id = (instrDesc*)ins;
 
 #ifdef TARGET_XARCH
-                    if ((id->idIns() == INS_jmp) && emitInstHasNoCode(id))
+                    if (emitJmpInstHasNoCode(id))
                     {
-                        // an instruction with no code prevents us being able to iterate to the
-                        // next instructions so we must be certain that when we find one it is
-                        // the last instruction in a group
+                        // A jmp instruction with no code doens't map to
+                        // any target block, so skip displaying it.
                         assert(cnt == 1);
                         break;
                     }

@@ -3525,6 +3525,37 @@ Return Values
 The return value is the initial value of the destination.
 
 --*/
+
+#if defined(TARGET_ARM64)
+
+FORCEINLINE LONG  FastInterlockedCompareExchange(
+    LONG volatile *Destination,
+    LONG Exchange,
+    LONG Comperand)
+{
+    printf("g_atomic_present (FastInterlockedCompareExchange)= %d\n", g_atomic_present);
+    if (g_atomic_present)
+    {
+        LONG result;
+        __asm__ __volatile__(
+             "casal %3, %2, [%1];"
+             : "=a" (result)
+             : "r" (Destination), "r" (Exchange), "r" (Comperand)
+             : "memory"
+        );
+        return result;
+    }
+    else
+    {
+        return InterlockedCompareExchange(Destination, Exchange, Comperand);
+    }
+}
+#endif
+
+#define FastInterlockedCompareExchange64 InterlockedCompareExchange64
+#define FastInterlockedCompareExchangeAcquire InterlockedCompareExchangeAcquire
+#define FastInterlockedCompareExchangeRelease InterlockedCompareExchangeRelease
+
 EXTERN_C
 PALIMPORT
 inline

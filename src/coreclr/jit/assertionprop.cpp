@@ -1984,15 +1984,20 @@ AssertionIndex Compiler::optAddAssertion(AssertionDsc* newAssertion)
     AssertionIndex fastAnswer = NO_ASSERTION_INDEX;
 #endif
 
+    int iter = 0;
     // Check if exists already, so we can skip adding new one. Search backwards.
     for (AssertionIndex index = optAssertionCount; index >= 1; index--)
     {
+        iter++;
         AssertionDsc* curAssertion = optGetAssertion(index);
         if (curAssertion->Equals(newAssertion))
         {
 #ifdef DEBUG
             found      = true;
             slowAnswer = index;
+
+            printf("[0x%X] AddAssertion iterated %d\n", info.compMethodHashPrivate, iter);
+
             break;
 #else
             return index;
@@ -2891,6 +2896,11 @@ AssertionIndex Compiler::optAssertionIsSubrange(GenTree* tree, IntegralRange ran
         return NO_ASSERTION_INDEX;
     }
 
+#ifdef DEBUG
+    AssertionIndex slowAnswer = NO_ASSERTION_INDEX;
+    AssertionIndex fastAnswer = NO_ASSERTION_INDEX;
+#endif
+
     for (AssertionIndex index = 1; index <= optAssertionCount; index++)
     {
         AssertionDsc* curAssertion = optGetAssertion(index);
@@ -2910,10 +2920,18 @@ AssertionIndex Compiler::optAssertionIsSubrange(GenTree* tree, IntegralRange ran
 
             if (range.Contains(curAssertion->op2.u2))
             {
+                printf("[0x%X] optAssertionIsSubrange iterated %d\n", info.compMethodHashPrivate, index);
+
                 return index;
             }
         }
     }
+
+#ifdef DEBUG
+    AssertionDsc assertionToFind(optLocalAssertionProp);
+    assertionToFind.assertionKind = OAK_SUBRANGE;
+    assertionToFind.op1.kind      = O1K_LCLVAR;
+#endif
 
     return NO_ASSERTION_INDEX;
 }
@@ -2976,6 +2994,7 @@ AssertionIndex Compiler::optAssertionIsSubtype(GenTree* tree, GenTree* methodTab
 
         if (curAssertion->op2.u1.iconVal == methodTableVal)
         {
+            printf("[0x%X] optAssertionIsSubtype iterated %d\n", info.compMethodHashPrivate, index);
             return index;
         }
     }
@@ -3686,6 +3705,7 @@ GenTree* Compiler::optAssertionProp_LclVar(ASSERT_VALARG_TP assertions, GenTreeL
                 GenTree* newTree = optCopyAssertionProp(curAssertion, tree, stmt DEBUGARG(assertionIndex));
                 if (newTree != nullptr)
                 {
+                    printf("[0x%X] optAssertionProp_LclVar iterated %d\n", info.compMethodHashPrivate, index);
                     return newTree;
                 }
             }
@@ -3827,6 +3847,7 @@ AssertionIndex Compiler::optLocalAssertionIsEqualOrNotEqual(
 
                 if (constantIsEqual || assertionIsEqual)
                 {
+                    printf("[0x%X] optAssertionProp_LclVar iterated %d\n", info.compMethodHashPrivate, index);
                     return index;
                 }
             }
@@ -3877,6 +3898,7 @@ AssertionIndex Compiler::optGlobalAssertionIsEqualOrNotEqual(ASSERT_VALARG_TP as
         if ((curAssertion->op1.vn == vnStore->VNConservativeNormalValue(op1->gtVNPair)) &&
             (curAssertion->op2.vn == vnStore->VNConservativeNormalValue(op2->gtVNPair)))
         {
+            printf("[0x%X] optGlobalAssertionIsEqualOrNotEqual iterated %d\n", info.compMethodHashPrivate, index);
             return assertionIndex;
         }
 
@@ -3930,6 +3952,7 @@ AssertionIndex Compiler::optGlobalAssertionIsEqualOrNotEqualZero(ASSERT_VALARG_T
         if ((curAssertion->op1.vn == vnStore->VNConservativeNormalValue(op1->gtVNPair)) &&
             (curAssertion->op2.vn == vnStore->VNZeroForType(op1->TypeGet())))
         {
+            printf("[0x%X] optGlobalAssertionIsEqualOrNotEqual iterated %d\n", info.compMethodHashPrivate, index);
             return assertionIndex;
         }
     }
@@ -4609,7 +4632,7 @@ AssertionIndex Compiler::optAssertionIsNonNullInternal(GenTree*         op,
 #ifdef DEBUG
             *pVnBased = true;
 #endif
-
+            printf("[0x%X] optAssertionIsNonNullInternal iterated %d\n", info.compMethodHashPrivate, index);
             return assertionIndex;
         }
     }
@@ -4625,6 +4648,7 @@ AssertionIndex Compiler::optAssertionIsNonNullInternal(GenTree*         op,
                 (curAssertion->op2.kind == O2K_CONST_INT) &&      // op2
                 (curAssertion->op1.lcl.lclNum == lclNum) && (curAssertion->op2.u1.iconVal == 0))
             {
+                printf("[0x%X] optAssertionIsNonNullInternal iterated %d\n", info.compMethodHashPrivate, index);
                 return index;
             }
         }
@@ -4863,7 +4887,7 @@ GenTree* Compiler::optAssertionProp_BndsChk(ASSERT_VALARG_TP assertions, GenTree
             // This can happen when trees are broken up due to inlining.
             // optRemoveStandaloneRangeCheck will return the modified tree (side effects or a no-op).
             GenTree* newTree = optRemoveStandaloneRangeCheck(arrBndsChk, stmt);
-
+            printf("[0x%X] optAssertionProp_BndsChk iterated %d\n", info.compMethodHashPrivate, index);
             return optAssertionProp_Update(newTree, arrBndsChk, stmt);
         }
 
@@ -5062,6 +5086,7 @@ void Compiler::optImpliedAssertions(AssertionIndex assertionIndex, ASSERT_TP& ac
                 continue;
             }
 
+            printf("[0x%X] optImpliedAssertions iterated %d\n", info.compMethodHashPrivate, chkIndex);
             // Determine which one is a copy assertion and use the other to check for implied assertions.
             AssertionDsc* iterAssertion = optGetAssertion(chkAssertionIndex);
             if (curAssertion->IsCopyAssertion())
@@ -5147,6 +5172,7 @@ void Compiler::optImpliedByTypeOfAssertions(ASSERT_TP& activeAssertions)
 #endif
             }
 
+            printf("[0x%X] optImpliedByTypeOfAssertions iterated %d\n", info.compMethodHashPrivate, impIndex);
             // There is at most one non-null assertion that is implied by the current chkIndex assertion
             break;
         }
@@ -5216,6 +5242,7 @@ void Compiler::optImpliedByConstAssertion(AssertionDsc* constAssertion, ASSERT_T
             continue;
         }
 
+        printf("[0x%X] optImpliedByConstAssertion iterated %d\n", info.compMethodHashPrivate, chkIndex);
         bool usable = false;
         switch (impAssertion->op2.kind)
         {
@@ -5342,6 +5369,8 @@ void Compiler::optImpliedByCopyAssertion(AssertionDsc* copyAssertion, AssertionD
         {
             continue;
         }
+
+        printf("[0x%X] optImpliedByCopyAssertion iterated %d\n", info.compMethodHashPrivate, impIndex);
 
         bool op1MatchesCopy =
             (copyAssertLclNum == impAssertion->op1.lcl.lclNum) && (copyAssertSsaNum == impAssertion->op1.lcl.ssaNum);

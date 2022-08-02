@@ -5968,6 +5968,9 @@ protected:
         VNSet* m_pHoistedInCurLoop;
 
     public:
+        // Value numbers of expressions that have been hoisted in parent loops in the loop nest.
+        VNSet m_hoistedInParentLoops;
+
         // Value numbers of expressions that have been hoisted in the current (or most recent) loop in the nest.
         // Previous decisions on loop-invariance of value numbers in the current loop.
         VNSet m_curLoopVnInvariantCache;
@@ -5982,6 +5985,13 @@ protected:
             return m_pHoistedInCurLoop;
         }
 
+        VNSet* ExtractHoistedInCurLoop()
+        {
+            VNSet* res          = m_pHoistedInCurLoop;
+            m_pHoistedInCurLoop = nullptr;
+            return res;
+        }
+
         // Return the so far collected VNs in cache for current loop and reset it.
         void ResetHoistedInCurLoop()
         {
@@ -5990,7 +6000,9 @@ protected:
         }
 
         LoopHoistContext(Compiler* comp)
-            : m_pHoistedInCurLoop(nullptr), m_curLoopVnInvariantCache(comp->getAllocatorLoopHoist())
+            : m_pHoistedInCurLoop(nullptr)
+            , m_hoistedInParentLoops(comp->getAllocatorLoopHoist())
+            , m_curLoopVnInvariantCache(comp->getAllocatorLoopHoist())
         {
         }
     };
@@ -9235,6 +9247,8 @@ public:
 
         // If set, tracks the hidden return buffer for struct arg.
         bool compJitOptimizeStructHiddenBuffer;
+
+        bool compJitEnableLoopHoistInNestedLoops;
 
 #ifdef LATE_DISASM
         bool doLateDisasm; // Run the late disassembler

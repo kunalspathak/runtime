@@ -2435,6 +2435,7 @@ void Compiler::compInitOptions(JitFlags* jitFlags)
     opts.compJitAlignLoopMaxCodeSize       = (unsigned short)JitConfig.JitAlignLoopMaxCodeSize();
     opts.compJitHideAlignBehindJmp         = JitConfig.JitHideAlignBehindJmp() == 1;
     opts.compJitOptimizeStructHiddenBuffer = JitConfig.JitOptimizeStructHiddenBuffer() == 1;
+    opts.compJitEnableLoopHoistInNestedLoops = JitConfig.JitEnableLoopHoistInNestedLoop() == 1;
 #else
     opts.compJitAlignLoopAdaptive          = true;
     opts.compJitAlignLoopBoundary          = DEFAULT_ALIGN_LOOP_BOUNDARY;

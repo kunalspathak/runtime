@@ -6442,7 +6442,7 @@ void Compiler::optPerformHoistExpr(GenTree* origExpr, BasicBlock* exprBb, unsign
 }
 
 //------------------------------------------------------------------------
-// optHoistLoopNest: run loop hoisting for indicated loop and all contained loops
+// optHoistLoopCode: run loop hoisting for indicated loop and all contained loops
 //
 // Returns:
 //    suitable phase status
@@ -6573,42 +6573,84 @@ bool Compiler::optHoistLoopNest(unsigned lnum, LoopHoistContext* hoistCtxt)
     m_curLoopHasHoistedExpression = false;
     m_loopsConsidered++;
 #endif // LOOP_HOIST_STATS
-
-    BasicBlockList*  firstPreHeader     = nullptr;
-    BasicBlockList** preHeaderAppendPtr = &firstPreHeader;
-
     bool modified = false;
-
-    if (optLoopTable[lnum].lpChild != BasicBlock::NOT_IN_LOOP)
+    if (!opts.compJitEnableLoopHoistInNestedLoops)
     {
-        for (unsigned child = optLoopTable[lnum].lpChild; child != BasicBlock::NOT_IN_LOOP;
-             child          = optLoopTable[child].lpSibling)
+        modified |= optHoistThisLoop(lnum, hoistCtxt, nullptr);
+        VNSet* hoistedInCurLoop = hoistCtxt->ExtractHoistedInCurLoop();
+
+        if (optLoopTable[lnum].lpChild != BasicBlock::NOT_IN_LOOP)
         {
-            modified |= optHoistLoopNest(child, hoistCtxt);
-
-            if (optLoopTable[child].lpFlags & LPFLG_HAS_PREHEAD)
+            // Add the ones hoisted in "lnum" to "hoistedInParents" for any nested loops.
+            // TODO-Cleanup: we should have a set abstraction for loops.
+            if (hoistedInCurLoop != nullptr)
             {
-                // If a pre-header is found, add it to the tracking list. Most likely, the recursive call
-                // to hoist from the `child` loop nest found something to hoist and created a pre-header
-                // where the hoisted code was placed.
+                for (VNSet::KeyIterator keys = hoistedInCurLoop->Begin(); !keys.Equal(hoistedInCurLoop->End()); ++keys)
+                {
+#ifdef DEBUG
+                    bool b;
+                    assert(!hoistCtxt->m_hoistedInParentLoops.Lookup(keys.Get(), &b));
+#endif
+                    hoistCtxt->m_hoistedInParentLoops.Set(keys.Get(), true);
+                }
+            }
 
-                BasicBlock* preHeaderBlock = optLoopTable[child].lpHead;
-                JITDUMP(" PREHEADER: " FMT_BB "\n", preHeaderBlock->bbNum);
+            for (unsigned child = optLoopTable[lnum].lpChild; child != BasicBlock::NOT_IN_LOOP;
+                 child          = optLoopTable[child].lpSibling)
+            {
+                modified |= optHoistLoopNest(child, hoistCtxt);
+            }
 
-                // Here, we are arranging the blocks in reverse lexical order, so when they are removed from the
-                // head of this list and pushed on the stack of hoisting blocks to process, they are in
-                // forward lexical order when popped. Note that for child loops `i` and `j`, in order `i`
-                // followed by `j` in the `lpSibling` list, that `j` is actually first in lexical order
-                // and that makes these blocks arranged in reverse lexical order in this list.
-                // That is, the sibling list is in reverse lexical order.
-                // Note: the sibling list order should not matter to any algorithm; this order is not guaranteed.
-                *preHeaderAppendPtr = new (this, CMK_LoopHoist) BasicBlockList(preHeaderBlock, nullptr);
-                preHeaderAppendPtr  = &((*preHeaderAppendPtr)->next);
+            // Now remove them.
+            // TODO-Cleanup: we should have a set abstraction for loops.
+            if (hoistedInCurLoop != nullptr)
+            {
+                for (VNSet::KeyIterator keys = hoistedInCurLoop->Begin(); !keys.Equal(hoistedInCurLoop->End()); ++keys)
+                {
+                    // Note that we asserted when we added these that they hadn't been members, so removing is
+                    // appropriate.
+                    hoistCtxt->m_hoistedInParentLoops.Remove(keys.Get());
+                }
             }
         }
     }
+    else
+    {
+        BasicBlockList*  firstPreHeader     = nullptr;
+        BasicBlockList** preHeaderAppendPtr = &firstPreHeader;
 
-    modified |= optHoistThisLoop(lnum, hoistCtxt, firstPreHeader);
+
+        if (optLoopTable[lnum].lpChild != BasicBlock::NOT_IN_LOOP)
+        {
+            for (unsigned child = optLoopTable[lnum].lpChild; child != BasicBlock::NOT_IN_LOOP;
+                    child          = optLoopTable[child].lpSibling)
+            {
+                modified |= optHoistLoopNest(child, hoistCtxt);
+
+                if (optLoopTable[child].lpFlags & LPFLG_HAS_PREHEAD)
+                {
+                    // If a pre-header is found, add it to the tracking list. Most likely, the recursive call
+                    // to hoist from the `child` loop nest found something to hoist and created a pre-header
+                    // where the hoisted code was placed.
+
+                    BasicBlock* preHeaderBlock = optLoopTable[child].lpHead;
+                    JITDUMP(" PREHEADER: " FMT_BB "\n", preHeaderBlock->bbNum);
+
+                    // Here, we are arranging the blocks in reverse lexical order, so when they are removed from the
+                    // head of this list and pushed on the stack of hoisting blocks to process, they are in
+                    // forward lexical order when popped. Note that for child loops `i` and `j`, in order `i`
+                    // followed by `j` in the `lpSibling` list, that `j` is actually first in lexical order
+                    // and that makes these blocks arranged in reverse lexical order in this list.
+                    // That is, the sibling list is in reverse lexical order.
+                    // Note: the sibling list order should not matter to any algorithm; this order is not guaranteed.
+                    *preHeaderAppendPtr = new (this, CMK_LoopHoist) BasicBlockList(preHeaderBlock, nullptr);
+                    preHeaderAppendPtr  = &((*preHeaderAppendPtr)->next);
+                }
+            }
+        }
+
+        modified |= optHoistThisLoop(lnum, hoistCtxt, firstPreHeader);
+    }
 
     return modified;
 }
@@ -7266,9 +7308,9 @@ void Compiler::optHoistLoopBlocks(unsigned loopNum, ArrayStack<BasicBlock*>* blo
                 // and the variable must be in SSA ...
                 isInvariant = isInvariant && m_compiler->lvaInSsa(lclNum) && lclVar->HasSsaName();
                 // and the SSA definition must be outside the loop we're hoisting from ...
-                isInvariant = isInvariant &&
-                              !m_compiler->optLoopTable[m_loopNum].lpContains(
-                                  m_compiler->lvaGetDesc(lclNum)->GetPerSsaData(lclVar->GetSsaNum())->GetBlock());
+                isInvariant =
+                    isInvariant && !m_compiler->optLoopTable[m_loopNum].lpContains(
+                                       m_compiler->lvaGetDesc(lclNum)->GetPerSsaData(lclVar->GetSsaNum())->GetBlock());
                 // and the VN of the tree is considered invariant as well.
                 //
                 // TODO-CQ: This VN invariance check should not be necessary and in some cases it is conservative - it
@@ -7582,7 +7624,8 @@ void Compiler::optHoistLoopBlocks(unsigned loopNum, ArrayStack<BasicBlock*>* blo
                     {
                         assert(value.Node() != tree);
 
-                        if (IsHoistableOverExcepSibling(value.Node(), hasExcep))
+                        if (!m_compiler->opts.compJitEnableLoopHoistInNestedLoops ||
+                            IsHoistableOverExcepSibling(value.Node(), hasExcep))
                         {
                             m_compiler->optHoistCandidate(value.Node(), m_currentBlock, m_loopNum, m_hoistContext);
                         }
@@ -7652,7 +7695,10 @@ void Compiler::optHoistLoopBlocks(unsigned loopNum, ArrayStack<BasicBlock*>* blo
         visitor.HoistBlock(block);
     }
 
-    hoistContext->ResetHoistedInCurLoop();
+    if (opts.compJitEnableLoopHoistInNestedLoops)
+    {
+        hoistContext->ResetHoistedInCurLoop();
+    }
 }
 
 void Compiler::optHoistCandidate(GenTree* tree, BasicBlock* treeBb, unsigned lnum, LoopHoistContext* hoistCtxt)
@@ -7664,6 +7710,16 @@ void Compiler::optHoistCandidate(GenTree* tree, BasicBlock* treeBb, unsigned lnu
     {
         JITDUMP("   ... not profitable to hoist\n");
         return;
+    }
+
+    if (!opts.compJitEnableLoopHoistInNestedLoops)
+    {
+        if (hoistCtxt->m_hoistedInParentLoops.Lookup(tree->gtVNPair.GetLiberal()))
+        {
+            JITDUMP("   ... already hoisted same VN in parent\n");
+            // already hoisted in a parent loop, so don't hoist this expression.
+            return;
+        }
     }
 
     if (hoistCtxt->GetHoistedInCurLoop(this)->Lookup(tree->gtVNPair.GetLiberal()))

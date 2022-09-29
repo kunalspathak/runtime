@@ -745,7 +745,8 @@ enum join_type
 enum join_time
 {
     time_start = 0,
-    time_end = 1
+    time_end = 1,
+    time_unknown = 2
 };
 
 enum join_heap_index
@@ -833,6 +834,9 @@ public:
 
         if (Interlocked::Decrement(&join_struct.join_lock) != 0)
         {
+            bool hardwaitedTrack = false;
+            int totalIterations = 0;
+
             dprintf (JOIN_LOG, ("join%d(%d): Join() Waiting...join_lock is now %d",
                 flavor, join_id, (int32_t)(join_struct.join_lock)));
 
@@ -845,6 +849,7 @@ respin:
                 int spin_count = 128 * yp_spin_count_unit;
                 for (int j = 0; j < spin_count; j++)
                 {
+                    totalIterations++;
                     if (color != join_struct.lock_color.LoadWithoutBarrier())
                     {
                         break;
@@ -855,6 +860,7 @@ respin:
                 // we've spun, and if color still hasn't changed, fall into hard wait
                 if (color == join_struct.lock_color.LoadWithoutBarrier())
                 {
+                    hardwaitedTrack = true;
                     dprintf (JOIN_LOG, ("join%d(%d): Join() hard wait on reset event %d, join_lock is now %d",
                         flavor, join_id, color, (int32_t)(join_struct.join_lock)));
 
@@ -867,9 +873,13 @@ respin:
                     }
                 }
 
+                // 0x10000000 <-- hardwait
+                // 0x20000000 <-- nohardwait
+
                 // avoid race due to the thread about to reset the event (occasionally) being preempted before ResetEvent()
                 if (color == join_struct.lock_color.LoadWithoutBarrier())
                 {
+                    fire_event(-1, time_unknown, type_join, -1);
                     goto respin;
                 }
 
@@ -877,7 +887,13 @@ respin:
                     flavor, join_id, (int32_t)(join_struct.join_lock)));
             }
 
-            fire_event (gch->heap_number, time_end, type_join, join_id);
+            //int taggedHeapNumber = hardwaitedTrack ? 0x20000000 : 0x10000000;
+            //taggedHeapNumber = taggedHeapNumber | gch->heap_number;
+            //int taggedJoinId = 0x10000000 | spinCountTrack;
+            int baseHeap = hardwaitedTrack ? 20000000 : 10000000;
+            int baseJoinId = join_id * 1000000;
+
+            fire_event(baseHeap + gch->heap_number, time_end, type_join, baseJoinId + totalIterations);
 
 #ifdef JOIN_STATS
             // parallel execution starts here
@@ -917,15 +933,19 @@ respin:
 
         if (Interlocked::CompareExchange(&join_struct.r_join_lock, 0, join_struct.n_threads) == 0)
         {
+            bool hardwaitedTrack = false;
+            int totalIterations = 0;
             fire_event (gch->heap_number, time_start, type_join, join_id);
 
             dprintf (JOIN_LOG, ("r_join() Waiting..."));
 
             //busy wait around the color
 respin:
+            //spinCountTrack++;
             int spin_count = 256 * yp_spin_count_unit;
             for (int j = 0; j < spin_count; j++)
             {
+                totalIterations++;
                 if (join_struct.wait_done)
                 {
                     break;
@@ -936,6 +956,7 @@ respin:
             // we've spun, and if color still hasn't changed, fall into hard wait
             if (!join_struct.wait_done)
             {
+                hardwaitedTrack = true;
                 dprintf (JOIN_LOG, ("Join() hard wait on reset event %d", first_thread_arrived));
                 uint32_t dwJoinWait = join_struct.joined_event[first_thread_arrived].Wait(INFINITE, FALSE);
                 if (dwJoinWait != WAIT_OBJECT_0)
@@ -952,8 +973,15 @@ respin:
             }
 
             dprintf (JOIN_LOG, ("r_join() done"));
+            /*int taggedHeapNumber = hardwaitedTrack ? 0x20000000 : 0x10000000;
+            taggedHeapNumber = taggedHeapNumber | gch->heap_number;
+            int taggedJoinId = 0x20000000 | spinCountTrack;
+            fire_event (taggedHeapNumber, time_end, type_join, taggedJoinId);*/
+            //fire_event (gch->heap_number, time_end, type_join, join_id);
+            int baseHeap = hardwaitedTrack ? 40000000 : 30000000;
+            int baseJoinId = join_id * 2000000;
 
-            fire_event (gch->heap_number, time_end, type_join, join_id);
+            fire_event(baseHeap + gch->heap_number, time_end, type_join, baseJoinId + totalIterations);
 
             return FALSE;
         }
@@ -45349,10 +45377,14 @@ void GCHeap::SetYieldProcessorScalingFactor (float scalingFactor)
     uint32_t saved_yp_spin_count_unit = yp_spin_count_unit;
     yp_spin_count_unit = (uint32_t)((float)original_spin_count_unit * scalingFactor / (float)9);
 
+    printf("[1] original_spin_count_unit= %u, scalingFactor= %f, yp_spin_count_unit= %u, saved_yp_spin_count_unit= %u\n",
+        original_spin_count_unit, scalingFactor, yp_spin_count_unit, saved_yp_spin_count_unit);
     // It's very suspicious if it becomes 0 and also, we don't want to spin too much.
     if ((yp_spin_count_unit == 0) || (yp_spin_count_unit > 32768))
     {
         yp_spin_count_unit = saved_yp_spin_count_unit;
+        printf("[2] original_spin_count_unit= %u, scalingFactor= %f, yp_spin_count_unit= %u, saved_yp_spin_count_unit= %u\n",
+        original_spin_count_unit, scalingFactor, yp_spin_count_unit, saved_yp_spin_count_unit);
     }
 }
 

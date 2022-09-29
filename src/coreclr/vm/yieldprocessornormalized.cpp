@@ -152,6 +152,7 @@ void YieldProcessorNormalization::PerformMeasurement()
         for (int i = 0; i < NsPerYieldMeasurementCount; ++i)
         {
             latestNsPerYield = MeasureNsPerYield(measureDurationUs);
+            printf("s_nsPerYieldMeasurements[%d]= %f\n", i, latestNsPerYield);
             AtomicStore(&s_nsPerYieldMeasurements[i], latestNsPerYield);
             if (i == 0 || latestNsPerYield < s_establishedNsPerYield)
             {
@@ -199,6 +200,12 @@ void YieldProcessorNormalization::PerformMeasurement()
     _ASSERTE(s_optimalMaxNormalizedYieldsPerSpinIteration <= MaxOptimalMaxNormalizedYieldsPerSpinIteration);
 
     GCHeapUtilities::GetGCHeap()->SetYieldProcessorScalingFactor((float)yieldsPerNormalizedYield);
+
+        printf("***Normalized calculation:\n");
+    printf("TargetNsPerNormalizedYield: %d\n", TargetNsPerNormalizedYield);
+    printf("establishedNsPerYield: %f\n", establishedNsPerYield);
+    printf("yieldsPerNormalizedYield: %u\n", yieldsPerNormalizedYield);
+    printf("s_optimalMaxNormalizedYieldsPerSpinIteration: %u\n", s_optimalMaxNormalizedYieldsPerSpinIteration);
 
     s_previousNormalizationTimeMs = GetTickCount();
     s_normalizationState = NormalizationState::Initialized;

@@ -9371,11 +9371,12 @@ void Compiler::impImportBlockCode(BasicBlock* block)
                         }
                     }
                     break;
-
+#ifdef TARGET_WINDOWS
                     case CORINFO_FIELD_STATIC_TLS_MANAGED:
                         op1 =
                             impThreadLocalFieldRead(resolvedToken, (CORINFO_ACCESS_FLAGS)aflags, &fieldInfo, lclTyp);
                         break;
+#endif // TARGET_WINDOWS
                     case CORINFO_FIELD_STATIC_TLS:
 #ifdef TARGET_X86
                         // Legacy TLS access is implemented as intrinsic on x86 only
@@ -9648,10 +9649,12 @@ void Compiler::impImportBlockCode(BasicBlock* block)
                         }
                     }
                     break;
+#ifdef TARGET_WINDOWS
                     case CORINFO_FIELD_STATIC_TLS_MANAGED:
                         op1 =
                             impThreadLocalFieldWrite(resolvedToken, (CORINFO_ACCESS_FLAGS)aflags, &fieldInfo, lclTyp);
                         break;
+#endif // TARGET_WINDOWS
                     case CORINFO_FIELD_STATIC_TLS:
 #ifdef TARGET_X86
                         // Legacy TLS access is implemented as intrinsic on x86 only.
@@ -14434,9 +14437,6 @@ GenTree* Compiler::impThreadLocalFieldRead(CORINFO_RESOLVED_TOKEN& token,
     const unsigned tmpNum = lvaGrabTemp(true DEBUGARG("TLS field access"));
     impAssignTempGen(tmpNum, maxThreadStaticBlocksQmark, token.hClass, CHECK_SPILL_ALL);
     var_types type = genActualType(lvaTable[tmpNum].TypeGet());
-
-    //slowPathForThreadStaticBlockNull->gtFlags = (GTF_IND_NONFAULTING | GTF_IND_INVARIANT);
-    //slowPathForMaxThreadStaticBlock->gtFlags = (GTF_IND_NONFAULTING | GTF_IND_INVARIANT);
 
     return gtNewLclvNode(tmpNum, type);
 }

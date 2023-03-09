@@ -4348,6 +4348,7 @@ private:
 
     methodPointerInfo* impAllocateMethodPointerInfo(const CORINFO_RESOLVED_TOKEN& token, mdToken tokenConstrained);
 
+#ifdef TARGET_WINDOWS
     GenTree* impThreadLocalFieldRead(CORINFO_RESOLVED_TOKEN& token,
                                        CORINFO_ACCESS_FLAGS    access,
                                        CORINFO_FIELD_INFO*     pFieldInfo,
@@ -4356,6 +4357,7 @@ private:
                                      CORINFO_ACCESS_FLAGS    access,
                                      CORINFO_FIELD_INFO*     pFieldInfo,
                                      var_types               lclTyp);
+#endif // TARGET_WINDOWS
     /*
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

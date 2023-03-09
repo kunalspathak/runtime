@@ -1818,50 +1818,55 @@ HCIMPL3(void*, JIT_GetSharedNonGCThreadStaticBaseOptimized, DomainLocalModule *p
 
     // Get the relevant ThreadLocalModule
     ThreadLocalModule * pThreadLocalModule = ThreadStatics::GetTLMIfExists(index);
+    void* staticBlock = nullptr;
 
     // If the TLM has been allocated and the class has been marked as initialized,
     // get the pointer to the non-GC statics base and return
     if (pThreadLocalModule != NULL && pThreadLocalModule->IsPrecomputedClassInitialized(dwClassDomainID))
-        return (void*)pThreadLocalModule->GetPrecomputedNonGCStaticsBasePointer();
+    {
+        staticBlock = (void*)pThreadLocalModule->GetPrecomputedNonGCStaticsBasePointer();
+    }
+    else
+    {
+        // If the TLM was not allocated or if the class was not marked as initialized
+        // then we have to go through the slow path
 
-    // If the TLM was not allocated or if the class was not marked as initialized
-    // then we have to go through the slow path
+        // Obtain the MethodTable
+        MethodTable * pMT = pDomainLocalModule->GetMethodTableFromClassDomainID(dwClassDomainID);
+        _ASSERTE(!pMT->HasGenericsStaticsInfo());
 
-    // Obtain the MethodTable
-    MethodTable * pMT = pDomainLocalModule->GetMethodTableFromClassDomainID(dwClassDomainID);
-    _ASSERTE(!pMT->HasGenericsStaticsInfo());
-
-    ENDFORBIDGC();
-    void* staticBlock = HCCALL1(JIT_GetNonGCThreadStaticBase_Helper, pMT);
+        ENDFORBIDGC();
+        staticBlock = HCCALL1(JIT_GetNonGCThreadStaticBase_Helper, pMT);
+    }
 
 #ifdef TARGET_WINDOWS
-        if (t_threadStaticBlocksSize <= staticBlockIndex)
+    if (t_threadStaticBlocksSize <= staticBlockIndex)
+    {
+        UINT32 prevThreadStaticBlocksSize = t_threadStaticBlocksSize;
+        void** prevThreadStaticBlock = t_threadStaticBlocks;
+
+        t_threadStaticBlocksSize = max(2 * t_threadStaticBlocksSize, staticBlockIndex + 1);
+        t_threadStaticBlocks = (void**) new (nothrow) PTR_BYTE[t_threadStaticBlocksSize * sizeof(PTR_BYTE)];
+        memset(t_threadStaticBlocks, 0, t_threadStaticBlocksSize * sizeof(PTR_BYTE));
+
+        if (prevThreadStaticBlocksSize > 0)
         {
-            UINT32 prevThreadStaticBlocksSize = t_threadStaticBlocksSize;
-            void** prevThreadStaticBlock = t_threadStaticBlocks;
-
-            t_threadStaticBlocksSize = max(2 * t_threadStaticBlocksSize, staticBlockIndex + 1);
-            t_threadStaticBlocks = (void**) new (nothrow) PTR_BYTE[t_threadStaticBlocksSize * sizeof(PTR_BYTE)];
-            memset(t_threadStaticBlocks, 0, t_threadStaticBlocksSize * sizeof(PTR_BYTE));
-
-            if (prevThreadStaticBlocksSize > 0)
-            {
-                memcpy(t_threadStaticBlocks, prevThreadStaticBlock, prevThreadStaticBlocksSize);
-                delete prevThreadStaticBlock;
-            }
+            memcpy(t_threadStaticBlocks, prevThreadStaticBlock, prevThreadStaticBlocksSize);
+            delete prevThreadStaticBlock;
         }
+    }
 
-        void* currentEntry = t_threadStaticBlocks[staticBlockIndex];
-        // We could be coming here 2nd time after running the ctor when we try to get the static block.
-        // In such case, just avoid adding the same entry.
-        if (currentEntry != staticBlock)
-        {
-            _ASSERTE(currentEntry == nullptr);
-            t_threadStaticBlocks[staticBlockIndex] = staticBlock;
-            t_maxThreadStaticBlocks = max(t_maxThreadStaticBlocks, staticBlockIndex);
-        }
+    void* currentEntry = t_threadStaticBlocks[staticBlockIndex];
+    // We could be coming here 2nd time after running the ctor when we try to get the static block.
+    // In such case, just avoid adding the same entry.
+    if (currentEntry != staticBlock)
+    {
+        _ASSERTE(currentEntry == nullptr);
+        t_threadStaticBlocks[staticBlockIndex] = staticBlock;
+        t_maxThreadStaticBlocks = max(t_maxThreadStaticBlocks, staticBlockIndex);
+    }
 
-        _ASSERTE(CEEInfo::g_threadStaticBlockTypeIDMap.LookupType(staticBlockIndex));
+    _ASSERTE(CEEInfo::g_threadStaticBlockTypeIDMap.LookupType(staticBlockIndex));
 #endif
 
     return staticBlock;

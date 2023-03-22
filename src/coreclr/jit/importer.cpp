@@ -14266,6 +14266,7 @@ bool Compiler::impCanSkipCovariantStoreCheck(GenTree* value, GenTree* array)
     return false;
 }
 
+#ifdef TARGET_WINDOWS
 //------------------------------------------------------------------------
 // impThreadLocalFieldRead: Import a TLS field address for read.
 //
@@ -14614,3 +14615,5 @@ GenTree* Compiler::impThreadLocalFieldWrite(CORINFO_RESOLVED_TOKEN& token,
     GenTree*  fieldAddress = gtNewOperNode(GT_ADD, TYP_I_IMPL, threadStaticBlockAddress, offsetNode);
     return  gtNewIndir(fieldType, fieldAddress);
 }
+
+#endif // TARGET_WINDOWS

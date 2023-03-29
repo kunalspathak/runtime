@@ -1750,7 +1750,9 @@ void CEEInfo::getFieldInfo (CORINFO_RESOLVED_TOKEN * pResolvedToken,
 
 /*********************************************************************/
 
+#ifdef HOST_WINDOWS
 TypeIDMap CEEInfo::g_threadStaticBlockTypeIDMap;
+#endif
 
 void CEEInfo::getThreadLocalFieldInfo (CORINFO_FIELD_HANDLE  field,
                                        CORINFO_THREAD_LOCAL_FIELD_INFO* pInfo)
@@ -1766,12 +1768,15 @@ void CEEInfo::getThreadLocalFieldInfo (CORINFO_FIELD_HANDLE  field,
     FieldDesc* fieldDesc = (FieldDesc*)field;
     _ASSERTE(fieldDesc->IsThreadStatic());
 
-    pInfo->tlsIndex = _tls_index;
-
 #ifdef HOST_WINDOWS
+    pInfo->tlsIndex = _tls_index;
     pInfo->offsetOfThreadLocalStoragePointer = offsetof(_TEB, ThreadLocalStoragePointer);
     pInfo->offsetOfThreadStaticBlocks = CEEInfo::ThreadLocalOffset(&t_threadStaticBlocks);
     pInfo->offsetOfMaxThreadStaticBlocks = CEEInfo::ThreadLocalOffset(&t_maxThreadStaticBlocks);
+
+    UINT32 typeIndex =  CEEInfo::GetTypeIndex(fieldDesc->GetEnclosingMethodTable());
+    assert(typeIndex != TypeIDProvider::INVALID_TYPE_ID);
+    pInfo->threadStaticBlockIndex = typeIndex;
 #endif // HOST_WINDOWS
      
     //pInfo->tlsIndex.accessType = IAT_VALUE;
@@ -1785,9 +1790,6 @@ void CEEInfo::getThreadLocalFieldInfo (CORINFO_FIELD_HANDLE  field,
     //pInfo->offsetOfThreadStaticBlocks.accessType = IAT_VALUE;
     //pInfo->offsetOfThreadStaticBlocks.addr = PTR_VOID(dac_cast<PTR_BYTE>(CEEInfo::ThreadLocalOffset(&t_threadStaticBlocks)));
 
-    UINT32 typeIndex =  CEEInfo::GetTypeIndex(fieldDesc->GetEnclosingMethodTable());
-    assert(typeIndex != TypeIDProvider::INVALID_TYPE_ID);
-    pInfo->threadStaticBlockIndex = typeIndex;
     
     EE_TO_JIT_TRANSITION();
 }

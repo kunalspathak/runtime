@@ -1917,82 +1917,73 @@ void           LinearScan::identifyCandidates()
             continue;
         }
 
-        if (varDsc->lvLRACandidate)
+        var_types type = varDsc->GetStackSlotHomeType();
+        if (!varTypeUsesIntReg(type))
         {
-            var_types type = varDsc->GetStackSlotHomeType();
-            if (!varTypeUsesIntReg(type))
-            {
-                compiler->compFloatingPointUsed = true;
-            }
-            Interval* newInt = newInterval(type);
-            newInt->setLocalNumber(compiler, lclNum, this);
-            VarSetOps::AddElemD(compiler, registerCandidateVars, varDsc->lvVarIndex);
+            compiler->compFloatingPointUsed = true;
+        }
+        Interval* newInt = newInterval(type);
+        newInt->setLocalNumber(compiler, lclNum, this);
+        VarSetOps::AddElemD(compiler, registerCandidateVars, varDsc->lvVarIndex);
 
-            // we will set this later when we have determined liveness
-            varDsc->lvMustInit = false;
+        // we will set this later when we have determined liveness
+        varDsc->lvMustInit = false;
 
-            if (varDsc->lvIsStructField)
-            {
-                newInt->isStructField = true;
-            }
+        if (varDsc->lvIsStructField)
+        {
+            newInt->isStructField = true;
+        }
 
-            if (varDsc->lvLiveInOutOfHndlr)
-            {
-                newInt->isWriteThru = varDsc->lvSingleDefRegCandidate;
-                setIntervalAsSpilled(newInt);
-            }
+        if (varDsc->lvLiveInOutOfHndlr)
+        {
+            newInt->isWriteThru = true;
+            setIntervalAsSpilled(newInt);
+        }
 
-            INTRACK_STATS(regCandidateVarCount++);
+        INTRACK_STATS(regCandidateVarCount++);
 
-            // We maintain two sets of FP vars - those that meet the first threshold of weighted ref Count,
-            // and those that meet the second (see the definitions of thresholdFPRefCntWtd and maybeFPRefCntWtd
-            // above).
-            CLANG_FORMAT_COMMENT_ANCHOR;
+        // We maintain two sets of FP vars - those that meet the first threshold of weighted ref Count,
+        // and those that meet the second (see the definitions of thresholdFPRefCntWtd and maybeFPRefCntWtd
+        // above).
+        CLANG_FORMAT_COMMENT_ANCHOR;
 
 #if FEATURE_PARTIAL_SIMD_CALLEE_SAVE
-            // Additionally, when we are generating code for a target with partial SIMD callee-save
-            // (AVX on non-UNIX amd64 and 16-byte vectors on arm64), we keep a separate set of the
-            // LargeVectorType vars.
-            if (Compiler::varTypeNeedsPartialCalleeSave(varDsc->GetRegisterType()))
+        // Additionally, when we are generating code for a target with partial SIMD callee-save
+        // (AVX on non-UNIX amd64 and 16-byte vectors on arm64), we keep a separate set of the
+        // LargeVectorType vars.
+        if (Compiler::varTypeNeedsPartialCalleeSave(varDsc->GetRegisterType()))
+        {
+            largeVectorVarCount++;
+            VarSetOps::AddElemD(compiler, largeVectorVars, varDsc->lvVarIndex);
+            weight_t refCntWtd = varDsc->lvRefCntWtd();
+            if (refCntWtd >= thresholdLargeVectorRefCntWtd)
             {
-                largeVectorVarCount++;
-                VarSetOps::AddElemD(compiler, largeVectorVars, varDsc->lvVarIndex);
-                weight_t refCntWtd = varDsc->lvRefCntWtd();
-                if (refCntWtd >= thresholdLargeVectorRefCntWtd)
-                {
-                    VarSetOps::AddElemD(compiler, largeVectorCalleeSaveCandidateVars, varDsc->lvVarIndex);
-                }
+                VarSetOps::AddElemD(compiler, largeVectorCalleeSaveCandidateVars, varDsc->lvVarIndex);
             }
-            else
-#endif // FEATURE_PARTIAL_SIMD_CALLEE_SAVE
-                if (regType(type) == FloatRegisterType)
-            {
-                floatVarCount++;
-                weight_t refCntWtd = varDsc->lvRefCntWtd();
-                if (varDsc->lvIsRegArg)
-                {
-                    // Don't count the initial reference for register params.  In those cases,
-                    // using a callee-save causes an extra copy.
-                    refCntWtd -= BB_UNITY_WEIGHT;
-                }
-                if (refCntWtd >= thresholdFPRefCntWtd)
-                {
-                    VarSetOps::AddElemD(compiler, fpCalleeSaveCandidateVars, varDsc->lvVarIndex);
-                }
-                else if (refCntWtd >= maybeFPRefCntWtd)
-                {
-                    VarSetOps::AddElemD(compiler, fpMaybeCandidateVars, varDsc->lvVarIndex);
-                }
-            }
-            JITDUMP("  ");
-            DBEXEC(VERBOSE, newInt->dump(compiler));
         }
         else
+#endif // FEATURE_PARTIAL_SIMD_CALLEE_SAVE
+            if (regType(type) == FloatRegisterType)
         {
-            // Added code just to check if we ever reach here. If not delete this if-else.
-            assert(false);
-            localVarIntervals[varDsc->lvVarIndex] = nullptr;
+            floatVarCount++;
+            weight_t refCntWtd = varDsc->lvRefCntWtd();
+            if (varDsc->lvIsRegArg)
+            {
+                // Don't count the initial reference for register params.  In those cases,
+                // using a callee-save causes an extra copy.
+                refCntWtd -= BB_UNITY_WEIGHT;
+            }
+            if (refCntWtd >= thresholdFPRefCntWtd)
+            {
+                VarSetOps::AddElemD(compiler, fpCalleeSaveCandidateVars, varDsc->lvVarIndex);
+            }
+            else if (refCntWtd >= maybeFPRefCntWtd)
+            {
+                VarSetOps::AddElemD(compiler, fpMaybeCandidateVars, varDsc->lvVarIndex);
+            }
         }
+        JITDUMP("  ");
+        DBEXEC(VERBOSE, newInt->dump(compiler));
     }
 
 #if FEATURE_PARTIAL_SIMD_CALLEE_SAVE
@@ -5696,7 +5687,7 @@ void LinearScan::allocateRegisters()
                 else if (currentInterval->isWriteThru)
                 {
                     // Don't allocate if the next reference is in a cold block.
-                    if (nextRefPosition == nullptr || (nextRefPosition->nodeLocation >= firstColdLoc))
+                    if (nextRefPosition == nullptr || (nextRefPosition->nodeLocation >= firstColdLoc) /*|| !currentInterval->isSingleDef*/)
                     {
                         allocate = false;
                     }

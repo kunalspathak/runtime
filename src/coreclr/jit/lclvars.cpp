@@ -4164,7 +4164,8 @@ void Compiler::lvaMarkLclRefs(GenTree* tree, BasicBlock* block, Statement* stmt,
                 }
             }
 
-            if (!varDsc->lvDisqualifySingleDefRegCandidate) // If this var is already disqualified, we can skip this
+            varDsc->updatedSingleDef = true;
+            if (/*isOld && */!varDsc->lvDisqualifySingleDefRegCandidate) // If this var is already disqualified, we can skip this
             {
                 bool bbInALoop  = (block->bbFlags & BBF_BACKWARD_JUMP) != 0;
                 bool bbIsReturn = block->bbJumpKind == BBJ_RETURN;
@@ -4180,13 +4181,13 @@ void Compiler::lvaMarkLclRefs(GenTree* tree, BasicBlock* block, Statement* stmt,
                     if (needsExplicitZeroInit)
                     {
                         varDsc->lvSingleDefDisqualifyReason = 'Z';
-                        JITDUMP("V%02u needs explicit zero init. Disqualified as a single-def register candidate.\n",
+                        JITDUMP("BLAH: V%02u needs explicit zero init. Disqualified as a single-def register candidate.\n",
                                 lclNum);
                     }
                     else
                     {
                         varDsc->lvSingleDefDisqualifyReason = 'M';
-                        JITDUMP("V%02u has multiple definitions. Disqualified as a single-def register candidate.\n",
+                        JITDUMP("BLAH: V%02u has multiple definitions. Disqualified as a single-def register candidate.\n",
                                 lclNum);
                     }
 
@@ -4207,7 +4208,7 @@ void Compiler::lvaMarkLclRefs(GenTree* tree, BasicBlock* block, Statement* stmt,
 #endif
                     {
                         varDsc->lvSingleDefRegCandidate = true;
-                        JITDUMP("Marking EH Var V%02u as a register candidate.\n", lclNum);
+                        JITDUMP("BLAH: Marking EH Var V%02u as a register candidate.\n", lclNum);
                     }
                 }
             }
@@ -4545,11 +4546,16 @@ void Compiler::lvaComputeRefCounts(bool isRecompute, bool setSlotNumbers)
         // argument locals as they are "defined" on entry.
         // However, if we are just recomputing the ref counts, retain the value
         // that was set by past phases.
+
+        //if (isRecompute && !isOld)
+        //{
+        //    varDsc->lvSingleDef             = varDsc->lvIsParam;
+        //    varDsc->lvSingleDefRegCandidate = varDsc->lvIsParam;
+        //}
         if (!isRecompute)
         {
             varDsc->lvSingleDef             = varDsc->lvIsParam;
             varDsc->lvSingleDefRegCandidate = varDsc->lvIsParam;
-
             varDsc->lvAllDefsAreNoGc = (varDsc->lvImplicitlyReferenced == false);
         }
     }
@@ -4592,6 +4598,62 @@ void Compiler::lvaComputeRefCounts(bool isRecompute, bool setSlotNumbers)
                     {
                         assert(node->OperIs(GT_LCL_VAR));
                         lvaGenericsContextInUse = true;
+                    }
+
+                    if (/*!isOld && */ !varDsc->updatedSingleDef && node->OperIs(GT_STORE_LCL_VAR))
+                    {
+                        JITDUMP("isRecompute: %s\n", isRecompute ? "yes" : "no");
+                        if (!varDsc->lvDisqualifySingleDefRegCandidate) // If this var is already disqualified, we can
+                                                                        // skip this
+                        {
+                            bool bbInALoop  = (block->bbFlags & BBF_BACKWARD_JUMP) != 0;
+                            bool bbIsReturn = block->bbJumpKind == BBJ_RETURN;
+                            lclNum          = node->AsLclVarCommon()->GetLclNum();
+                            // TODO: Zero-inits in LSRA are created with below condition. But if filter out based on
+                            // that condition we filter a lot of interesting variables that would benefit otherwise with
+                            // EH var enregistration. bool needsExplicitZeroInit = !varDsc->lvIsParam &&
+                            // (info.compInitMem || varTypeIsGC(varDsc->TypeGet()));
+                            bool needsExplicitZeroInit = fgVarNeedsExplicitZeroInit(lclNum, bbInALoop, bbIsReturn);
+
+                            if (varDsc->lvSingleDefRegCandidate || needsExplicitZeroInit)
+                            {
+#ifdef DEBUG
+                                if (needsExplicitZeroInit)
+                                {
+                                    varDsc->lvSingleDefDisqualifyReason = 'Z';
+                                    JITDUMP("BLAH: V%02u needs explicit zero init. Disqualified as a single-def register "
+                                            "candidate.\n",
+                                            lclNum);
+                                }
+                                else
+                                {
+                                    varDsc->lvSingleDefDisqualifyReason = 'M';
+                                    JITDUMP("BLAH: V%02u has multiple definitions. Disqualified as a single-def register "
+                                            "candidate.\n",
+                                            lclNum);
+                                }
+
+#endif // DEBUG
+                                varDsc->lvSingleDefRegCandidate           = false;
+                                varDsc->lvDisqualifySingleDefRegCandidate = true;
+                            }
+                            else if (!varDsc->lvDoNotEnregister)
+                            {
+                                // Variables can be marked as DoNotEngister in earlier stages like LocalAddressVisitor.
+                                // No need to track them for single-def.
+                                CLANG_FORMAT_COMMENT_ANCHOR;
+
+#if FEATURE_PARTIAL_SIMD_CALLEE_SAVE
+                                // TODO-CQ: If the varType needs partial callee save, conservatively do not enregister
+                                // such variable. In future, we should enable enregisteration for such variables.
+                                if (!varTypeNeedsPartialCalleeSave(varDsc->GetRegisterType()))
+#endif
+                                {
+                                    varDsc->lvSingleDefRegCandidate = true;
+                                    JITDUMP("BLAH: Marking EH Var V%02u as a register candidate.\n", lclNum);
+                                }
+                            }
+                        }
                     }
                 }
             }

@@ -563,6 +563,7 @@ public:
 
     unsigned char lvDisqualifySingleDefRegCandidate : 1; // tracks variable that are disqualified from register
                                                          // candidancy
+    unsigned char updatedSingleDef : 1;
 
     unsigned char lvSpillAtSingleDef : 1; // variable has a single def (as determined by LSRA interval scan)
                                           // and is spilled making it candidate to spill right after the
@@ -3489,6 +3490,7 @@ public:
     void lvaSortByRefCount();
 
     PhaseStatus lvaMarkLocalVars(); // Local variable ref-counting
+    //bool isOld;
     void lvaComputeRefCounts(bool isRecompute, bool setSlotNumbers);
     void lvaMarkLocalVars(BasicBlock* block, bool isRecompute);
 

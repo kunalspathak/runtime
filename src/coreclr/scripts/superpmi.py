@@ -1588,7 +1588,7 @@ class SuperPMIReplayAsmDiffs:
             "DOTNET_JitEHDump": "*",
             "DOTNET_JitDiffableDasm": "1", # to be removed
             "DOTNET_JitDisasmDiffable": "1",
-            "DOTNET_JitDisasmWithGC": "1"
+            # "DOTNET_JitDisasmWithGC": "1"
         }
 
         if self.coreclr_args.gcinfo:

@@ -1777,6 +1777,7 @@ void Compiler::compInit(ArenaAllocator*       pAlloc,
                         InlineInfo*           inlineInfo)
 {
     assert(pAlloc);
+    //isOld = false;
     compArenaAllocator = pAlloc;
 
     // Inlinee Compile object will only be allocated when needed for the 1st time.

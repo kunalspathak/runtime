@@ -1931,6 +1931,12 @@ void LinearScan::buildPhysRegRecords()
 {
     for (regNumber reg = REG_FIRST; reg < AVAILABLE_REG_COUNT; reg = REG_NEXT(reg))
     {
+#ifdef TARGET_AMD64
+        if (reg == REG_R15)
+        {
+            continue;
+        }
+#endif
         RegRecord* curr = &physRegs[reg];
         curr->init(reg);
     }

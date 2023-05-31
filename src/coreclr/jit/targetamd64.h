@@ -127,7 +127,7 @@
 #ifdef UNIX_AMD64_ABI
   #define MIN_ARG_AREA_FOR_CALL   0       // Minimum required outgoing argument space for a call.
 
-  #define RBM_INT_CALLEE_SAVED    (RBM_EBX|RBM_ETW_FRAMED_EBP|RBM_R12|RBM_R13|RBM_R14|RBM_R15)
+  #define RBM_INT_CALLEE_SAVED    (RBM_EBX|RBM_ETW_FRAMED_EBP|RBM_R12|RBM_R13|RBM_R14/*|RBM_R15*/)
   #define RBM_INT_CALLEE_TRASH    (RBM_EAX|RBM_RDI|RBM_RSI|RBM_EDX|RBM_ECX|RBM_R8|RBM_R9|RBM_R10|RBM_R11)
   #define RBM_FLT_CALLEE_SAVED    (0)
 
@@ -138,14 +138,14 @@
   #define REG_PROFILER_ENTER_ARG_0 REG_R14
   #define RBM_PROFILER_ENTER_ARG_0 RBM_R14
   #define REG_PROFILER_ENTER_ARG_1 REG_R15
-  #define RBM_PROFILER_ENTER_ARG_1 RBM_R15
+  //#define RBM_PROFILER_ENTER_ARG_1 RBM_R15
 
   #define REG_DEFAULT_PROFILER_CALL_TARGET REG_R11
 
 #else // !UNIX_AMD64_ABI
 #define MIN_ARG_AREA_FOR_CALL     (4 * REGSIZE_BYTES)       // Minimum required outgoing argument space for a call.
 
-  #define RBM_INT_CALLEE_SAVED    (RBM_EBX|RBM_ESI|RBM_EDI|RBM_ETW_FRAMED_EBP|RBM_R12|RBM_R13|RBM_R14|RBM_R15)
+  #define RBM_INT_CALLEE_SAVED    (RBM_EBX|RBM_ESI|RBM_EDI|RBM_ETW_FRAMED_EBP|RBM_R12|RBM_R13|RBM_R14/*|RBM_R15*/)
   #define RBM_INT_CALLEE_TRASH    (RBM_EAX|RBM_ECX|RBM_EDX|RBM_R8|RBM_R9|RBM_R10|RBM_R11)
   #define RBM_FLT_CALLEE_SAVED    (RBM_XMM6|RBM_XMM7|RBM_XMM8|RBM_XMM9|RBM_XMM10|RBM_XMM11|RBM_XMM12|RBM_XMM13|RBM_XMM14|RBM_XMM15)
 
@@ -209,7 +209,7 @@
 
 #if 0
 #define REG_VAR_ORDER            REG_EAX,REG_EDX,REG_ECX,REG_ESI,REG_EDI,REG_EBX,REG_ETW_FRAMED_EBP_LIST \
-                                 REG_R8,REG_R9,REG_R10,REG_R11,REG_R14,REG_R15,REG_R12,REG_R13
+                                 REG_R8,REG_R9,REG_R10,REG_R11,REG_R14,/*REG_R15,*/REG_R12,REG_R13
 #else
   // TEMPORARY ORDER TO AVOID CALLEE-SAVES
   // TODO-CQ: Review this and set appropriately
@@ -217,12 +217,12 @@
   #define REG_VAR_ORDER          REG_EAX,REG_EDI,REG_ESI, \
                                  REG_EDX,REG_ECX,REG_R8,REG_R9, \
                                  REG_R10,REG_R11,REG_EBX,REG_ETW_FRAMED_EBP_LIST \
-                                 REG_R14,REG_R15,REG_R12,REG_R13
+                                 REG_R14,/*REG_R15,*/REG_R12,REG_R13
 #else // !UNIX_AMD64_ABI
   #define REG_VAR_ORDER          REG_EAX,REG_EDX,REG_ECX, \
                                  REG_R8,REG_R9,REG_R10,REG_R11, \
                                  REG_ESI,REG_EDI,REG_EBX,REG_ETW_FRAMED_EBP_LIST \
-                                 REG_R14,REG_R15,REG_R12,REG_R13
+                                 REG_R14,/*REG_R15,*/REG_R12,REG_R13
 #endif // !UNIX_AMD64_ABI
 #endif
 
@@ -244,8 +244,8 @@
   #define CNT_CALLEE_TRASH_HIGHFLOAT    (16)
   /* NOTE: Sync with variable name defined in compiler.h */
 
-  #define REG_CALLEE_SAVED_ORDER   REG_EBX,REG_ETW_FRAMED_EBP_LIST REG_R12,REG_R13,REG_R14,REG_R15
-  #define RBM_CALLEE_SAVED_ORDER   RBM_EBX,RBM_ETW_FRAMED_EBP_LIST RBM_R12,RBM_R13,RBM_R14,RBM_R15
+  #define REG_CALLEE_SAVED_ORDER   REG_EBX,REG_ETW_FRAMED_EBP_LIST REG_R12,REG_R13,REG_R14//,REG_R15
+  #define RBM_CALLEE_SAVED_ORDER   RBM_EBX,RBM_ETW_FRAMED_EBP_LIST RBM_R12,RBM_R13,RBM_R14//,RBM_R15
 #else // !UNIX_AMD64_ABI
   #define CNT_CALLEE_SAVED         (7 + REG_ETW_FRAMED_EBP_COUNT)
   #define CNT_CALLEE_TRASH         (7)
@@ -255,8 +255,8 @@
   #define CNT_CALLEE_TRASH_FLOAT_INIT   (6)
   #define CNT_CALLEE_TRASH_HIGHFLOAT    (16)
   /* NOTE: Sync with variable name defined in compiler.h */
-  #define REG_CALLEE_SAVED_ORDER   REG_EBX,REG_ESI,REG_EDI,REG_ETW_FRAMED_EBP_LIST REG_R12,REG_R13,REG_R14,REG_R15
-  #define RBM_CALLEE_SAVED_ORDER   RBM_EBX,RBM_ESI,RBM_EDI,RBM_ETW_FRAMED_EBP_LIST RBM_R12,RBM_R13,RBM_R14,RBM_R15
+  #define REG_CALLEE_SAVED_ORDER   REG_EBX,REG_ESI,REG_EDI,REG_ETW_FRAMED_EBP_LIST REG_R12,REG_R13,REG_R14//,REG_R15
+  #define RBM_CALLEE_SAVED_ORDER   RBM_EBX,RBM_ESI,RBM_EDI,RBM_ETW_FRAMED_EBP_LIST RBM_R12,RBM_R13,RBM_R14//,RBM_R15
 #endif // !UNIX_AMD64_ABI
 
   #define CNT_CALLEE_TRASH_FLOAT   get_CNT_CALLEE_TRASH_FLOAT()
@@ -327,7 +327,7 @@
   // The following defines are useful for iterating a regNumber
   #define REG_FIRST                REG_EAX
   #define REG_INT_FIRST            REG_EAX
-  #define REG_INT_LAST             REG_R15
+  #define REG_INT_LAST             REG_R14
   #define REG_INT_COUNT            (REG_INT_LAST - REG_INT_FIRST + 1)
   #define REG_NEXT(reg)           ((regNumber)((unsigned)(reg) + 1))
   #define REG_PREV(reg)           ((regNumber)((unsigned)(reg) - 1))

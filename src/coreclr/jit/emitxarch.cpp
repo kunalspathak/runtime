@@ -1540,7 +1540,7 @@ bool emitter::HasMaskReg(const instrDesc* id) const
 bool IsExtendedReg(regNumber reg)
 {
 #ifdef TARGET_AMD64
-    return ((reg >= REG_R8) && (reg <= REG_R15)) || ((reg >= REG_XMM8) && (reg <= REG_XMM31));
+    return ((reg >= REG_R8) && (reg <= REG_R14)) || ((reg >= REG_XMM8) && (reg <= REG_XMM31));
 #else
     // X86 JIT operates in 32-bit mode and hence extended reg are not available.
     return false;
@@ -9978,7 +9978,7 @@ const char* emitter::emitRegName(regNumber reg, emitAttr attr, bool varName)
             }
 
 #if defined(TARGET_AMD64)
-            if (reg > REG_R15)
+            if (reg > REG_R14)
             {
                 break;
             }

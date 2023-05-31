@@ -4173,6 +4173,12 @@ void LinearScan::resetAllRegistersState()
     resetAvailableRegs();
     for (regNumber reg = REG_FIRST; reg < AVAILABLE_REG_COUNT; reg = REG_NEXT(reg))
     {
+#ifdef TARGET_AMD64
+        if (reg == REG_R15)
+        {
+            continue;
+        }
+#endif
         RegRecord* physRegRecord    = getRegisterRecord(reg);
         Interval*  assignedInterval = physRegRecord->assignedInterval;
         clearNextIntervalRef(reg, physRegRecord->registerType);
@@ -4442,6 +4448,12 @@ void LinearScan::processBlockStartLocations(BasicBlock* currentBlock)
     }
     for (regNumber reg = REG_FIRST; reg < AVAILABLE_REG_COUNT; reg = REG_NEXT(reg))
     {
+#ifdef TARGET_AMD64
+        if (reg == REG_R15)
+        {
+            continue;
+        }
+#endif
         RegRecord* physRegRecord = getRegisterRecord(reg);
         if ((liveRegs & genRegMask(reg)) == 0)
         {
@@ -4727,6 +4739,12 @@ void LinearScan::allocateRegisters()
     resetRegState();
     for (regNumber reg = REG_FIRST; reg < AVAILABLE_REG_COUNT; reg = REG_NEXT(reg))
     {
+#ifdef TARGET_AMD64
+        if (reg == REG_R15)
+        {
+            continue;
+        }
+#endif
         RegRecord* physRegRecord         = getRegisterRecord(reg);
         physRegRecord->recentRefPosition = nullptr;
         updateNextFixedRef(physRegRecord, physRegRecord->firstRefPosition);
@@ -4896,6 +4914,12 @@ void LinearScan::allocateRegisters()
                 // freed registers will have had their state updated to reflect the intervals they were holding.
                 for (regNumber reg = REG_FIRST; reg < AVAILABLE_REG_COUNT; reg = REG_NEXT(reg))
                 {
+#ifdef TARGET_AMD64
+                    if (reg == REG_R15)
+                    {
+                        continue;
+                    }
+#endif
                     regMaskTP regMask = genRegMask(reg);
                     // If this isn't available or if it's still waiting to be freed (i.e. it was in
                     // delayRegsToFree and so now it's in regsToFree), then skip it.
@@ -7067,6 +7091,12 @@ void           LinearScan::resolveRegisters()
     {
         for (regNumber reg = REG_FIRST; reg < AVAILABLE_REG_COUNT; reg = REG_NEXT(reg))
         {
+#ifdef TARGET_AMD64
+            if (reg == REG_R15)
+            {
+                continue;
+            }
+#endif
             RegRecord* physRegRecord    = getRegisterRecord(reg);
             Interval*  assignedInterval = physRegRecord->assignedInterval;
             if (assignedInterval != nullptr)
@@ -10837,6 +10867,12 @@ void LinearScan::verifyFinalAllocation()
     // Clear register assignments.
     for (regNumber reg = REG_FIRST; reg < AVAILABLE_REG_COUNT; reg = REG_NEXT(reg))
     {
+#ifdef TARGET_AMD64
+        if (reg == REG_R15)
+        {
+            continue;
+        }
+#endif
         RegRecord* physRegRecord        = getRegisterRecord(reg);
         physRegRecord->assignedInterval = nullptr;
     }
@@ -10941,6 +10977,12 @@ void LinearScan::verifyFinalAllocation()
                     // Clear register assignments.
                     for (regNumber reg = REG_FIRST; reg < AVAILABLE_REG_COUNT; reg = REG_NEXT(reg))
                     {
+#ifdef TARGET_AMD64
+                        if (reg == REG_R15)
+                        {
+                            continue;
+                        }
+#endif
                         RegRecord* physRegRecord        = getRegisterRecord(reg);
                         physRegRecord->assignedInterval = nullptr;
                     }
@@ -11266,6 +11308,12 @@ void LinearScan::verifyFinalAllocation()
             // Clear register assignments.
             for (regNumber reg = REG_FIRST; reg < AVAILABLE_REG_COUNT; reg = REG_NEXT(reg))
             {
+#ifdef TARGET_AMD64
+                if (reg == REG_R15)
+                {
+                    continue;
+                }
+#endif
                 RegRecord* physRegRecord        = getRegisterRecord(reg);
                 physRegRecord->assignedInterval = nullptr;
             }

@@ -54,7 +54,7 @@ inline void emitter::check3opImulValues()
     assert(INS_imul_12 - INS_imul_AX == REG_R12);
     assert(INS_imul_13 - INS_imul_AX == REG_R13);
     assert(INS_imul_14 - INS_imul_AX == REG_R14);
-    assert(INS_imul_15 - INS_imul_AX == REG_R15);
+    //assert(INS_imul_15 - INS_imul_AX == REG_R15);
 #endif
 }
 
@@ -265,10 +265,10 @@ inline ssize_t emitter::emitGetInsAmdAny(instrDesc* id)
     {
         encodeMask |= 0x04;
     }
-    if ((regmask & RBM_R15) != RBM_NONE)
-    {
-        encodeMask |= 0x08;
-    }
+    //if ((regmask & RBM_R15) != RBM_NONE)
+    //{
+    //    encodeMask |= 0x08;
+    //}
 
     id->idReg2((regNumber)encodeMask); // Save in idReg2
 
@@ -451,10 +451,10 @@ inline ssize_t emitter::emitGetInsAmdAny(instrDesc* id)
     {
         regmask |= RBM_R14;
     }
-    if ((encodeMask & 0x08) != 0)
-    {
-        regmask |= RBM_R15;
-    }
+    //if ((encodeMask & 0x08) != 0)
+    //{
+    //    regmask |= RBM_R15;
+    //}
 
 #elif defined(TARGET_ARM)
     assert(REGNUM_BITS >= 4);

@@ -9385,7 +9385,7 @@ void CodeGen::genProfilingEnterCallback(regNumber initReg, bool* pInitRegZeroed)
     //      of that offset to FramePointer to obtain caller's SP value.
     assert(compiler->lvaOutgoingArgSpaceVar != BAD_VAR_NUM);
     int callerSPOffset = compiler->lvaToCallerSPRelativeOffset(0, isFramePointerUsed());
-    GetEmitter()->emitIns_R_AR(INS_lea, EA_PTRSIZE, REG_PROFILER_ENTER_ARG_1, genFramePointerReg(), -callerSPOffset);
+    GetEmitter()->emitIns_R_AR(INS_lea, EA_PTRSIZE, REG_PROFILER_ENTER_ARG_0, genFramePointerReg(), -callerSPOffset);
 
     // We can use any callee trash register (other than RAX, RDI, RSI) for call target.
     // We use R11 here. This will emit either
@@ -9833,11 +9833,11 @@ unsigned CodeGen::genPopCalleeSavedRegistersFromMask(regMaskTP rsPopRegs)
         popCount++;
         inst_RV(INS_pop, REG_R14, TYP_I_IMPL);
     }
-    if ((rsPopRegs & RBM_R15) != 0)
-    {
-        popCount++;
-        inst_RV(INS_pop, REG_R15, TYP_I_IMPL);
-    }
+    //if ((rsPopRegs & RBM_R15) != 0)
+    //{
+    //    popCount++;
+    //    inst_RV(INS_pop, REG_R15, TYP_I_IMPL);
+    //}
 #endif // TARGET_AMD64
 
     // Amd64/x86 doesn't support push/pop of xmm registers.

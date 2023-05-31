@@ -5243,7 +5243,7 @@ void CodeGen::genFinalizeFrame()
     // On Unix x64 we also save R14 and R15 for ELT profiler hook generation.
     if (compiler->compIsProfilerHookNeeded())
     {
-        regSet.rsSetRegsModified(RBM_PROFILER_ENTER_ARG_0 | RBM_PROFILER_ENTER_ARG_1);
+        regSet.rsSetRegsModified(RBM_PROFILER_ENTER_ARG_0 /*| RBM_PROFILER_ENTER_ARG_1*/);
     }
 #endif
 

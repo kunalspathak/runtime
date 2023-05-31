@@ -68,9 +68,9 @@ short Compiler::mapRegNumToDwarfReg(regNumber reg)
         case REG_R14:
             dwarfReg = 14;
             break;
-        case REG_R15:
-            dwarfReg = 15;
-            break;
+        //case REG_R15:
+        //    dwarfReg = 15;
+        //    break;
         default:
             noway_assert(!"unexpected REG_NUM");
     }

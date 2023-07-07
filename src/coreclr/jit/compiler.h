@@ -5341,6 +5341,7 @@ public:
 
     PhaseStatus fgExpandThreadLocalAccess();
     bool fgExpandThreadLocalAccessForCall(BasicBlock** pBlock, Statement* stmt, GenTreeCall* call);
+    bool fgExpandThreadLocalAccessForCallReadyToRun(BasicBlock** pBlock, Statement* stmt, GenTreeCall* call);
 
     PhaseStatus fgExpandStaticInit();
     bool fgExpandStaticInitForCall(BasicBlock** pBlock, Statement* stmt, GenTreeCall* call);

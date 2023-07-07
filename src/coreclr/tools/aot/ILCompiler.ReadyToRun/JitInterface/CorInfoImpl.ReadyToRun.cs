@@ -3204,5 +3204,22 @@ namespace Internal.JitInterface
             // Implemented for JIT and NativeAOT only for now.
             return false;
         }
+
+#pragma warning disable CA1822 // Mark members as static
+        private void getThreadLocalStaticBlocksInfo(CORINFO_THREAD_STATIC_BLOCKS_INFO* pInfo, bool isGCType)
+        {
+            // Implemented for JIT and NativeAOT only for now.
+        }
+
+        private void getTlsRootInfo(ref CORINFO_CONST_LOOKUP addr)
+        {
+            // Implemented for JIT and NativeAOT only for now.
+        }
+
+        private void getThreadStaticBaseSlowInfo(ref CORINFO_CONST_LOOKUP addr)
+        {
+            // Implemented for JIT and NativeAOT only for now.
+        }
+#pragma warning restore CA1822 // Mark members as static
     }
 }

@@ -3840,6 +3840,7 @@ GenTree* Compiler::impImportStaticFieldAddress(CORINFO_RESOLVED_TOKEN* pResolved
         break;
 
         case CORINFO_FIELD_STATIC_TLS_MANAGED:
+        case CORINFO_FIELD_STATIC_TLS_MANAGED_LAZY:
 
 #ifdef FEATURE_READYTORUN           
             if (!opts.IsReadyToRun())
@@ -3875,6 +3876,11 @@ GenTree* Compiler::impImportStaticFieldAddress(CORINFO_RESOLVED_TOKEN* pResolved
                 if (pFieldInfo->fieldAccessor == CORINFO_FIELD_STATIC_TLS_MANAGED)
                 {
                     op1->AsCall()->SetExpTLSFieldAccess();
+                }
+                else if (pFieldInfo->fieldAccessor == CORINFO_FIELD_STATIC_TLS_MANAGED_LAZY)
+                {
+                    op1->AsCall()->SetExpTLSFieldAccessLazyCtor();
+                    op1->AsCall()->gtInitClsHnd = pResolvedToken->hClass;
                 }
                 if (pResolvedToken->hClass == info.compClassHnd && m_preferredInitCctor == CORINFO_HELP_UNDEF &&
                     (pFieldInfo->helper == CORINFO_HELP_READYTORUN_GCSTATIC_BASE ||
@@ -9040,6 +9046,7 @@ void Compiler::impImportBlockCode(BasicBlock* block)
                         break;
 
                     case CORINFO_FIELD_STATIC_TLS_MANAGED:
+                    case CORINFO_FIELD_STATIC_TLS_MANAGED_LAZY:
                         setMethodHasTlsFieldAccess();
                         FALLTHROUGH;
                     case CORINFO_FIELD_STATIC_SHARED_STATIC_HELPER:
@@ -9220,6 +9227,7 @@ void Compiler::impImportBlockCode(BasicBlock* block)
                         break;
 
                     case CORINFO_FIELD_STATIC_TLS_MANAGED:
+                    case CORINFO_FIELD_STATIC_TLS_MANAGED_LAZY:
                     case CORINFO_FIELD_STATIC_ADDRESS:
                     case CORINFO_FIELD_STATIC_RVA_ADDRESS:
                     case CORINFO_FIELD_STATIC_SHARED_STATIC_HELPER:
@@ -9320,6 +9328,7 @@ void Compiler::impImportBlockCode(BasicBlock* block)
                         goto SPILL_APPEND;
 
                     case CORINFO_FIELD_STATIC_TLS_MANAGED:
+                    case CORINFO_FIELD_STATIC_TLS_MANAGED_LAZY:
                         setMethodHasTlsFieldAccess();
                         FALLTHROUGH;
                     case CORINFO_FIELD_STATIC_ADDRESS:

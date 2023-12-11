@@ -9110,7 +9110,17 @@ void emitter::emitIns_J(instruction ins,
 #endif // DEBUG
 
     emitContainsRemovableJmpCandidates |= isRemovableJmpCandidate;
-    id->idjIsRemovableJmpCandidate = isRemovableJmpCandidate ? 1 : 0;
+    if (isRemovableJmpCandidate)
+    {
+        id->idjIsRemovableJmpCandidate = 1;
+#if defined(TARGET_XARCH)
+        emitCurIG->igFlags |= IGF_HAS_REMOVABLE_JMP;
+#endif
+    }
+    else
+    {
+        id->idjIsRemovableJmpCandidate = 0;
+    }
     id->idjShort                   = 0;
     if (dst != nullptr)
     {

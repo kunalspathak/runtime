@@ -580,7 +580,9 @@ bool Compiler::fgExpandThreadLocalAccessForCallNativeAOT(BasicBlock** pBlock, St
         GenTree* tlsRootAddrDef            = gtNewStoreLclVarNode(tlsRootAddrLclNum, tlsRootAddr);
         GenTree* tlsRootAddrUse            = gtNewLclVarNode(tlsRootAddrLclNum);
 
-        GenTree* tlsRootVal = gtNewIndir(TYP_I_IMPL, tlsRootAddrUse, GTF_IND_NONFAULTING | GTF_IND_INVARIANT);
+        // Note, `tlsRoot` refers to the TLS blob object, which is an unpinned managed object,
+        // thus the type of the pointer is TYP_REF
+        GenTree* tlsRootVal = gtNewIndir(TYP_REF, tlsRootAddrUse, GTF_IND_NONFAULTING | GTF_IND_INVARIANT);
 
         GenTree* tlsRootDef = gtNewStoreLclVarNode(finalLclNum, tlsRootVal);
 

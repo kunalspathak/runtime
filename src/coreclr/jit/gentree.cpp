@@ -10772,6 +10772,8 @@ const char* GenTree::gtGetHandleKindString(GenTreeFlags flags)
             return "GTF_ICON_STATIC_ADDR_PTR";
         case GTF_ICON_SECREL_OFFSET:
             return "GTF_ICON_SECREL_OFFSET";
+        case GTF_ICON_TLSGD_OFFSET:
+            return "GTF_ICON_TLSGD_OFFSET";
         default:
             return "ILLEGAL!";
     }
@@ -12003,6 +12005,9 @@ void Compiler::gtDispConst(GenTree* tree)
                             break;
                         case GTF_ICON_SECREL_OFFSET:
                             printf(" relative offset in section");
+                            break;
+                        case GTF_ICON_TLSGD_OFFSET:
+                            printf(" tls global dynamic offset");
                             break;
                         default:
                             printf(" UNKNOWN");

@@ -339,9 +339,9 @@ InlineContext::InlineContext(InlineStrategy* strategy)
     , m_CodeSizeEstimate(0)
     , m_Ordinal(0)
     , m_Success(true)
+    , m_TreeID(0)
 #if defined(DEBUG)
     , m_Policy(nullptr)
-    , m_TreeID(0)
     , m_Devirtualized(false)
     , m_Guarded(false)
     , m_Unboxed(false)
@@ -1316,12 +1316,12 @@ InlineContext* InlineStrategy::NewContext(InlineContext* parentContext, Statemen
 
     assert(call->gtCallType == CT_USER_FUNC);
     context->m_Callee = call->gtCallMethHnd;
-
+    context->m_TreeID = call->gtTreeID;
 #if defined(DEBUG)
     context->m_Devirtualized = call->IsDevirtualized();
     context->m_Guarded       = call->IsGuarded();
     context->m_Unboxed       = call->IsUnboxed();
-    context->m_TreeID        = call->gtTreeID;
+
 #endif
 
     return context;

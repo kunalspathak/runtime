@@ -648,6 +648,8 @@ private:
             //
             if (value->OperIs(GT_LCL_VAR) && (value->AsLclVar()->GetLclNum() == lclNum))
             {
+                //__debugbreak();
+
                 JITDUMP("... removing self-assignment\n");
                 DISPTREE(tree);
                 tree->gtBashToNOP();

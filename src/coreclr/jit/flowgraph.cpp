@@ -3962,11 +3962,13 @@ FlowGraphDfsTree* Compiler::fgComputeDfs()
     bool         hasCycle  = false;
 
     auto visitPreorder = [](BasicBlock* block, unsigned preorderNum) {
+        printf("visitPreorder: BB%d\n", block->bbNum);
         block->bbPreorderNum  = preorderNum;
         block->bbPostorderNum = UINT_MAX;
     };
 
     auto visitPostorder = [=](BasicBlock* block, unsigned postorderNum) {
+        printf("visitPostorder: BB%d\n", block->bbNum);
         block->bbPostorderNum = postorderNum;
         assert(postorderNum < fgBBcount);
         postOrder[postorderNum] = block;

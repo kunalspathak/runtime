@@ -5288,10 +5288,12 @@ void Compiler::fgDebugCheckProfileWeights()
 
     if (configEnabled)
     {
+        printf("fgDebugCheckProfileWeights: true\n");
         fgDebugCheckProfileWeights((ProfileChecks)JitConfig.JitProfileChecks());
     }
     else
     {
+        printf("fgDebugCheckProfileWeights: false\n");
         ProfileChecks checks = ProfileChecks::CHECK_HASLIKELIHOOD | ProfileChecks::RAISE_ASSERT;
         fgDebugCheckProfileWeights(checks);
     }

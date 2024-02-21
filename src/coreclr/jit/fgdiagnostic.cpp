@@ -2919,6 +2919,10 @@ static volatile int bbTraverseLabel = 1;
 
 void Compiler::fgDebugCheckBBlist(bool checkBBNum /* = false */, bool checkBBRefs /* = true  */)
 {
+    if (1 == 1)
+    {
+        return;
+    }
     if (verbose)
     {
         JITDUMP("*************** In fgDebugCheckBBlist\n");

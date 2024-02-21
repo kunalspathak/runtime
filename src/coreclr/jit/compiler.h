@@ -1091,7 +1091,12 @@ public:
 
     void SetStackOffset(int offset)
     {
-        lvStkOffs = offset;
+        //if ((lvSlotNum == 87) || (lvSlotNum == 88))
+        {
+            //__debugbreak();
+            //printf("** V%02u: was: %d, now: %d\n", lvSlotNum, lvStkOffs, offset);
+            lvStkOffs = offset;
+        }
     }
 
     unsigned lvExactSize() const;
@@ -5845,9 +5850,15 @@ private:
 public:
     BlockToSwitchDescMap* GetSwitchDescMap(bool createIfNull = true)
     {
+        //printf("GetSwitchDescMap: ");
         if ((m_switchDescMap == nullptr) && createIfNull)
         {
             m_switchDescMap = new (getAllocator()) BlockToSwitchDescMap(getAllocator());
+            printf("Created m_switchDescMap\n");
+        }
+        else
+        {
+            //printf("\n");
         }
         return m_switchDescMap;
     }
@@ -5857,6 +5868,7 @@ public:
     // we don't accidentally look up and return the wrong switch data.
     void InvalidateUniqueSwitchSuccMap()
     {
+        printf("Reset m_switchDescMap\n");
         m_switchDescMap = nullptr;
     }
 
@@ -10402,11 +10414,9 @@ private:
 #endif
 
 public:
-#ifdef DEBUG
-    unsigned compGenTreeID;
+        unsigned compGenTreeID;
     unsigned compStatementID;
     unsigned compBasicBlockID;
-#endif
     LONG compMethodID;
 
     BasicBlock* compCurBB;   // the current basic block in process

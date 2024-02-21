@@ -2323,14 +2323,19 @@ public:
         m_curSucc++;
         if (m_curSucc >= m_numSuccs)
         {
+            printf("No successor\n");
             return nullptr;
         }
 
         if (m_numSuccs <= ArrLen(m_successors))
         {
+            printf("[BB%d] m_curSucc: %d, m_numSuccs: %d. m_successors: BB%d\n",m_block->bbNum, m_curSucc, m_numSuccs,
+                   m_successors[m_curSucc]->bbNum);
             return m_successors[m_curSucc];
         }
 
+        printf("BB[%d] m_curSucc: %d, m_numSuccs: %d. m_pSuccessors: BB%d\n", m_block->bbNum, m_curSucc, m_numSuccs,
+               m_pSuccessors[m_curSucc]->bbNum);
         return m_pSuccessors[m_curSucc];
     }
 };

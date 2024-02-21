@@ -1819,6 +1819,8 @@ bool Compiler::fgOptimizeSwitchBranches(BasicBlock* block)
         bDest    = *jmpTab;
         bNewDest = bDest;
 
+        printf("[BB%d] fgOptimizeSwitchBranches: bbDest= BB%d, bbNewDest= BB%d\n", block->bbNum, bDest->bbNum,
+               bNewDest->bbNum);
         // Do we have a JUMP to an empty unconditional JUMP block?
         if (bDest->isEmpty() && bDest->KindIs(BBJ_ALWAYS) && !bDest->TargetIs(bDest)) // special case for self jumps
         {
@@ -1835,6 +1837,7 @@ bool Compiler::fgOptimizeSwitchBranches(BasicBlock* block)
             if (optimizeJump)
             {
                 bNewDest = bDest->GetTarget();
+                printf("[BB%d] Updated bbNewDest= BB%d\n", block->bbNum, bNewDest->bbNum);
 #ifdef DEBUG
                 if (verbose)
                 {
@@ -1846,6 +1849,7 @@ bool Compiler::fgOptimizeSwitchBranches(BasicBlock* block)
             }
         }
 
+        printf("bNewDest= BB%d @ %p, bDest= BB%d @ %p\n", bNewDest->bbNum, bNewDest, bDest->bbNum, bDest);
         if (bNewDest != bDest)
         {
             //
@@ -1854,8 +1858,10 @@ bool Compiler::fgOptimizeSwitchBranches(BasicBlock* block)
             //
             if (fgIsUsingProfileWeights() && bDest->hasProfileWeight())
             {
+                printf("fgIsUsingProfileWeights()\n");
                 if (fgHaveValidEdgeWeights)
                 {
+                    printf("fgHaveValidEdgeWeights\n");
                     FlowEdge* edge                = fgGetPredForBlock(bDest, block);
                     weight_t  branchThroughWeight = edge->edgeWeightMin();
 
@@ -1874,6 +1880,7 @@ bool Compiler::fgOptimizeSwitchBranches(BasicBlock* block)
             // Update the switch jump table
             *jmpTab = bNewDest;
 
+            printf("Calling UpdateSwitchTableTarget(BB%d, BB%d, BB%d)\n", block->bbNum, bNewDest->bbNum, bDest->bbNum);
             // Maintain, if necessary, the set of unique targets of "block."
             UpdateSwitchTableTarget(block, bDest, bNewDest);
 

@@ -528,6 +528,7 @@ void Compiler::SwitchUniqueSuccSet::UpdateTarget(CompAllocator alloc,
                                                  BasicBlock*   from,
                                                  BasicBlock*   to)
 {
+    printf("UpdateTarget: switchBlk= BB%d, from= BB%d, to= BB%d\n", switchBlk->bbNum, from->bbNum, to->bbNum);
     assert(switchBlk->KindIs(BBJ_SWITCH)); // Precondition.
 
     // Is "from" still in the switch table (because it had more than one entry before?)
@@ -578,6 +579,7 @@ void Compiler::SwitchUniqueSuccSet::UpdateTarget(CompAllocator alloc,
         {
             if (nonDuplicates[i] == from)
             {
+                printf("nonDuplicates[%d] = %d\n", i, to->bbNum);
                 nonDuplicates[i] = to;
                 INDEBUG(foundFrom = true);
                 break;
@@ -623,6 +625,7 @@ void Compiler::UpdateSwitchTableTarget(BasicBlock* switchBlk, BasicBlock* from, 
 {
     if (m_switchDescMap == nullptr)
     {
+        printf("m_switchDescMap == nullptr\n");
         return; // No mappings, nothing to do.
     }
 
@@ -633,5 +636,9 @@ void Compiler::UpdateSwitchTableTarget(BasicBlock* switchBlk, BasicBlock* from, 
     {
         // If no result, nothing to do. Otherwise, update it.
         res->UpdateTarget(getAllocator(), switchBlk, from, to);
+    }
+    else
+    {
+        printf("res == nullptr\n");
     }
 }

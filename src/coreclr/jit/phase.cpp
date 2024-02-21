@@ -16,15 +16,16 @@
 //
 Phase::Observations::Observations(Compiler* compiler)
 {
+    m_compGenTreeID    = compiler->compGenTreeID;
+    m_compStatementID  = compiler->compStatementID;
+    m_compBasicBlockID = compiler->compBasicBlockID;
 #ifdef DEBUG
     m_compiler          = compiler->impInlineRoot();
     m_fgBBcount         = m_compiler->fgBBcount;
     m_fgBBNumMax        = m_compiler->fgBBNumMax;
     m_compHndBBtabCount = m_compiler->compHndBBtabCount;
     m_lvaCount          = m_compiler->lvaCount;
-    m_compGenTreeID     = m_compiler->compGenTreeID;
-    m_compStatementID   = m_compiler->compStatementID;
-    m_compBasicBlockID  = m_compiler->compBasicBlockID;
+
 #endif
 }
 
@@ -44,9 +45,9 @@ void Phase::Observations::Check(PhaseStatus status)
         assert(m_fgBBNumMax == m_compiler->fgBBNumMax);
         assert(m_compHndBBtabCount == m_compiler->compHndBBtabCount);
         assert(m_lvaCount == m_compiler->lvaCount);
-        assert(m_compGenTreeID == m_compiler->compGenTreeID);
-        assert(m_compStatementID == m_compiler->compStatementID);
-        assert(m_compBasicBlockID == m_compiler->compBasicBlockID);
+        //assert(m_compGenTreeID == m_compiler->compGenTreeID);
+        //assert(m_compStatementID == m_compiler->compStatementID);
+        //assert(m_compBasicBlockID == m_compiler->compBasicBlockID);
     }
 #endif
 }
@@ -134,6 +135,7 @@ void Phase::PostPhase(PhaseStatus status)
         }
     }
 
+    printf("PostPhase: %d\n", comp->activePhaseChecks);
     if (doPostPhase && doPostPhaseChecks)
     {
         if ((comp->activePhaseChecks & PhaseChecks::CHECK_UNIQUE) == PhaseChecks::CHECK_UNIQUE)

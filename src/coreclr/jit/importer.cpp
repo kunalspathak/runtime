@@ -5541,6 +5541,10 @@ GenTree* Compiler::impCastClassOrIsInstToTree(
         //
         op2->gtFlags |= GTF_DONT_CSE;
 
+        if (helper == 52)
+        {
+            printf("CAST_HELPER\n");
+        }
         GenTreeCall* call = gtNewHelperCallNode(helper, TYP_REF, op2, op1);
 
         // Instrument this castclass/isinst

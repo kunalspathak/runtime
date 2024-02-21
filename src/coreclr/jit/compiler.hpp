@@ -694,6 +694,7 @@ BasicBlockVisit BasicBlock::VisitAllSuccs(Compiler* comp, TFunc func)
             Compiler::SwitchUniqueSuccSet sd = comp->GetDescriptorForSwitch(this);
             for (unsigned i = 0; i < sd.numDistinctSuccs; i++)
             {
+                printf("[BB%d] VisitAllSuccs: %d - BB%d\n", bbNum, i, sd.nonDuplicates[i]->bbNum);
                 RETURN_ON_ABORT(func(sd.nonDuplicates[i]));
             }
 
@@ -1268,18 +1269,24 @@ inline GenTree::GenTree(genTreeOps oper, var_types type DEBUGARG(bool largeNode)
 #ifdef DEBUG
     gtSeqNum = 0;
     gtUseNum = -1;
-    gtTreeID = JitTls::GetCompiler()->compGenTreeID++;
+
     gtVNPair.SetBoth(ValueNumStore::NoVN);
     gtRegTag   = GT_REGTAG_NONE;
     gtOperSave = GT_NONE;
 #endif
+    gtTreeID = JitTls::GetCompiler()->compGenTreeID++;
+    //if (gtTreeID >= 782)
+    //{
+    //    __debugbreak();
+    //}
+    printf("GenTree: [%d] - %d\n", gtTreeID, gtOper);
 }
 
 /*****************************************************************************/
 
 inline Statement* Compiler::gtNewStmt(GenTree* expr)
 {
-    Statement* stmt = new (this->getAllocator(CMK_ASTNode)) Statement(expr DEBUGARG(compStatementID++));
+    Statement* stmt = new (this->getAllocator(CMK_ASTNode)) Statement(expr, compStatementID++);
     return stmt;
 }
 
@@ -1819,11 +1826,11 @@ inline void GenTree::SetOper(genTreeOps oper, ValueNumberUpdate vnUpdate)
     }
 #endif // DEBUG
 
-#if DEBUGGABLE_GENTREE
-    // Until we eliminate SetOper/ChangeOper, we also change the vtable of the node, so that
-    // it shows up correctly in the debugger.
-    SetVtableForOper(oper);
-#endif // DEBUGGABLE_GENTREE
+//#if DEBUGGABLE_GENTREE
+//    // Until we eliminate SetOper/ChangeOper, we also change the vtable of the node, so that
+//    // it shows up correctly in the debugger.
+//    SetVtableForOper(oper);
+//#endif // DEBUGGABLE_GENTREE
 
     if (vnUpdate == CLEAR_VN)
     {
@@ -2138,6 +2145,11 @@ inline unsigned Compiler::lvaGrabTemp(bool shortLifetime DEBUGARG(const char* re
     lvaTable[tempNum].lvType    = TYP_UNDEF;
     lvaTable[tempNum].lvIsTemp  = shortLifetime;
     lvaTable[tempNum].lvOnFrame = true;
+
+    if ((tempNum == 87) || (tempNum == 88))
+    {
+        __debugbreak();
+    }
 
     // If we've started normal ref counting, bump the ref count of this
     // local, as we no longer do any incremental counting, and we presume
@@ -4806,9 +4818,10 @@ unsigned Compiler::fgRunDfs(VisitPreorder visitPreorder, VisitPostorder visitPos
         {
             BasicBlock* block = blocks.TopRef().Block();
             BasicBlock* succ  = blocks.TopRef().NextSuccessor();
-
+            printf("Processing BB%d", block->bbNum);
             if (succ != nullptr)
             {
+                printf(" having succ BB%d\n", succ->bbNum);
                 if (BitVecOps::TryAddElemD(&traits, visited, succ->bbNum))
                 {
                     blocks.Emplace(this, succ);
@@ -4819,6 +4832,7 @@ unsigned Compiler::fgRunDfs(VisitPreorder visitPreorder, VisitPostorder visitPos
             }
             else
             {
+                printf("\n");
                 blocks.Pop();
                 visitPostorder(block, postOrderIndex++);
             }

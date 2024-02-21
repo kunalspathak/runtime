@@ -1011,9 +1011,9 @@ public:
 
     GenTree* gtNext;
     GenTree* gtPrev;
+    unsigned gtTreeID;
 
 #ifdef DEBUG
-    unsigned gtTreeID;
     unsigned gtSeqNum; // liveness traversal order within the current statement
 
     int gtUseNum; // use-ordered traversal within the function
@@ -7796,17 +7796,22 @@ private:
 struct Statement
 {
 public:
-    Statement(GenTree* expr DEBUGARG(unsigned stmtID))
+    Statement(GenTree* expr, unsigned stmtID)
         : m_rootNode(expr)
         , m_treeList(nullptr)
         , m_treeListEnd(nullptr)
         , m_next(nullptr)
         , m_prev(nullptr)
+        , m_stmtID(stmtID)
 #ifdef DEBUG
         , m_lastILOffset(BAD_IL_OFFSET)
-        , m_stmtID(stmtID)
+
 #endif
     {
+        //if ((expr->gtTreeID == 189) || (expr->gtTreeID == 319))
+        //{
+        //    __debugbreak();
+        //}
     }
 
     GenTree* GetRootNode() const
@@ -7821,6 +7826,10 @@ public:
 
     void SetRootNode(GenTree* treeRoot)
     {
+        if ((treeRoot->gtTreeID == 189) || (treeRoot->gtTreeID == 319))
+        {
+            __debugbreak();
+        }
         m_rootNode = treeRoot;
     }
 
@@ -7943,10 +7952,10 @@ private:
     Statement* m_prev;
 
     DebugInfo m_debugInfo;
-
+    public:
+    unsigned  m_stmtID;
 #ifdef DEBUG
     IL_OFFSET m_lastILOffset; // The instr offset at the end of this statement.
-    unsigned  m_stmtID;
 #endif
 };
 

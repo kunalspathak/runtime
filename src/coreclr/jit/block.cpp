@@ -95,6 +95,7 @@ AllSuccessorEnumerator::AllSuccessorEnumerator(Compiler* comp, BasicBlock* block
         unsigned numSuccs = 0;
         block->VisitAllSuccs(comp, [this, &numSuccs](BasicBlock* succ) {
             assert(numSuccs < m_numSuccs);
+            printf("Adding successor[%d]= BB%d\n", numSuccs, succ->bbNum);
             m_pSuccessors[numSuccs++] = succ;
             return BasicBlockVisit::Continue;
         });

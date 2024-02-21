@@ -6638,7 +6638,7 @@ PhaseStatus Compiler::optAssertionPropMain()
     bool madeChanges = false;
 
     // Assertion prop can speculatively create trees.
-    INDEBUG(const unsigned baseTreeID = compGenTreeID);
+    const unsigned baseTreeID = compGenTreeID;
 
     // First discover all assertions and record them in the table.
     for (BasicBlock* const block : Blocks())
@@ -6663,7 +6663,7 @@ PhaseStatus Compiler::optAssertionPropMain()
                 // Perform VN based assertion prop before assertion gen.
                 Statement* nextStmt = optVNAssertionPropCurStmt(block, stmt);
                 madeChanges |= optAssertionPropagatedCurrentStmt;
-                INDEBUG(madeChanges |= (baseTreeID != compGenTreeID));
+                madeChanges |= (baseTreeID != compGenTreeID);
 
                 // Propagation resulted in removal of the remaining stmts, perform it.
                 if (fgRemoveRestOfBlock)

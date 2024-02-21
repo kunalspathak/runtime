@@ -18,15 +18,16 @@ class Phase
         void Check(PhaseStatus status);
 
     private:
+        unsigned m_compGenTreeID;
+        unsigned m_compStatementID;
+        unsigned m_compBasicBlockID;
+
 #ifdef DEBUG
         Compiler* m_compiler;
         unsigned  m_fgBBcount;
         unsigned  m_fgBBNumMax;
         unsigned  m_compHndBBtabCount;
         unsigned  m_lvaCount;
-        unsigned  m_compGenTreeID;
-        unsigned  m_compStatementID;
-        unsigned  m_compBasicBlockID;
 #endif // DEBUG
     };
 

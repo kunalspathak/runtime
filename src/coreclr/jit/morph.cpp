@@ -1643,6 +1643,7 @@ void CallArgs::EvalArgsToTemps(Compiler* comp, GenTreeCall* call)
     unsigned regArgInx = 0;
     // Now go through the sorted argument table and perform the necessary evaluation into temps.
     CallArg** lateTail = &m_lateHead;
+    printf("GenTree: [%d], ArgsCount: %d\n", call->gtTreeID, numArgs);
     for (size_t i = 0; i < numArgs; i++)
     {
         CallArg& arg = *(sortedArgs[i]);
@@ -1733,6 +1734,10 @@ void CallArgs::EvalArgsToTemps(Compiler* comp, GenTreeCall* call)
                 }
                 else
                 {
+                    if ((tmpVarNum == 87) || (tmpVarNum == 87))
+                    {
+                        __debugbreak();
+                    }
                     setupArg = comp->gtNewTempStore(tmpVarNum, argx);
 
                     LclVarDsc* varDsc     = comp->lvaGetDesc(tmpVarNum);
@@ -7741,6 +7746,7 @@ GenTree* Compiler::fgMorphCall(GenTreeCall* call)
     SharedTempsScope sharedTemps(this);
 
     // Process the "normal" argument list
+    printf("fgMorphCall: GenTree [%d]\n", call->gtTreeID);
     call = fgMorphArgs(call);
     noway_assert(call->gtOper == GT_CALL);
 
@@ -12596,6 +12602,7 @@ GenTreeOp* Compiler::fgMorphLongMul(GenTreeOp* mul)
 
 GenTree* Compiler::fgMorphTree(GenTree* tree, MorphAddrContext* mac)
 {
+    printf("fgMorphTree: GenTree[%d]\n", tree->gtTreeID);
     assert(tree);
 
 #ifdef DEBUG
@@ -13602,8 +13609,10 @@ void Compiler::fgMorphStmts(BasicBlock* block)
 {
     fgRemoveRestOfBlock = false;
 
+    printf("fgMorphStmts(BB%d)----------------------\n", block->bbNum);
     for (Statement* const stmt : block->Statements())
     {
+        printf("STMT: %d\n", stmt->m_stmtID);
         if (fgRemoveRestOfBlock)
         {
             fgRemoveStmt(block, stmt);
@@ -13613,6 +13622,7 @@ void Compiler::fgMorphStmts(BasicBlock* block)
         fgMorphStmt      = stmt;
         compCurStmt      = stmt;
         GenTree* oldTree = stmt->GetRootNode();
+        printf("oldTree: GenTree[%d]\n", oldTree->gtTreeID);
 
 #ifdef DEBUG
 
@@ -13788,7 +13798,7 @@ void Compiler::fgMorphStmts(BasicBlock* block)
 //
 void Compiler::fgMorphBlock(BasicBlock* block)
 {
-    JITDUMP("\nMorphing " FMT_BB "\n", block->bbNum);
+    printf("\nMorphing " FMT_BB "\n", block->bbNum);
 
     if (optLocalAssertionProp)
     {
@@ -13988,6 +13998,7 @@ PhaseStatus Compiler::fgMorphBlocks()
     {
         // If we aren't optimizing, we just morph in normal bbNext order.
         //
+        printf("morph.cpp: 14001 (global)\n");
         for (BasicBlock* block : Blocks())
         {
             fgMorphBlock(block);
@@ -14020,11 +14031,13 @@ PhaseStatus Compiler::fgMorphBlocks()
         //
         unsigned const bbNumMax = fgBBNumMax;
 
+        printf("morph.cpp: 14034 (local)\n");
         // Morph the blocks in RPO.
         //
         for (unsigned i = m_dfsTree->GetPostOrderCount(); i != 0; i--)
         {
             BasicBlock* const block = m_dfsTree->GetPostOrder(i - 1);
+            printf("post order returned BB%d\n", block->bbNum);
             fgMorphBlock(block);
         }
         assert(bbNumMax == fgBBNumMax);

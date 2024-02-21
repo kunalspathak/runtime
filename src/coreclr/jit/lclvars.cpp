@@ -5284,7 +5284,10 @@ void Compiler::lvaFixVirtualFrameOffsets()
 
         if (doAssignStkOffs)
         {
-            JITDUMP("-- V%02u was %d, now %d\n", lclNum, varDsc->GetStackOffset(), varDsc->GetStackOffset() + delta);
+            if ((lclNum == 87) || (lclNum == 88))
+            {
+                printf("-- V%02u was %d, now %d\n", lclNum, varDsc->GetStackOffset(), varDsc->GetStackOffset() + delta);
+            }
             varDsc->SetStackOffset(varDsc->GetStackOffset() + delta);
 
 #if DOUBLE_ALIGN
@@ -6667,6 +6670,10 @@ void Compiler::lvaAssignVirtualFrameOffsetsToLocals()
             }
 
             /* Make sure the type is appropriate */
+            if ((lclNum == 87) || (lclNum == 88))
+            {
+                __debugbreak();
+            }
 
             if (varDsc->lvIsUnsafeBuffer && compGSReorderStackLayout)
             {
@@ -7002,14 +7009,17 @@ int Compiler::lvaAllocLocalAndSetVirtualOffset(unsigned lclNum, unsigned size, i
     stkOffs -= size;
     lcl->SetStackOffset(stkOffs);
 
-#ifdef DEBUG
-    if (verbose)
+//#ifdef DEBUG
+    if ((lcl->lvSlotNum == 87) || (lcl->lvSlotNum == 88))
+
     {
+        __debugbreak();
         printf("Assign ");
-        gtDispLclVar(lclNum, /*pad*/ false);
+        //gtDispLclVar(lclNum, /*pad*/ false);
+        printf("V%02u", lclNum);
         printf(", size=%d, stkOffs=%c0x%x\n", size, stkOffs < 0 ? '-' : '+', stkOffs < 0 ? -stkOffs : stkOffs);
     }
-#endif
+//#endif
 
     return stkOffs;
 }

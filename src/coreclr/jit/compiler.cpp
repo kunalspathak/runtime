@@ -6865,13 +6865,15 @@ int Compiler::compCompileHelper(CORINFO_MODULE_HANDLE classPtr,
     compHasBackwardJump          = false;
     compHasBackwardJumpInHandler = false;
 
+    compGenTreeID = 0;
+    compStatementID = 0;
+
 #ifdef DEBUG
     compCurBB = nullptr;
     lvaTable  = nullptr;
 
     // Reset node and block ID counter
-    compGenTreeID    = 0;
-    compStatementID  = 0;
+    
     compBasicBlockID = 0;
 #endif
 
@@ -7187,24 +7189,22 @@ int Compiler::compCompileHelper(CORINFO_MODULE_HANDLE classPtr,
         }
     }
 
-#ifdef DEBUG
     if (compIsForInlining())
     {
         compGenTreeID   = impInlineInfo->InlinerCompiler->compGenTreeID;
         compStatementID = impInlineInfo->InlinerCompiler->compStatementID;
     }
-#endif
+
 
     compCompile(methodCodePtr, methodCodeSize, compileFlags);
 
-#ifdef DEBUG
     if (compIsForInlining())
     {
         impInlineInfo->InlinerCompiler->compGenTreeID    = compGenTreeID;
         impInlineInfo->InlinerCompiler->compStatementID  = compStatementID;
         impInlineInfo->InlinerCompiler->compBasicBlockID = compBasicBlockID;
     }
-#endif
+
 
 _Next:
 

@@ -135,7 +135,7 @@ void Phase::PostPhase(PhaseStatus status)
         }
     }
 
-    printf("PostPhase: %d\n", comp->activePhaseChecks);
+    //printf("PostPhase: %d\n", comp->activePhaseChecks);
     if (doPostPhase && doPostPhaseChecks)
     {
         if ((comp->activePhaseChecks & PhaseChecks::CHECK_UNIQUE) == PhaseChecks::CHECK_UNIQUE)

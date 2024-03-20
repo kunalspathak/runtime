@@ -271,53 +271,81 @@ typedef unsigned char   regNumberSmall;
 typedef struct _regMaskAll
 {
 private:
-    regMaskTP registers[REGISTER_TYPE_COUNT];
+    //regMaskTP registers[REGISTER_TYPE_COUNT];
+    //
+    // TODO-4byte:
+    // Only in this struct, floatRegs will be in high-32 bits of 64-bit integer.
+    // Every where else, it will be represented by low-32 bits.
+    // For that, #define of RBM_* floats need to be done 1 << (REG - REG_FP_FIRST) 
+    // 
+    // If `mask` of type `float`, then we would do (mask << 32) and `|` it in registers.
+    // If `mask` of type `gpr` or `predicate`, then we would do `|` it in registers.
+    // When a read needs to happen for `float`, we return (registers >> 32).
+    // When a read needs to happen for `gpr` or `predicate`, we return (registers & 0xFFFFFFFF) or even just `registers` because
+    // the lower 32-bits will be the gpr registers and return type is `regMaskOnlyOne` or a 32-bit integer.
+    // When a write needs to happen for floatRegs, it will be shifted by 32 bits.
+
+    regMaskTP       registers;
+#ifdef HAS_PREDICATE_REGS
+    regMaskTP       predicateRegisters;
+#endif
     regMaskOnlyOne operator[](int index) const;
-    regMaskOnlyOne& operator[](int index);
+    //regMaskOnlyOne& operator[](int index);
+    regMaskOnlyOne encode(regMaskOnlyOne mask, var_types type);
+    regMaskOnlyOne  encode(regMaskOnlyOne mask, regNumber reg);
 
 public:
+
     inline regMaskGpr gprRegs() const
     {
-        return registers[0];
+        return registers & 0xFFFFFFFF; // TODO: This will go once regMaskGpr is reduced to 32-bit.
     }
     inline regMaskFloat floatRegs() const
     {
-        return registers[1];
+        // TODO-4byte:
+//#ifdef TARGET_64BIT
+//        return registers >> 32;
+//#else
+//        return registers >> 16;
+//#endif
+        return registers & 0xFFFFFFFF00000000;
     }
 #ifdef HAS_PREDICATE_REGS
     inline regMaskPredicate predicateRegs() const
     {
-        static_assert((REGISTER_TYPE_COUNT == 3), "There should be 3 types of registers");
-        return registers[2];
+        //static_assert((REGISTER_TYPE_COUNT == 3), "There should be 3 types of registers");
+        return predicateRegisters;
     }
 #endif
 
     _regMaskAll(regMaskGpr _gprRegMask, regMaskFloat _floatRegMask, regMaskPredicate _predicateRegMask = RBM_NONE)
-        : registers{_gprRegMask, _floatRegMask
+// TODO-4byte:
+//#if TARGET_64BIT
+//        : registers((_floatRegMask << 32) | _gprRegMask)
+//#else
+//        : registers((_floatRegMask << 16) | _gprRegMask)
+//#endif
+        : registers(_floatRegMask | _gprRegMask)
 #ifdef HAS_PREDICATE_REGS
-                    ,
-                    _predicateRegMask
+                    , predicateRegisters(_predicateRegMask)
 #endif
-          }
     {
     }
 
     _regMaskAll()
-        : registers{RBM_NONE, RBM_NONE
+        : registers(RBM_NONE)
 #ifdef HAS_PREDICATE_REGS
-                    ,
-                    RBM_NONE
+                    , predicateRegisters(RBM_NONE)
 #endif
-          }
     {
     }
 
-    _regMaskAll(int (&_registers)[3])
-    {
-        registers[0] = _registers[0];
-        registers[1] = _registers[1];
-        registers[2] = _registers[2];
-    }
+    //_regMaskAll(int (&_registers)[3])
+    //{
+    //    registers[0] = _registers[0];
+    //    registers[1] = _registers[1];
+    //    registers[2] = _registers[2];
+    //}
 
 #ifdef TARGET_ARM
     _regMaskAll(regNumber reg) : _regMaskAll()
@@ -331,45 +359,43 @@ public:
         AddRegNumInMask(reg ARM_ARG(type));
     }
 
-    FORCEINLINE void     Clear();
-    FORCEINLINE bool IsEmpty();
+    void     Clear();
+    bool IsEmpty();
     unsigned Count();
-    FORCEINLINE void     Create(regNumber reg);
-    // Rename this to AddRegNum
-    FORCEINLINE void AddGprRegInMask(regNumber reg);
+    void     Create(regNumber reg);
     void AddRegNumInMask(regNumber reg ARM_ARG(var_types type));
-    FORCEINLINE void AddRegMaskForType(regMaskOnlyOne maskToAdd, var_types type);
+    void AddRegMaskForType(regMaskOnlyOne maskToAdd, var_types type);
     void AddGprRegMask(regMaskGpr maskToAdd);
-    FORCEINLINE void AddFloatRegMask(regMaskFloat maskToAdd);
+    void AddFloatRegMask(regMaskFloat maskToAdd);
 
 #ifdef TARGET_ARM
     void AddRegNumInMask(regNumber reg);
-    FORCEINLINE void RemoveRegNumFromMask(regNumber reg);
-    FORCEINLINE bool IsRegNumInMask(regNumber reg);
+    void RemoveRegNumFromMask(regNumber reg);
+    bool IsRegNumInMask(regNumber reg);
 #endif
-    FORCEINLINE void RemoveRegNumFromMask(regNumber reg ARM_ARG(var_types type));
+    void RemoveRegNumFromMask(regNumber reg ARM_ARG(var_types type));
     void RemoveRegTypeFromMask(regMaskOnlyOne regMaskToRemove, var_types type);
-    FORCEINLINE bool IsRegNumInMask(regNumber reg ARM_ARG(var_types type));
+    bool IsRegNumInMask(regNumber reg ARM_ARG(var_types type));
     bool IsGprMaskPresent(regMaskGpr maskToCheck) const;
     bool IsFloatMaskPresent(regMaskFloat maskToCheck) const;
     // bool IsOnlyRegNumInMask(regNumber reg);
-    FORCEINLINE regMaskOnlyOne GetRegMaskForType(var_types type) const;
-    regMaskOnlyOne GetMaskForRegNum(regNumber reg) const;
+    regMaskOnlyOne GetRegMaskForType(var_types type) const;
+    regMaskOnlyOne             GetMaskForRegNum(regNumber reg) const;
 
     // TODO: this might go away once we have just `regMaskTP` gpr_float field
-    FORCEINLINE bool IsGprOrFloatPresent() const;
-    FORCEINLINE regMaskTP GetGprFloatCombinedMask() const;
+    bool IsGprOrFloatPresent() const;
+    regMaskTP GetGprFloatCombinedMask() const;
 
-    FORCEINLINE void operator|=(const _regMaskAll& other);
-    FORCEINLINE void operator&=(const _regMaskAll& other);
-    FORCEINLINE void operator|=(const regNumber reg);
-    FORCEINLINE void operator^=(const regNumber reg);
-    FORCEINLINE _regMaskAll operator~();
+    void operator|=(const _regMaskAll& other);
+    void operator&=(const _regMaskAll& other);
+    void operator|=(const regNumber reg);
+    void operator^=(const regNumber reg);
+    _regMaskAll operator~();
     bool        operator==(const _regMaskAll& other);
-    FORCEINLINE bool        operator!=(const _regMaskAll& other);
-    FORCEINLINE _regMaskAll operator&(const _regMaskAll& other);
-    FORCEINLINE _regMaskAll operator|(const _regMaskAll& other);
-    FORCEINLINE _regMaskAll operator&(const regNumber reg);
+    bool        operator!=(const _regMaskAll& other);
+    _regMaskAll operator&(const _regMaskAll& other);
+    _regMaskAll operator|(const _regMaskAll& other);
+    _regMaskAll operator&(const regNumber reg);
 
 } AllRegsMask;
 

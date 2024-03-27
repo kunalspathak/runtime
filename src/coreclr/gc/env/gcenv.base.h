@@ -143,9 +143,9 @@ typedef DWORD (WINAPI *PTHREAD_START_ROUTINE)(void* lpThreadParameter);
 
  #elif defined(HOST_ARM64)
 
-  extern "C" void __yield(void);
-  #pragma intrinsic(__yield)
-  __forceinline void YieldProcessor() { __yield();}
+  extern "C" void __isb(void);
+  #pragma intrinsic(__isb)
+  __forceinline void YieldProcessor() { __isb();}
 
   extern "C" void __dmb(const unsigned __int32 _Type);
   #pragma intrinsic(__dmb)

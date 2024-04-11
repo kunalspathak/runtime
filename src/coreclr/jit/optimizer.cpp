@@ -4190,7 +4190,7 @@ bool Compiler::optHoistThisLoop(FlowGraphNaturalLoop* loop, LoopHoistContext* ho
         hoistCtxt->m_loopVarMskCount      = 0;
         hoistCtxt->m_loopVarInOutMskCount = 0;
 #ifdef FEATURE_MASKED_HW_INTRINSICS
-        hoistCtxt->m_hoistedMskExprCount  = 0;
+        hoistCtxt->m_hoistedMskExprCount = 0;
 #endif
     }
 #endif // TARGET_XARCH
@@ -5265,12 +5265,12 @@ void Compiler::optHoistCandidate(GenTree*              tree,
         }
 #endif
     }
-#ifdef TARGET_XARCH
+#ifdef FEATURE_MASKED_HW_INTRINSICS
     else if (varTypeUsesMaskReg(tree))
     {
         hoistCtxt->m_hoistedMskExprCount++;
     }
-#endif // TARGET_XARCH
+#endif // FEATURE_MASKED_HW_INTRINSICS
     else
     {
         assert(varTypeUsesFloatReg(tree));

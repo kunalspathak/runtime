@@ -3171,14 +3171,13 @@ void LinearScan::BuildCallDefs(GenTree* tree, int dstCount, REF_AllRegsMask dstC
     assert(tree->IsMultiRegCall());
 
     const ReturnTypeDesc* retTypeDesc = tree->AsCall()->GetReturnTypeDesc();
-    assert(retTypeDesc != nullptr);
+    noway_assert(retTypeDesc != nullptr);
 
     for (int i = 0; i < dstCount; i++)
     {
         // In case of multi-reg call node, we have to query the i'th position return register.
         // For all other cases of multi-reg definitions, the registers must be in sequential order.
-        regNumber thisReg =
-            tree->AsCall()->GetReturnTypeDesc()->GetABIReturnReg(i, tree->AsCall()->GetUnmanagedCallConv());
+        regNumber thisReg = retTypeDesc->GetABIReturnReg(i, tree->AsCall()->GetUnmanagedCallConv());
 
         assert(dstCandidates.IsRegNumInMask(thisReg));
         dstCandidates.RemoveRegNumFromMask(thisReg);

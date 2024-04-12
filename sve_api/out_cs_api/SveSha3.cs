@@ -31,11 +31,13 @@ namespace System.Runtime.Intrinsics.Arm
 
         /// <summary>
         /// svint64_t svrax1[_s64](svint64_t op1, svint64_t op2)
+        ///   RAX1 Zresult.D, Zop1.D, Zop2.D
         /// </summary>
         public static unsafe Vector<long> BitwiseRotateLeftBy1AndXor(Vector<long> left, Vector<long> right) => BitwiseRotateLeftBy1AndXor(left, right);
 
         /// <summary>
         /// svuint64_t svrax1[_u64](svuint64_t op1, svuint64_t op2)
+        ///   RAX1 Zresult.D, Zop1.D, Zop2.D
         /// </summary>
         public static unsafe Vector<ulong> BitwiseRotateLeftBy1AndXor(Vector<ulong> left, Vector<ulong> right) => BitwiseRotateLeftBy1AndXor(left, right);
 

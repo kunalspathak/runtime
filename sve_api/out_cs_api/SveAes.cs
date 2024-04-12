@@ -31,6 +31,7 @@ namespace System.Runtime.Intrinsics.Arm
 
         /// <summary>
         /// svuint8_t svaesimc[_u8](svuint8_t op)
+        ///   AESIMC Ztied.B, Ztied.B
         /// </summary>
         public static unsafe Vector<byte> AesInverseMixColumns(Vector<byte> value) => AesInverseMixColumns(value);
 
@@ -39,6 +40,7 @@ namespace System.Runtime.Intrinsics.Arm
 
         /// <summary>
         /// svuint8_t svaesmc[_u8](svuint8_t op)
+        ///   AESMC Ztied.B, Ztied.B
         /// </summary>
         public static unsafe Vector<byte> AesMixColumns(Vector<byte> value) => AesMixColumns(value);
 
@@ -47,6 +49,8 @@ namespace System.Runtime.Intrinsics.Arm
 
         /// <summary>
         /// svuint8_t svaesd[_u8](svuint8_t op1, svuint8_t op2)
+        ///   AESD Ztied1.B, Ztied1.B, Zop2.B
+        ///   AESD Ztied2.B, Ztied2.B, Zop1.B
         /// </summary>
         public static unsafe Vector<byte> AesSingleRoundDecryption(Vector<byte> left, Vector<byte> right) => AesSingleRoundDecryption(left, right);
 
@@ -55,6 +59,8 @@ namespace System.Runtime.Intrinsics.Arm
 
         /// <summary>
         /// svuint8_t svaese[_u8](svuint8_t op1, svuint8_t op2)
+        ///   AESE Ztied1.B, Ztied1.B, Zop2.B
+        ///   AESE Ztied2.B, Ztied2.B, Zop1.B
         /// </summary>
         public static unsafe Vector<byte> AesSingleRoundEncryption(Vector<byte> left, Vector<byte> right) => AesSingleRoundEncryption(left, right);
 
@@ -63,6 +69,7 @@ namespace System.Runtime.Intrinsics.Arm
 
         /// <summary>
         /// svuint64_t svpmullb_pair[_u64](svuint64_t op1, svuint64_t op2)
+        ///   PMULLB Zresult.Q, Zop1.D, Zop2.D
         /// </summary>
         public static unsafe Vector<ulong> PolynomialMultiplyWideningLower(Vector<ulong> left, Vector<ulong> right) => PolynomialMultiplyWideningLower(left, right);
 
@@ -71,6 +78,7 @@ namespace System.Runtime.Intrinsics.Arm
 
         /// <summary>
         /// svuint64_t svpmullt_pair[_u64](svuint64_t op1, svuint64_t op2)
+        ///   PMULLT Zresult.Q, Zop1.D, Zop2.D
         /// </summary>
         public static unsafe Vector<ulong> PolynomialMultiplyWideningUpper(Vector<ulong> left, Vector<ulong> right) => PolynomialMultiplyWideningUpper(left, right);
 

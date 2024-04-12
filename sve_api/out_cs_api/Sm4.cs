@@ -31,6 +31,7 @@ namespace System.Runtime.Intrinsics.Arm
 
         /// <summary>
         /// uint32x4_t vsm4eq_u32(uint32x4_t a, uint32x4_t b)
+        ///   SM4E Vd.4S,Vn.4S
         /// </summary>
         public static unsafe Vector128<uint> Sm4EncryptionAndDecryption(Vector128<uint> a, Vector128<uint> b) => Sm4EncryptionAndDecryption(a, b);
 
@@ -39,6 +40,7 @@ namespace System.Runtime.Intrinsics.Arm
 
         /// <summary>
         /// uint32x4_t vsm4ekeyq_u32(uint32x4_t a, uint32x4_t b)
+        ///   SM4EKEY Vd.4S,Vn.4S,Vm.4S
         /// </summary>
         public static unsafe Vector128<uint> Sm4KeyUpdates(Vector128<uint> a, Vector128<uint> b) => Sm4KeyUpdates(a, b);
 

@@ -534,7 +534,13 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.D, Pg/Z, Zop.D; FCVT Zresult.D, Pg/M, Zop.H
         ///
         /// codegenarm64test:
-        ///   sve_fcvt - not implemented in coreclr
+        ///    IF_SVE_HO_3B  FCVT <Zd>.D, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V7, REG_P7, REG_V1, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V29, REG_P3, REG_V12, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V0, REG_P4, REG_V13, INS_OPTS_D_TO_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V1, REG_P5, REG_V14, INS_OPTS_H_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V2, REG_P6, REG_V15, INS_OPTS_S_TO_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V3, REG_P7, REG_V16, INS_OPTS_H_TO_S);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -554,7 +560,14 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.H, Pg/Z, Zop.H; SCVTF Zresult.H, Pg/M, Zop.H
         ///
         /// codegenarm64test:
-        ///   sve_scvtf - not implemented in coreclr
+        ///    IF_SVE_HS_3A  SCVTF <Zd>.S, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V19, REG_P2, REG_V8, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V1, REG_P5, REG_V19, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V4, REG_P0, REG_V14, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V0, REG_P0, REG_V0, INS_OPTS_SCALABLE_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V12, REG_P5, REG_V14, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V14, REG_P7, REG_V16, INS_OPTS_S_TO_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V16, REG_P1, REG_V18, INS_OPTS_D_TO_H);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -571,7 +584,14 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.S, Pg/Z, Zop.S; SCVTF Zresult.H, Pg/M, Zop.S
         ///
         /// codegenarm64test:
-        ///   sve_scvtf - not implemented in coreclr
+        ///    IF_SVE_HS_3A  SCVTF <Zd>.S, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V19, REG_P2, REG_V8, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V1, REG_P5, REG_V19, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V4, REG_P0, REG_V14, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V0, REG_P0, REG_V0, INS_OPTS_SCALABLE_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V12, REG_P5, REG_V14, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V14, REG_P7, REG_V16, INS_OPTS_S_TO_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V16, REG_P1, REG_V18, INS_OPTS_D_TO_H);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -588,7 +608,14 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.D, Pg/Z, Zop.D; SCVTF Zresult.H, Pg/M, Zop.D
         ///
         /// codegenarm64test:
-        ///   sve_scvtf - not implemented in coreclr
+        ///    IF_SVE_HS_3A  SCVTF <Zd>.S, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V19, REG_P2, REG_V8, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V1, REG_P5, REG_V19, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V4, REG_P0, REG_V14, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V0, REG_P0, REG_V0, INS_OPTS_SCALABLE_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V12, REG_P5, REG_V14, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V14, REG_P7, REG_V16, INS_OPTS_S_TO_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_scvtf, EA_SCALABLE, REG_V16, REG_P1, REG_V18, INS_OPTS_D_TO_H);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -605,7 +632,14 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.H, Pg/Z, Zop.H; UCVTF Zresult.H, Pg/M, Zop.H
         ///
         /// codegenarm64test:
-        ///   sve_ucvtf - not implemented in coreclr
+        ///    IF_SVE_HS_3A  UCVTF <Zd>.S, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V17, REG_P6, REG_V11, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V3, REG_P3, REG_V20, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V8, REG_P1, REG_V7, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V8, REG_P4, REG_V9, INS_OPTS_SCALABLE_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V13, REG_P6, REG_V15, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V15, REG_P0, REG_V17, INS_OPTS_S_TO_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V17, REG_P2, REG_V19, INS_OPTS_D_TO_H);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -622,7 +656,14 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.S, Pg/Z, Zop.S; UCVTF Zresult.H, Pg/M, Zop.S
         ///
         /// codegenarm64test:
-        ///   sve_ucvtf - not implemented in coreclr
+        ///    IF_SVE_HS_3A  UCVTF <Zd>.S, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V17, REG_P6, REG_V11, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V3, REG_P3, REG_V20, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V8, REG_P1, REG_V7, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V8, REG_P4, REG_V9, INS_OPTS_SCALABLE_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V13, REG_P6, REG_V15, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V15, REG_P0, REG_V17, INS_OPTS_S_TO_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V17, REG_P2, REG_V19, INS_OPTS_D_TO_H);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -639,7 +680,14 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.D, Pg/Z, Zop.D; UCVTF Zresult.H, Pg/M, Zop.D
         ///
         /// codegenarm64test:
-        ///   sve_ucvtf - not implemented in coreclr
+        ///    IF_SVE_HS_3A  UCVTF <Zd>.S, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V17, REG_P6, REG_V11, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V3, REG_P3, REG_V20, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V8, REG_P1, REG_V7, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V8, REG_P4, REG_V9, INS_OPTS_SCALABLE_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V13, REG_P6, REG_V15, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V15, REG_P0, REG_V17, INS_OPTS_S_TO_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_ucvtf, EA_SCALABLE, REG_V17, REG_P2, REG_V19, INS_OPTS_D_TO_H);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -656,7 +704,13 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.S, Pg/Z, Zop.S; FCVT Zresult.H, Pg/M, Zop.S
         ///
         /// codegenarm64test:
-        ///   sve_fcvt - not implemented in coreclr
+        ///    IF_SVE_HO_3B  FCVT <Zd>.D, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V7, REG_P7, REG_V1, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V29, REG_P3, REG_V12, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V0, REG_P4, REG_V13, INS_OPTS_D_TO_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V1, REG_P5, REG_V14, INS_OPTS_H_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V2, REG_P6, REG_V15, INS_OPTS_S_TO_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V3, REG_P7, REG_V16, INS_OPTS_H_TO_S);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -673,7 +727,13 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.D, Pg/Z, Zop.D; FCVT Zresult.H, Pg/M, Zop.D
         ///
         /// codegenarm64test:
-        ///   sve_fcvt - not implemented in coreclr
+        ///    IF_SVE_HO_3B  FCVT <Zd>.D, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V7, REG_P7, REG_V1, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V29, REG_P3, REG_V12, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V0, REG_P4, REG_V13, INS_OPTS_D_TO_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V1, REG_P5, REG_V14, INS_OPTS_H_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V2, REG_P6, REG_V15, INS_OPTS_S_TO_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V3, REG_P7, REG_V16, INS_OPTS_H_TO_S);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -693,7 +753,14 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.H, Pg/Z, Zop.H; FCVTZS Zresult.H, Pg/M, Zop.H
         ///
         /// codegenarm64test:
-        ///   sve_fcvtzs - not implemented in coreclr
+        ///    IF_SVE_HP_3B  FCVTZS <Zd>.S, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V9, REG_P1, REG_V3, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V5, REG_P0, REG_V24, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V12, REG_P3, REG_V6, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V2, REG_P1, REG_V17, INS_OPTS_SCALABLE_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V3, REG_P2, REG_V18, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V4, REG_P3, REG_V19, INS_OPTS_H_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V5, REG_P4, REG_V20, INS_OPTS_H_TO_D);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -713,7 +780,14 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.S, Pg/Z, Zop.S; FCVTZS Zresult.S, Pg/M, Zop.H
         ///
         /// codegenarm64test:
-        ///   sve_fcvtzs - not implemented in coreclr
+        ///    IF_SVE_HP_3B  FCVTZS <Zd>.S, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V9, REG_P1, REG_V3, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V5, REG_P0, REG_V24, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V12, REG_P3, REG_V6, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V2, REG_P1, REG_V17, INS_OPTS_SCALABLE_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V3, REG_P2, REG_V18, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V4, REG_P3, REG_V19, INS_OPTS_H_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V5, REG_P4, REG_V20, INS_OPTS_H_TO_D);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -733,7 +807,14 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.D, Pg/Z, Zop.D; FCVTZS Zresult.D, Pg/M, Zop.H
         ///
         /// codegenarm64test:
-        ///   sve_fcvtzs - not implemented in coreclr
+        ///    IF_SVE_HP_3B  FCVTZS <Zd>.S, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V9, REG_P1, REG_V3, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V5, REG_P0, REG_V24, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V12, REG_P3, REG_V6, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V2, REG_P1, REG_V17, INS_OPTS_SCALABLE_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V3, REG_P2, REG_V18, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V4, REG_P3, REG_V19, INS_OPTS_H_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzs, EA_SCALABLE, REG_V5, REG_P4, REG_V20, INS_OPTS_H_TO_D);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -753,7 +834,13 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.S, Pg/Z, Zop.S; FCVT Zresult.S, Pg/M, Zop.H
         ///
         /// codegenarm64test:
-        ///   sve_fcvt - not implemented in coreclr
+        ///    IF_SVE_HO_3B  FCVT <Zd>.D, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V7, REG_P7, REG_V1, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V29, REG_P3, REG_V12, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V0, REG_P4, REG_V13, INS_OPTS_D_TO_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V1, REG_P5, REG_V14, INS_OPTS_H_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V2, REG_P6, REG_V15, INS_OPTS_S_TO_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvt, EA_SCALABLE, REG_V3, REG_P7, REG_V16, INS_OPTS_H_TO_S);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -773,7 +860,14 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.H, Pg/Z, Zop.H; FCVTZU Zresult.H, Pg/M, Zop.H
         ///
         /// codegenarm64test:
-        ///   sve_fcvtzu - not implemented in coreclr
+        ///    IF_SVE_HP_3B  FCVTZU <Zd>.S, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V3, REG_P2, REG_V10, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V10, REG_P7, REG_V1, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V4, REG_P3, REG_V13, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V22, REG_P6, REG_V4, INS_OPTS_SCALABLE_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V23, REG_P7, REG_V5, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V24, REG_P0, REG_V6, INS_OPTS_H_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V25, REG_P1, REG_V7, INS_OPTS_H_TO_D);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -793,7 +887,14 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.S, Pg/Z, Zop.S; FCVTZU Zresult.S, Pg/M, Zop.H
         ///
         /// codegenarm64test:
-        ///   sve_fcvtzu - not implemented in coreclr
+        ///    IF_SVE_HP_3B  FCVTZU <Zd>.S, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V3, REG_P2, REG_V10, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V10, REG_P7, REG_V1, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V4, REG_P3, REG_V13, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V22, REG_P6, REG_V4, INS_OPTS_SCALABLE_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V23, REG_P7, REG_V5, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V24, REG_P0, REG_V6, INS_OPTS_H_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V25, REG_P1, REG_V7, INS_OPTS_H_TO_D);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -813,7 +914,14 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.D, Pg/Z, Zop.D; FCVTZU Zresult.D, Pg/M, Zop.H
         ///
         /// codegenarm64test:
-        ///   sve_fcvtzu - not implemented in coreclr
+        ///    IF_SVE_HP_3B  FCVTZU <Zd>.S, <Pg>/M, <Zn>.S
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V3, REG_P2, REG_V10, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V10, REG_P7, REG_V1, INS_OPTS_S_TO_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V4, REG_P3, REG_V13, INS_OPTS_D_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V22, REG_P6, REG_V4, INS_OPTS_SCALABLE_D);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V23, REG_P7, REG_V5, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V24, REG_P0, REG_V6, INS_OPTS_H_TO_S);
+        ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtzu, EA_SCALABLE, REG_V25, REG_P1, REG_V7, INS_OPTS_H_TO_D);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -922,7 +1030,7 @@ namespace System.Runtime.Intrinsics.Arm
         ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtnt, EA_SCALABLE, REG_V18, REG_P3, REG_V9, INS_OPTS_S_TO_H);
         ///        theEmitter->emitIns_R_R_R(INS_sve_fcvtnt, EA_SCALABLE, REG_V12, REG_P3, REG_V5, INS_OPTS_D_TO_S);
         ///    IF_SVE_HG_2A  FCVTNT <Zd>.B, {<Zn1>.S-<Zn2>.S }
-        ///        theEmitter->emitIns_R_R(INS_sve_fcvtnt, EA_SCALABLE, REG_V14, REG_V15);
+        ///        theEmitter->emitIns_R_R(INS_sve_fcvtnt, EA_SCALABLE, REG_V14, REG_V16);
         ///
         /// Embedded arg1 mask predicate
         /// </summary>
@@ -940,9 +1048,20 @@ namespace System.Runtime.Intrinsics.Arm
         ///   TBL Zresult.D, Zdata.D, Zindices_d.D
         ///
         /// codegenarm64test:
+        ///    IF_SVE_BW_2A  MOV <Zd>.<T>, <Zn>.<T>[<imm>]
+        ///        theEmitter->emitIns_R_R_I(INS_sve_dup, EA_SCALABLE, REG_V4, REG_V12, 63, INS_OPTS_SCALABLE_B);
+        ///        theEmitter->emitIns_R_R_I(INS_sve_dup, EA_SCALABLE, REG_V8, REG_V9, 31, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R_I(INS_sve_dup, EA_SCALABLE, REG_V11, REG_V28, 15, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R_I(INS_sve_dup, EA_SCALABLE, REG_V21, REG_V12, 7, INS_OPTS_SCALABLE_D);
+        ///        theEmitter->emitIns_R_R_I(INS_sve_dup, EA_SCALABLE, REG_V14, REG_V7, 3, INS_OPTS_SCALABLE_Q);
+        ///        theEmitter->emitIns_R_R_I(INS_sve_dup, EA_SCALABLE, REG_V13, REG_V8, 0, INS_OPTS_SCALABLE_B);
+        ///        theEmitter->emitIns_R_R_I(INS_sve_dup, EA_SCALABLE, REG_V2, REG_V0, 0, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R_I(INS_sve_dup, EA_SCALABLE, REG_V15, REG_V31, 0, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R_I(INS_sve_dup, EA_SCALABLE, REG_V23, REG_V27, 0, INS_OPTS_SCALABLE_D);
+        ///        theEmitter->emitIns_R_R_I(INS_sve_dup, EA_SCALABLE, REG_V4, REG_V3, 0, INS_OPTS_SCALABLE_Q);
         ///    IF_SVE_EB_1A  DUP <Zd>.<T>, #<imm>{, <shift>}
         ///        theEmitter->emitIns_R_I(INS_sve_dup, EA_SCALABLE, REG_V0, -128, INS_OPTS_SCALABLE_B);
-        ///        theEmitter->emitIns_R_I(INS_sve_dup, EA_SCALABLE, REG_V1, 0, INS_OPTS_SCALABLE_H, INS_SCALABLE_OPTS_SHIFT);
+        ///        theEmitter->emitIns_R_I(INS_sve_dup, EA_SCALABLE, REG_V1, 0, INS_OPTS_SCALABLE_H);
         ///        theEmitter->emitIns_R_I(INS_sve_dup, EA_SCALABLE, REG_V2, 5, INS_OPTS_SCALABLE_S);
         ///        theEmitter->emitIns_R_I(INS_sve_dup, EA_SCALABLE, REG_V3, 127, INS_OPTS_SCALABLE_D);
         ///    IF_SVE_CB_2A  DUP <Zd>.<T>, <R><n|SP>
@@ -1050,7 +1169,16 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult, Zop1; EXT Zresult.B, Zresult.B, Zop2.B, #imm3 * 2
         ///
         /// codegenarm64test:
-        ///   sve_ext - not implemented in coreclr
+        ///    IF_SVE_BQ_2A  EXT <Zd>.B, {<Zn1>.B, <Zn2>.B }, #<imm>
+        ///        theEmitter->emitIns_R_R_I(INS_sve_ext, EA_SCALABLE, REG_V0, REG_V1, 0, INS_OPTS_SCALABLE_B, INS_SCALABLE_OPTS_WITH_VECTOR_PAIR);
+        ///        theEmitter->emitIns_R_R_I(INS_sve_ext, EA_SCALABLE, REG_V2, REG_V3, 5, INS_OPTS_SCALABLE_B, INS_SCALABLE_OPTS_WITH_VECTOR_PAIR);
+        ///        theEmitter->emitIns_R_R_I(INS_sve_ext, EA_SCALABLE, REG_V4, REG_V5, 128, INS_OPTS_SCALABLE_B, INS_SCALABLE_OPTS_WITH_VECTOR_PAIR);
+        ///        theEmitter->emitIns_R_R_I(INS_sve_ext, EA_SCALABLE, REG_V6, REG_FP_LAST, 255, INS_OPTS_SCALABLE_B, INS_SCALABLE_OPTS_WITH_VECTOR_PAIR);
+        ///    IF_SVE_BQ_2B  EXT <Zdn>.B, <Zdn>.B, <Zm>.B, #<imm>
+        ///        theEmitter->emitIns_R_R_I(INS_sve_ext, EA_SCALABLE, REG_V0, REG_V1, 0, INS_OPTS_SCALABLE_B);
+        ///        theEmitter->emitIns_R_R_I(INS_sve_ext, EA_SCALABLE, REG_V2, REG_V3, 31, INS_OPTS_SCALABLE_B);
+        ///        theEmitter->emitIns_R_R_I(INS_sve_ext, EA_SCALABLE, REG_V4, REG_V5, 64, INS_OPTS_SCALABLE_B);
+        ///        theEmitter->emitIns_R_R_I(INS_sve_ext, EA_SCALABLE, REG_V6, REG_V7, 255, INS_OPTS_SCALABLE_B);
         /// </summary>
         public static unsafe Vector<half> ExtractVector(Vector<half> upper, Vector<half> lower, [ConstantExpected] byte index) => ExtractVector(upper, lower, index);
 
@@ -1252,7 +1380,17 @@ namespace System.Runtime.Intrinsics.Arm
         ///   INSR Ztied1.H, Hop2
         ///
         /// codegenarm64test:
-        ///   sve_insr - not implemented in coreclr
+        ///    IF_SVE_CC_2A  INSR <Zdn>.<T>, <V><m>
+        ///        theEmitter->emitIns_R_R(INS_sve_insr, EA_SCALABLE, REG_V0, REG_V13, INS_OPTS_SCALABLE_B);
+        ///        theEmitter->emitIns_R_R(INS_sve_insr, EA_SCALABLE, REG_V29, REG_V0, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R(INS_sve_insr, EA_SCALABLE, REG_V4, REG_V15, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R(INS_sve_insr, EA_SCALABLE, REG_V8, REG_V2, INS_OPTS_SCALABLE_D);
+        ///    IF_SVE_CD_2A  INSR <Zdn>.<T>, <R><m>
+        ///        theEmitter->emitIns_R_R(INS_sve_insr, EA_SCALABLE, REG_V4, REG_R23, INS_OPTS_SCALABLE_B);
+        ///        theEmitter->emitIns_R_R(INS_sve_insr, EA_SCALABLE, REG_V11, REG_R1, INS_OPTS_SCALABLE_H);
+        ///        theEmitter->emitIns_R_R(INS_sve_insr, EA_SCALABLE, REG_V14, REG_R9, INS_OPTS_SCALABLE_S);
+        ///        theEmitter->emitIns_R_R(INS_sve_insr, EA_SCALABLE, REG_V19, REG_R0, INS_OPTS_SCALABLE_D);
+        ///        theEmitter->emitIns_R_R(INS_sve_insr, EA_SCALABLE, REG_V29, REG_ZR, INS_OPTS_SCALABLE_D);
         /// </summary>
         public static unsafe Vector<half> InsertIntoShiftedVector(Vector<half> left, half right) => InsertIntoShiftedVector(left, right);
 

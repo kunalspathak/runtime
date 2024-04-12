@@ -31,6 +31,8 @@ namespace System.Runtime.Intrinsics.Arm
 
         /// <summary>
         /// svfloat32_t svmmla[_f32](svfloat32_t op1, svfloat32_t op2, svfloat32_t op3)
+        ///   FMMLA Ztied1.S, Zop2.S, Zop3.S
+        ///   MOVPRFX Zresult, Zop1; FMMLA Zresult.S, Zop2.S, Zop3.S
         /// </summary>
         public static unsafe Vector<float> MatrixMultiplyAccumulate(Vector<float> op1, Vector<float> op2, Vector<float> op3) => MatrixMultiplyAccumulate(op1, op2, op3);
 

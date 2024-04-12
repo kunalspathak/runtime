@@ -31,6 +31,7 @@ namespace System.Runtime.Intrinsics.Arm
 
         /// <summary>
         /// svuint32_t svsm4e[_u32](svuint32_t op1, svuint32_t op2)
+        ///   SM4E Ztied1.S, Ztied1.S, Zop2.S
         /// </summary>
         public static unsafe Vector<uint> Sm4EncryptionAndDecryption(Vector<uint> left, Vector<uint> right) { throw new PlatformNotSupportedException(); }
 
@@ -39,6 +40,7 @@ namespace System.Runtime.Intrinsics.Arm
 
         /// <summary>
         /// svuint32_t svsm4ekey[_u32](svuint32_t op1, svuint32_t op2)
+        ///   SM4EKEY Zresult.S, Zop1.S, Zop2.S
         /// </summary>
         public static unsafe Vector<uint> Sm4KeyUpdates(Vector<uint> left, Vector<uint> right) { throw new PlatformNotSupportedException(); }
 

@@ -299,63 +299,7 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<double> ConditionalSelect(Vector<double> mask, Vector<double> left, Vector<double> right) { throw new PlatformNotSupportedException(); }
 
-        ///  Divide : Divide
-
-        /// <summary>
-        /// svint32_t svdiv[_s32]_m(svbool_t pg, svint32_t op1, svint32_t op2)
-        ///   SDIV Ztied1.S, Pg/M, Ztied1.S, Zop2.S
-        ///   MOVPRFX Zresult, Zop1; SDIV Zresult.S, Pg/M, Zresult.S, Zop2.S
-        /// svint32_t svdiv[_s32]_x(svbool_t pg, svint32_t op1, svint32_t op2)
-        ///   SDIV Ztied1.S, Pg/M, Ztied1.S, Zop2.S
-        ///   SDIVR Ztied2.S, Pg/M, Ztied2.S, Zop1.S
-        ///   MOVPRFX Zresult, Zop1; SDIV Zresult.S, Pg/M, Zresult.S, Zop2.S
-        /// svint32_t svdiv[_s32]_z(svbool_t pg, svint32_t op1, svint32_t op2)
-        ///   MOVPRFX Zresult.S, Pg/Z, Zop1.S; SDIV Zresult.S, Pg/M, Zresult.S, Zop2.S
-        ///   MOVPRFX Zresult.S, Pg/Z, Zop2.S; SDIVR Zresult.S, Pg/M, Zresult.S, Zop1.S
-        /// </summary>
-        public static unsafe Vector<int> Divide(Vector<int> left, Vector<int> right) { throw new PlatformNotSupportedException(); }
-
-        /// <summary>
-        /// svint64_t svdiv[_s64]_m(svbool_t pg, svint64_t op1, svint64_t op2)
-        ///   SDIV Ztied1.D, Pg/M, Ztied1.D, Zop2.D
-        ///   MOVPRFX Zresult, Zop1; SDIV Zresult.D, Pg/M, Zresult.D, Zop2.D
-        /// svint64_t svdiv[_s64]_x(svbool_t pg, svint64_t op1, svint64_t op2)
-        ///   SDIV Ztied1.D, Pg/M, Ztied1.D, Zop2.D
-        ///   SDIVR Ztied2.D, Pg/M, Ztied2.D, Zop1.D
-        ///   MOVPRFX Zresult, Zop1; SDIV Zresult.D, Pg/M, Zresult.D, Zop2.D
-        /// svint64_t svdiv[_s64]_z(svbool_t pg, svint64_t op1, svint64_t op2)
-        ///   MOVPRFX Zresult.D, Pg/Z, Zop1.D; SDIV Zresult.D, Pg/M, Zresult.D, Zop2.D
-        ///   MOVPRFX Zresult.D, Pg/Z, Zop2.D; SDIVR Zresult.D, Pg/M, Zresult.D, Zop1.D
-        /// </summary>
-        public static unsafe Vector<long> Divide(Vector<long> left, Vector<long> right) { throw new PlatformNotSupportedException(); }
-
-        /// <summary>
-        /// svuint32_t svdiv[_u32]_m(svbool_t pg, svuint32_t op1, svuint32_t op2)
-        ///   UDIV Ztied1.S, Pg/M, Ztied1.S, Zop2.S
-        ///   MOVPRFX Zresult, Zop1; UDIV Zresult.S, Pg/M, Zresult.S, Zop2.S
-        /// svuint32_t svdiv[_u32]_x(svbool_t pg, svuint32_t op1, svuint32_t op2)
-        ///   UDIV Ztied1.S, Pg/M, Ztied1.S, Zop2.S
-        ///   UDIVR Ztied2.S, Pg/M, Ztied2.S, Zop1.S
-        ///   MOVPRFX Zresult, Zop1; UDIV Zresult.S, Pg/M, Zresult.S, Zop2.S
-        /// svuint32_t svdiv[_u32]_z(svbool_t pg, svuint32_t op1, svuint32_t op2)
-        ///   MOVPRFX Zresult.S, Pg/Z, Zop1.S; UDIV Zresult.S, Pg/M, Zresult.S, Zop2.S
-        ///   MOVPRFX Zresult.S, Pg/Z, Zop2.S; UDIVR Zresult.S, Pg/M, Zresult.S, Zop1.S
-        /// </summary>
-        public static unsafe Vector<uint> Divide(Vector<uint> left, Vector<uint> right) { throw new PlatformNotSupportedException(); }
-
-        /// <summary>
-        /// svuint64_t svdiv[_u64]_m(svbool_t pg, svuint64_t op1, svuint64_t op2)
-        ///   UDIV Ztied1.D, Pg/M, Ztied1.D, Zop2.D
-        ///   MOVPRFX Zresult, Zop1; UDIV Zresult.D, Pg/M, Zresult.D, Zop2.D
-        /// svuint64_t svdiv[_u64]_x(svbool_t pg, svuint64_t op1, svuint64_t op2)
-        ///   UDIV Ztied1.D, Pg/M, Ztied1.D, Zop2.D
-        ///   UDIVR Ztied2.D, Pg/M, Ztied2.D, Zop1.D
-        ///   MOVPRFX Zresult, Zop1; UDIV Zresult.D, Pg/M, Zresult.D, Zop2.D
-        /// svuint64_t svdiv[_u64]_z(svbool_t pg, svuint64_t op1, svuint64_t op2)
-        ///   MOVPRFX Zresult.D, Pg/Z, Zop1.D; UDIV Zresult.D, Pg/M, Zresult.D, Zop2.D
-        ///   MOVPRFX Zresult.D, Pg/Z, Zop2.D; UDIVR Zresult.D, Pg/M, Zresult.D, Zop1.D
-        /// </summary>
-        public static unsafe Vector<ulong> Divide(Vector<ulong> left, Vector<ulong> right) { throw new PlatformNotSupportedException(); }
+        ///  Divide : Divide        
 
         /// <summary>
         /// svfloat32_t svdiv[_f32]_m(svbool_t pg, svfloat32_t op1, svfloat32_t op2)

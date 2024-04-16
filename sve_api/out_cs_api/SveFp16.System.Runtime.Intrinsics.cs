@@ -26,14 +26,14 @@
         public static System.Numerics.Vector<half> ConditionalExtractLastActiveElementAndReplicate(System.Numerics.Vector<half> mask, System.Numerics.Vector<half> fallback, System.Numerics.Vector<half> data) { throw null; }
         public static System.Numerics.Vector<half> ConditionalSelect(System.Numerics.Vector<half> mask, System.Numerics.Vector<half> left, System.Numerics.Vector<half> right) { throw null; }
         public static System.Numerics.Vector<double> ConvertToDouble(System.Numerics.Vector<half> value) { throw null; }
+        public static System.Numerics.Vector<half> ConvertToHalf(System.Numerics.Vector<double> value) { throw null; }
         public static System.Numerics.Vector<half> ConvertToHalf(System.Numerics.Vector<short> value) { throw null; }
         public static System.Numerics.Vector<half> ConvertToHalf(System.Numerics.Vector<int> value) { throw null; }
         public static System.Numerics.Vector<half> ConvertToHalf(System.Numerics.Vector<long> value) { throw null; }
+        public static System.Numerics.Vector<half> ConvertToHalf(System.Numerics.Vector<float> value) { throw null; }
         public static System.Numerics.Vector<half> ConvertToHalf(System.Numerics.Vector<ushort> value) { throw null; }
         public static System.Numerics.Vector<half> ConvertToHalf(System.Numerics.Vector<uint> value) { throw null; }
         public static System.Numerics.Vector<half> ConvertToHalf(System.Numerics.Vector<ulong> value) { throw null; }
-        public static System.Numerics.Vector<half> ConvertToHalf(System.Numerics.Vector<float> value) { throw null; }
-        public static System.Numerics.Vector<half> ConvertToHalf(System.Numerics.Vector<double> value) { throw null; }
         public static System.Numerics.Vector<short> ConvertToInt16(System.Numerics.Vector<half> value) { throw null; }
         public static System.Numerics.Vector<int> ConvertToInt32(System.Numerics.Vector<half> value) { throw null; }
         public static System.Numerics.Vector<long> ConvertToInt64(System.Numerics.Vector<half> value) { throw null; }

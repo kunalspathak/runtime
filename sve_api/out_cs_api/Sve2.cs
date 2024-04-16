@@ -30,11 +30,11 @@ namespace System.Runtime.Intrinsics.Arm
         ///  AbsoluteDifferenceAdd : Absolute difference and accumulate
 
         /// <summary>
-        /// svint8_t svaba[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
-        ///   SABA Ztied1.B, Zop2.B, Zop3.B
-        ///   MOVPRFX Zresult, Zop1; SABA Zresult.B, Zop2.B, Zop3.B
+        /// svuint8_t svaba[_u8](svuint8_t op1, svuint8_t op2, svuint8_t op3)
+        ///   UABA Ztied1.B, Zop2.B, Zop3.B
+        ///   MOVPRFX Zresult, Zop1; UABA Zresult.B, Zop2.B, Zop3.B
         /// </summary>
-        public static unsafe Vector<sbyte> AbsoluteDifferenceAdd(Vector<sbyte> addend, Vector<sbyte> left, Vector<sbyte> right) => AbsoluteDifferenceAdd(addend, left, right);
+        public static unsafe Vector<byte> AbsoluteDifferenceAdd(Vector<byte> addend, Vector<byte> left, Vector<byte> right) => AbsoluteDifferenceAdd(addend, left, right);
 
         /// <summary>
         /// svint16_t svaba[_s16](svint16_t op1, svint16_t op2, svint16_t op3)
@@ -58,11 +58,11 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> AbsoluteDifferenceAdd(Vector<long> addend, Vector<long> left, Vector<long> right) => AbsoluteDifferenceAdd(addend, left, right);
 
         /// <summary>
-        /// svuint8_t svaba[_u8](svuint8_t op1, svuint8_t op2, svuint8_t op3)
-        ///   UABA Ztied1.B, Zop2.B, Zop3.B
-        ///   MOVPRFX Zresult, Zop1; UABA Zresult.B, Zop2.B, Zop3.B
+        /// svint8_t svaba[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
+        ///   SABA Ztied1.B, Zop2.B, Zop3.B
+        ///   MOVPRFX Zresult, Zop1; SABA Zresult.B, Zop2.B, Zop3.B
         /// </summary>
-        public static unsafe Vector<byte> AbsoluteDifferenceAdd(Vector<byte> addend, Vector<byte> left, Vector<byte> right) => AbsoluteDifferenceAdd(addend, left, right);
+        public static unsafe Vector<sbyte> AbsoluteDifferenceAdd(Vector<sbyte> addend, Vector<sbyte> left, Vector<sbyte> right) => AbsoluteDifferenceAdd(addend, left, right);
 
         /// <summary>
         /// svuint16_t svaba[_u16](svuint16_t op1, svuint16_t op2, svuint16_t op3)
@@ -291,10 +291,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  AddHighNarowingLower : Add narrow high part (bottom)
 
         /// <summary>
-        /// svint8_t svaddhnb[_s16](svint16_t op1, svint16_t op2)
+        /// svuint8_t svaddhnb[_u16](svuint16_t op1, svuint16_t op2)
         ///   ADDHNB Zresult.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<sbyte> AddHighNarowingLower(Vector<short> left, Vector<short> right) => AddHighNarowingLower(left, right);
+        public static unsafe Vector<byte> AddHighNarowingLower(Vector<ushort> left, Vector<ushort> right) => AddHighNarowingLower(left, right);
 
         /// <summary>
         /// svint16_t svaddhnb[_s32](svint32_t op1, svint32_t op2)
@@ -309,10 +309,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> AddHighNarowingLower(Vector<long> left, Vector<long> right) => AddHighNarowingLower(left, right);
 
         /// <summary>
-        /// svuint8_t svaddhnb[_u16](svuint16_t op1, svuint16_t op2)
+        /// svint8_t svaddhnb[_s16](svint16_t op1, svint16_t op2)
         ///   ADDHNB Zresult.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<byte> AddHighNarowingLower(Vector<ushort> left, Vector<ushort> right) => AddHighNarowingLower(left, right);
+        public static unsafe Vector<sbyte> AddHighNarowingLower(Vector<short> left, Vector<short> right) => AddHighNarowingLower(left, right);
 
         /// <summary>
         /// svuint16_t svaddhnb[_u32](svuint32_t op1, svuint32_t op2)
@@ -330,10 +330,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  AddHighNarowingUpper : Add narrow high part (top)
 
         /// <summary>
-        /// svint8_t svaddhnt[_s16](svint8_t even, svint16_t op1, svint16_t op2)
+        /// svuint8_t svaddhnt[_u16](svuint8_t even, svuint16_t op1, svuint16_t op2)
         ///   ADDHNT Ztied.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<sbyte> AddHighNarowingUpper(Vector<sbyte> even, Vector<short> left, Vector<short> right) => AddHighNarowingUpper(even, left, right);
+        public static unsafe Vector<byte> AddHighNarowingUpper(Vector<byte> even, Vector<ushort> left, Vector<ushort> right) => AddHighNarowingUpper(even, left, right);
 
         /// <summary>
         /// svint16_t svaddhnt[_s32](svint16_t even, svint32_t op1, svint32_t op2)
@@ -348,10 +348,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> AddHighNarowingUpper(Vector<int> even, Vector<long> left, Vector<long> right) => AddHighNarowingUpper(even, left, right);
 
         /// <summary>
-        /// svuint8_t svaddhnt[_u16](svuint8_t even, svuint16_t op1, svuint16_t op2)
+        /// svint8_t svaddhnt[_s16](svint8_t even, svint16_t op1, svint16_t op2)
         ///   ADDHNT Ztied.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<byte> AddHighNarowingUpper(Vector<byte> even, Vector<ushort> left, Vector<ushort> right) => AddHighNarowingUpper(even, left, right);
+        public static unsafe Vector<sbyte> AddHighNarowingUpper(Vector<sbyte> even, Vector<short> left, Vector<short> right) => AddHighNarowingUpper(even, left, right);
 
         /// <summary>
         /// svuint16_t svaddhnt[_u32](svuint16_t even, svuint32_t op1, svuint32_t op2)
@@ -369,14 +369,24 @@ namespace System.Runtime.Intrinsics.Arm
         ///  AddPairwise : Add pairwise
 
         /// <summary>
-        /// svint8_t svaddp[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
+        /// svuint8_t svaddp[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
         ///   ADDP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
         ///   MOVPRFX Zresult, Zop1; ADDP Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svaddp[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
+        /// svuint8_t svaddp[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
         ///   ADDP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
         ///   MOVPRFX Zresult, Zop1; ADDP Zresult.B, Pg/M, Zresult.B, Zop2.B
         /// </summary>
-        public static unsafe Vector<sbyte> AddPairwise(Vector<sbyte> left, Vector<sbyte> right) => AddPairwise(left, right);
+        public static unsafe Vector<byte> AddPairwise(Vector<byte> left, Vector<byte> right) => AddPairwise(left, right);
+
+        /// <summary>
+        /// svfloat64_t svaddp[_f64]_m(svbool_t pg, svfloat64_t op1, svfloat64_t op2)
+        ///   FADDP Ztied1.D, Pg/M, Ztied1.D, Zop2.D
+        ///   MOVPRFX Zresult, Zop1; FADDP Zresult.D, Pg/M, Zresult.D, Zop2.D
+        /// svfloat64_t svaddp[_f64]_x(svbool_t pg, svfloat64_t op1, svfloat64_t op2)
+        ///   FADDP Ztied1.D, Pg/M, Ztied1.D, Zop2.D
+        ///   MOVPRFX Zresult, Zop1; FADDP Zresult.D, Pg/M, Zresult.D, Zop2.D
+        /// </summary>
+        public static unsafe Vector<double> AddPairwise(Vector<double> left, Vector<double> right) => AddPairwise(left, right);
 
         /// <summary>
         /// svint16_t svaddp[_s16]_m(svbool_t pg, svint16_t op1, svint16_t op2)
@@ -409,14 +419,24 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> AddPairwise(Vector<long> left, Vector<long> right) => AddPairwise(left, right);
 
         /// <summary>
-        /// svuint8_t svaddp[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        /// svint8_t svaddp[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
         ///   ADDP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
         ///   MOVPRFX Zresult, Zop1; ADDP Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svuint8_t svaddp[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        /// svint8_t svaddp[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
         ///   ADDP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
         ///   MOVPRFX Zresult, Zop1; ADDP Zresult.B, Pg/M, Zresult.B, Zop2.B
         /// </summary>
-        public static unsafe Vector<byte> AddPairwise(Vector<byte> left, Vector<byte> right) => AddPairwise(left, right);
+        public static unsafe Vector<sbyte> AddPairwise(Vector<sbyte> left, Vector<sbyte> right) => AddPairwise(left, right);
+
+        /// <summary>
+        /// svfloat32_t svaddp[_f32]_m(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
+        ///   FADDP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
+        ///   MOVPRFX Zresult, Zop1; FADDP Zresult.S, Pg/M, Zresult.S, Zop2.S
+        /// svfloat32_t svaddp[_f32]_x(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
+        ///   FADDP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
+        ///   MOVPRFX Zresult, Zop1; FADDP Zresult.S, Pg/M, Zresult.S, Zop2.S
+        /// </summary>
+        public static unsafe Vector<float> AddPairwise(Vector<float> left, Vector<float> right) => AddPairwise(left, right);
 
         /// <summary>
         /// svuint16_t svaddp[_u16]_m(svbool_t pg, svuint16_t op1, svuint16_t op2)
@@ -447,26 +467,6 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult, Zop1; ADDP Zresult.D, Pg/M, Zresult.D, Zop2.D
         /// </summary>
         public static unsafe Vector<ulong> AddPairwise(Vector<ulong> left, Vector<ulong> right) => AddPairwise(left, right);
-
-        /// <summary>
-        /// svfloat32_t svaddp[_f32]_m(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
-        ///   FADDP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
-        ///   MOVPRFX Zresult, Zop1; FADDP Zresult.S, Pg/M, Zresult.S, Zop2.S
-        /// svfloat32_t svaddp[_f32]_x(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
-        ///   FADDP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
-        ///   MOVPRFX Zresult, Zop1; FADDP Zresult.S, Pg/M, Zresult.S, Zop2.S
-        /// </summary>
-        public static unsafe Vector<float> AddPairwise(Vector<float> left, Vector<float> right) => AddPairwise(left, right);
-
-        /// <summary>
-        /// svfloat64_t svaddp[_f64]_m(svbool_t pg, svfloat64_t op1, svfloat64_t op2)
-        ///   FADDP Ztied1.D, Pg/M, Ztied1.D, Zop2.D
-        ///   MOVPRFX Zresult, Zop1; FADDP Zresult.D, Pg/M, Zresult.D, Zop2.D
-        /// svfloat64_t svaddp[_f64]_x(svbool_t pg, svfloat64_t op1, svfloat64_t op2)
-        ///   FADDP Ztied1.D, Pg/M, Ztied1.D, Zop2.D
-        ///   MOVPRFX Zresult, Zop1; FADDP Zresult.D, Pg/M, Zresult.D, Zop2.D
-        /// </summary>
-        public static unsafe Vector<double> AddPairwise(Vector<double> left, Vector<double> right) => AddPairwise(left, right);
 
 
         ///  AddPairwiseWidening : Add and accumulate long pairwise
@@ -547,11 +547,11 @@ namespace System.Runtime.Intrinsics.Arm
         ///  AddRotateComplex : Complex add with rotate
 
         /// <summary>
-        /// svint8_t svcadd[_s8](svint8_t op1, svint8_t op2, uint64_t imm_rotation)
+        /// svuint8_t svcadd[_u8](svuint8_t op1, svuint8_t op2, uint64_t imm_rotation)
         ///   CADD Ztied1.B, Ztied1.B, Zop2.B, #imm_rotation
         ///   MOVPRFX Zresult, Zop1; CADD Zresult.B, Zresult.B, Zop2.B, #imm_rotation
         /// </summary>
-        public static unsafe Vector<sbyte> AddRotateComplex(Vector<sbyte> left, Vector<sbyte> right, [ConstantExpected] byte rotation) => AddRotateComplex(left, right, rotation);
+        public static unsafe Vector<byte> AddRotateComplex(Vector<byte> left, Vector<byte> right, [ConstantExpected] byte rotation) => AddRotateComplex(left, right, rotation);
 
         /// <summary>
         /// svint16_t svcadd[_s16](svint16_t op1, svint16_t op2, uint64_t imm_rotation)
@@ -575,11 +575,11 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> AddRotateComplex(Vector<long> left, Vector<long> right, [ConstantExpected] byte rotation) => AddRotateComplex(left, right, rotation);
 
         /// <summary>
-        /// svuint8_t svcadd[_u8](svuint8_t op1, svuint8_t op2, uint64_t imm_rotation)
+        /// svint8_t svcadd[_s8](svint8_t op1, svint8_t op2, uint64_t imm_rotation)
         ///   CADD Ztied1.B, Ztied1.B, Zop2.B, #imm_rotation
         ///   MOVPRFX Zresult, Zop1; CADD Zresult.B, Zresult.B, Zop2.B, #imm_rotation
         /// </summary>
-        public static unsafe Vector<byte> AddRotateComplex(Vector<byte> left, Vector<byte> right, [ConstantExpected] byte rotation) => AddRotateComplex(left, right, rotation);
+        public static unsafe Vector<sbyte> AddRotateComplex(Vector<sbyte> left, Vector<sbyte> right, [ConstantExpected] byte rotation) => AddRotateComplex(left, right, rotation);
 
         /// <summary>
         /// svuint16_t svcadd[_u16](svuint16_t op1, svuint16_t op2, uint64_t imm_rotation)
@@ -606,18 +606,18 @@ namespace System.Runtime.Intrinsics.Arm
         ///  AddSaturate : Saturating add
 
         /// <summary>
-        /// svint8_t svqadd[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SQADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SQADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svqadd[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SQADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   SQADD Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   SQADD Zresult.B, Zop1.B, Zop2.B
-        /// svint8_t svqadd[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SQADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SQADD Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// svuint8_t svqadd[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UQADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; UQADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svuint8_t svqadd[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UQADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   UQADD Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   UQADD Zresult.B, Zop1.B, Zop2.B
+        /// svuint8_t svqadd[_u8]_z(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; UQADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; UQADD Zresult.B, Pg/M, Zresult.B, Zop1.B
         /// </summary>
-        public static unsafe Vector<sbyte> AddSaturate(Vector<sbyte> left, Vector<sbyte> right) => AddSaturate(left, right);
+        public static unsafe Vector<byte> AddSaturate(Vector<byte> left, Vector<byte> right) => AddSaturate(left, right);
 
         /// <summary>
         /// svint16_t svqadd[_s16]_m(svbool_t pg, svint16_t op1, svint16_t op2)
@@ -662,18 +662,18 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> AddSaturate(Vector<long> left, Vector<long> right) => AddSaturate(left, right);
 
         /// <summary>
-        /// svuint8_t svqadd[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UQADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; UQADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svuint8_t svqadd[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UQADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   UQADD Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   UQADD Zresult.B, Zop1.B, Zop2.B
-        /// svuint8_t svqadd[_u8]_z(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; UQADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; UQADD Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// svint8_t svqadd[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SQADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SQADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svqadd[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SQADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   SQADD Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   SQADD Zresult.B, Zop1.B, Zop2.B
+        /// svint8_t svqadd[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SQADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SQADD Zresult.B, Pg/M, Zresult.B, Zop1.B
         /// </summary>
-        public static unsafe Vector<byte> AddSaturate(Vector<byte> left, Vector<byte> right) => AddSaturate(left, right);
+        public static unsafe Vector<sbyte> AddSaturate(Vector<sbyte> left, Vector<sbyte> right) => AddSaturate(left, right);
 
         /// <summary>
         /// svuint16_t svqadd[_u16]_m(svbool_t pg, svuint16_t op1, svuint16_t op2)
@@ -772,18 +772,6 @@ namespace System.Runtime.Intrinsics.Arm
         ///  AddSaturateWithUnsignedAddend : Saturating add with unsigned addend
 
         /// <summary>
-        /// svint8_t svuqadd[_s8]_m(svbool_t pg, svint8_t op1, svuint8_t op2)
-        ///   SUQADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SUQADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svuqadd[_s8]_x(svbool_t pg, svint8_t op1, svuint8_t op2)
-        ///   SUQADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SUQADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svuqadd[_s8]_z(svbool_t pg, svint8_t op1, svuint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SUQADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// </summary>
-        public static unsafe Vector<sbyte> AddSaturateWithUnsignedAddend(Vector<sbyte> left, Vector<byte> right) => AddSaturateWithUnsignedAddend(left, right);
-
-        /// <summary>
         /// svint16_t svuqadd[_s16]_m(svbool_t pg, svint16_t op1, svuint16_t op2)
         ///   SUQADD Ztied1.H, Pg/M, Ztied1.H, Zop2.H
         ///   MOVPRFX Zresult, Zop1; SUQADD Zresult.H, Pg/M, Zresult.H, Zop2.H
@@ -818,6 +806,18 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.D, Pg/Z, Zop1.D; SUQADD Zresult.D, Pg/M, Zresult.D, Zop2.D
         /// </summary>
         public static unsafe Vector<long> AddSaturateWithUnsignedAddend(Vector<long> left, Vector<ulong> right) => AddSaturateWithUnsignedAddend(left, right);
+
+        /// <summary>
+        /// svint8_t svuqadd[_s8]_m(svbool_t pg, svint8_t op1, svuint8_t op2)
+        ///   SUQADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SUQADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svuqadd[_s8]_x(svbool_t pg, svint8_t op1, svuint8_t op2)
+        ///   SUQADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SUQADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svuqadd[_s8]_z(svbool_t pg, svint8_t op1, svuint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SUQADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// </summary>
+        public static unsafe Vector<sbyte> AddSaturateWithUnsignedAddend(Vector<sbyte> left, Vector<byte> right) => AddSaturateWithUnsignedAddend(left, right);
 
 
         ///  AddWideLower : Add wide (bottom)
@@ -1000,11 +1000,11 @@ namespace System.Runtime.Intrinsics.Arm
         ///  BitwiseClearXor : Bitwise clear and exclusive OR
 
         /// <summary>
-        /// svint8_t svbcax[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
+        /// svuint8_t svbcax[_u8](svuint8_t op1, svuint8_t op2, svuint8_t op3)
         ///   BCAX Ztied1.D, Ztied1.D, Zop2.D, Zop3.D
         ///   MOVPRFX Zresult, Zop1; BCAX Zresult.D, Zresult.D, Zop2.D, Zop3.D
         /// </summary>
-        public static unsafe Vector<sbyte> BitwiseClearXor(Vector<sbyte> xor, Vector<sbyte> value, Vector<sbyte> mask) => BitwiseClearXor(xor, value, mask);
+        public static unsafe Vector<byte> BitwiseClearXor(Vector<byte> xor, Vector<byte> value, Vector<byte> mask) => BitwiseClearXor(xor, value, mask);
 
         /// <summary>
         /// svint16_t svbcax[_s16](svint16_t op1, svint16_t op2, svint16_t op3)
@@ -1028,11 +1028,11 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> BitwiseClearXor(Vector<long> xor, Vector<long> value, Vector<long> mask) => BitwiseClearXor(xor, value, mask);
 
         /// <summary>
-        /// svuint8_t svbcax[_u8](svuint8_t op1, svuint8_t op2, svuint8_t op3)
+        /// svint8_t svbcax[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
         ///   BCAX Ztied1.D, Ztied1.D, Zop2.D, Zop3.D
         ///   MOVPRFX Zresult, Zop1; BCAX Zresult.D, Zresult.D, Zop2.D, Zop3.D
         /// </summary>
-        public static unsafe Vector<byte> BitwiseClearXor(Vector<byte> xor, Vector<byte> value, Vector<byte> mask) => BitwiseClearXor(xor, value, mask);
+        public static unsafe Vector<sbyte> BitwiseClearXor(Vector<sbyte> xor, Vector<sbyte> value, Vector<sbyte> mask) => BitwiseClearXor(xor, value, mask);
 
         /// <summary>
         /// svuint16_t svbcax[_u16](svuint16_t op1, svuint16_t op2, svuint16_t op3)
@@ -1059,11 +1059,11 @@ namespace System.Runtime.Intrinsics.Arm
         ///  BitwiseSelect : Bitwise select
 
         /// <summary>
-        /// svint8_t svbsl[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
+        /// svuint8_t svbsl[_u8](svuint8_t op1, svuint8_t op2, svuint8_t op3)
         ///   BSL Ztied1.D, Ztied1.D, Zop2.D, Zop3.D
         ///   MOVPRFX Zresult, Zop1; BSL Zresult.D, Zresult.D, Zop2.D, Zop3.D
         /// </summary>
-        public static unsafe Vector<sbyte> BitwiseSelect(Vector<sbyte> select, Vector<sbyte> left, Vector<sbyte> right) => BitwiseSelect(select, left, right);
+        public static unsafe Vector<byte> BitwiseSelect(Vector<byte> select, Vector<byte> left, Vector<byte> right) => BitwiseSelect(select, left, right);
 
         /// <summary>
         /// svint16_t svbsl[_s16](svint16_t op1, svint16_t op2, svint16_t op3)
@@ -1087,11 +1087,11 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> BitwiseSelect(Vector<long> select, Vector<long> left, Vector<long> right) => BitwiseSelect(select, left, right);
 
         /// <summary>
-        /// svuint8_t svbsl[_u8](svuint8_t op1, svuint8_t op2, svuint8_t op3)
+        /// svint8_t svbsl[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
         ///   BSL Ztied1.D, Ztied1.D, Zop2.D, Zop3.D
         ///   MOVPRFX Zresult, Zop1; BSL Zresult.D, Zresult.D, Zop2.D, Zop3.D
         /// </summary>
-        public static unsafe Vector<byte> BitwiseSelect(Vector<byte> select, Vector<byte> left, Vector<byte> right) => BitwiseSelect(select, left, right);
+        public static unsafe Vector<sbyte> BitwiseSelect(Vector<sbyte> select, Vector<sbyte> left, Vector<sbyte> right) => BitwiseSelect(select, left, right);
 
         /// <summary>
         /// svuint16_t svbsl[_u16](svuint16_t op1, svuint16_t op2, svuint16_t op3)
@@ -1119,11 +1119,11 @@ namespace System.Runtime.Intrinsics.Arm
         ///  BitwiseSelectLeftInverted : Bitwise select with first input inverted
 
         /// <summary>
-        /// svint8_t svbsl1n[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
+        /// svuint8_t svbsl1n[_u8](svuint8_t op1, svuint8_t op2, svuint8_t op3)
         ///   BSL1N Ztied1.D, Ztied1.D, Zop2.D, Zop3.D
         ///   MOVPRFX Zresult, Zop1; BSL1N Zresult.D, Zresult.D, Zop2.D, Zop3.D
         /// </summary>
-        public static unsafe Vector<sbyte> BitwiseSelectLeftInverted(Vector<sbyte> select, Vector<sbyte> left, Vector<sbyte> right) => BitwiseSelectLeftInverted(select, left, right);
+        public static unsafe Vector<byte> BitwiseSelectLeftInverted(Vector<byte> select, Vector<byte> left, Vector<byte> right) => BitwiseSelectLeftInverted(select, left, right);
 
         /// <summary>
         /// svint16_t svbsl1n[_s16](svint16_t op1, svint16_t op2, svint16_t op3)
@@ -1147,11 +1147,11 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> BitwiseSelectLeftInverted(Vector<long> select, Vector<long> left, Vector<long> right) => BitwiseSelectLeftInverted(select, left, right);
 
         /// <summary>
-        /// svuint8_t svbsl1n[_u8](svuint8_t op1, svuint8_t op2, svuint8_t op3)
+        /// svint8_t svbsl1n[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
         ///   BSL1N Ztied1.D, Ztied1.D, Zop2.D, Zop3.D
         ///   MOVPRFX Zresult, Zop1; BSL1N Zresult.D, Zresult.D, Zop2.D, Zop3.D
         /// </summary>
-        public static unsafe Vector<byte> BitwiseSelectLeftInverted(Vector<byte> select, Vector<byte> left, Vector<byte> right) => BitwiseSelectLeftInverted(select, left, right);
+        public static unsafe Vector<sbyte> BitwiseSelectLeftInverted(Vector<sbyte> select, Vector<sbyte> left, Vector<sbyte> right) => BitwiseSelectLeftInverted(select, left, right);
 
         /// <summary>
         /// svuint16_t svbsl1n[_u16](svuint16_t op1, svuint16_t op2, svuint16_t op3)
@@ -1178,11 +1178,11 @@ namespace System.Runtime.Intrinsics.Arm
         ///  BitwiseSelectRightInverted : Bitwise select with second input inverted
 
         /// <summary>
-        /// svint8_t svbsl2n[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
+        /// svuint8_t svbsl2n[_u8](svuint8_t op1, svuint8_t op2, svuint8_t op3)
         ///   BSL2N Ztied1.D, Ztied1.D, Zop2.D, Zop3.D
         ///   MOVPRFX Zresult, Zop1; BSL2N Zresult.D, Zresult.D, Zop2.D, Zop3.D
         /// </summary>
-        public static unsafe Vector<sbyte> BitwiseSelectRightInverted(Vector<sbyte> select, Vector<sbyte> left, Vector<sbyte> right) => BitwiseSelectRightInverted(select, left, right);
+        public static unsafe Vector<byte> BitwiseSelectRightInverted(Vector<byte> select, Vector<byte> left, Vector<byte> right) => BitwiseSelectRightInverted(select, left, right);
 
         /// <summary>
         /// svint16_t svbsl2n[_s16](svint16_t op1, svint16_t op2, svint16_t op3)
@@ -1206,11 +1206,11 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> BitwiseSelectRightInverted(Vector<long> select, Vector<long> left, Vector<long> right) => BitwiseSelectRightInverted(select, left, right);
 
         /// <summary>
-        /// svuint8_t svbsl2n[_u8](svuint8_t op1, svuint8_t op2, svuint8_t op3)
+        /// svint8_t svbsl2n[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
         ///   BSL2N Ztied1.D, Ztied1.D, Zop2.D, Zop3.D
         ///   MOVPRFX Zresult, Zop1; BSL2N Zresult.D, Zresult.D, Zop2.D, Zop3.D
         /// </summary>
-        public static unsafe Vector<byte> BitwiseSelectRightInverted(Vector<byte> select, Vector<byte> left, Vector<byte> right) => BitwiseSelectRightInverted(select, left, right);
+        public static unsafe Vector<sbyte> BitwiseSelectRightInverted(Vector<sbyte> select, Vector<sbyte> left, Vector<sbyte> right) => BitwiseSelectRightInverted(select, left, right);
 
         /// <summary>
         /// svuint16_t svbsl2n[_u16](svuint16_t op1, svuint16_t op2, svuint16_t op3)
@@ -1477,10 +1477,16 @@ namespace System.Runtime.Intrinsics.Arm
         ///  CreateWhileReadAfterWriteMask : While free of read-after-write conflicts
 
         /// <summary>
-        /// svbool_t svwhilerw[_s8](const int8_t *op1, const int8_t *op2)
+        /// svbool_t svwhilerw[_u8](const uint8_t *op1, const uint8_t *op2)
         ///   WHILERW Presult.B, Xop1, Xop2
         /// </summary>
-        public static unsafe Vector<sbyte> CreateWhileReadAfterWriteMask(sbyte* left, sbyte* right) => CreateWhileReadAfterWriteMask(left, right);
+        public static unsafe Vector<byte> CreateWhileReadAfterWriteMask(byte* left, byte* right) => CreateWhileReadAfterWriteMask(left, right);
+
+        /// <summary>
+        /// svbool_t svwhilerw[_f64](const float64_t *op1, const float64_t *op2)
+        ///   WHILERW Presult.D, Xop1, Xop2
+        /// </summary>
+        public static unsafe Vector<double> CreateWhileReadAfterWriteMask(double* left, double* right) => CreateWhileReadAfterWriteMask(left, right);
 
         /// <summary>
         /// svbool_t svwhilerw[_s16](const int16_t *op1, const int16_t *op2)
@@ -1501,10 +1507,16 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> CreateWhileReadAfterWriteMask(long* left, long* right) => CreateWhileReadAfterWriteMask(left, right);
 
         /// <summary>
-        /// svbool_t svwhilerw[_u8](const uint8_t *op1, const uint8_t *op2)
+        /// svbool_t svwhilerw[_s8](const int8_t *op1, const int8_t *op2)
         ///   WHILERW Presult.B, Xop1, Xop2
         /// </summary>
-        public static unsafe Vector<byte> CreateWhileReadAfterWriteMask(byte* left, byte* right) => CreateWhileReadAfterWriteMask(left, right);
+        public static unsafe Vector<sbyte> CreateWhileReadAfterWriteMask(sbyte* left, sbyte* right) => CreateWhileReadAfterWriteMask(left, right);
+
+        /// <summary>
+        /// svbool_t svwhilerw[_f32](const float32_t *op1, const float32_t *op2)
+        ///   WHILERW Presult.S, Xop1, Xop2
+        /// </summary>
+        public static unsafe Vector<float> CreateWhileReadAfterWriteMask(float* left, float* right) => CreateWhileReadAfterWriteMask(left, right);
 
         /// <summary>
         /// svbool_t svwhilerw[_u16](const uint16_t *op1, const uint16_t *op2)
@@ -1524,26 +1536,20 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<ulong> CreateWhileReadAfterWriteMask(ulong* left, ulong* right) => CreateWhileReadAfterWriteMask(left, right);
 
-        /// <summary>
-        /// svbool_t svwhilerw[_f32](const float32_t *op1, const float32_t *op2)
-        ///   WHILERW Presult.S, Xop1, Xop2
-        /// </summary>
-        public static unsafe Vector<float> CreateWhileReadAfterWriteMask(float* left, float* right) => CreateWhileReadAfterWriteMask(left, right);
-
-        /// <summary>
-        /// svbool_t svwhilerw[_f64](const float64_t *op1, const float64_t *op2)
-        ///   WHILERW Presult.D, Xop1, Xop2
-        /// </summary>
-        public static unsafe Vector<double> CreateWhileReadAfterWriteMask(double* left, double* right) => CreateWhileReadAfterWriteMask(left, right);
-
 
         ///  CreateWhileWriteAfterReadMask : While free of write-after-read conflicts
 
         /// <summary>
-        /// svbool_t svwhilewr[_s8](const int8_t *op1, const int8_t *op2)
+        /// svbool_t svwhilewr[_u8](const uint8_t *op1, const uint8_t *op2)
         ///   WHILEWR Presult.B, Xop1, Xop2
         /// </summary>
-        public static unsafe Vector<sbyte> CreateWhileWriteAfterReadMask(sbyte* left, sbyte* right) => CreateWhileWriteAfterReadMask(left, right);
+        public static unsafe Vector<byte> CreateWhileWriteAfterReadMask(byte* left, byte* right) => CreateWhileWriteAfterReadMask(left, right);
+
+        /// <summary>
+        /// svbool_t svwhilewr[_f64](const float64_t *op1, const float64_t *op2)
+        ///   WHILEWR Presult.D, Xop1, Xop2
+        /// </summary>
+        public static unsafe Vector<double> CreateWhileWriteAfterReadMask(double* left, double* right) => CreateWhileWriteAfterReadMask(left, right);
 
         /// <summary>
         /// svbool_t svwhilewr[_s16](const int16_t *op1, const int16_t *op2)
@@ -1564,10 +1570,16 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> CreateWhileWriteAfterReadMask(long* left, long* right) => CreateWhileWriteAfterReadMask(left, right);
 
         /// <summary>
-        /// svbool_t svwhilewr[_u8](const uint8_t *op1, const uint8_t *op2)
+        /// svbool_t svwhilewr[_s8](const int8_t *op1, const int8_t *op2)
         ///   WHILEWR Presult.B, Xop1, Xop2
         /// </summary>
-        public static unsafe Vector<byte> CreateWhileWriteAfterReadMask(byte* left, byte* right) => CreateWhileWriteAfterReadMask(left, right);
+        public static unsafe Vector<sbyte> CreateWhileWriteAfterReadMask(sbyte* left, sbyte* right) => CreateWhileWriteAfterReadMask(left, right);
+
+        /// <summary>
+        /// svbool_t svwhilewr[_f32](const float32_t *op1, const float32_t *op2)
+        ///   WHILEWR Presult.S, Xop1, Xop2
+        /// </summary>
+        public static unsafe Vector<float> CreateWhileWriteAfterReadMask(float* left, float* right) => CreateWhileWriteAfterReadMask(left, right);
 
         /// <summary>
         /// svbool_t svwhilewr[_u16](const uint16_t *op1, const uint16_t *op2)
@@ -1586,18 +1598,6 @@ namespace System.Runtime.Intrinsics.Arm
         ///   WHILEWR Presult.D, Xop1, Xop2
         /// </summary>
         public static unsafe Vector<ulong> CreateWhileWriteAfterReadMask(ulong* left, ulong* right) => CreateWhileWriteAfterReadMask(left, right);
-
-        /// <summary>
-        /// svbool_t svwhilewr[_f32](const float32_t *op1, const float32_t *op2)
-        ///   WHILEWR Presult.S, Xop1, Xop2
-        /// </summary>
-        public static unsafe Vector<float> CreateWhileWriteAfterReadMask(float* left, float* right) => CreateWhileWriteAfterReadMask(left, right);
-
-        /// <summary>
-        /// svbool_t svwhilewr[_f64](const float64_t *op1, const float64_t *op2)
-        ///   WHILEWR Presult.D, Xop1, Xop2
-        /// </summary>
-        public static unsafe Vector<double> CreateWhileWriteAfterReadMask(double* left, double* right) => CreateWhileWriteAfterReadMask(left, right);
 
 
         ///  DotProductComplex : Complex dot product
@@ -1950,6 +1950,36 @@ namespace System.Runtime.Intrinsics.Arm
         ///  GatherVectorNonTemporal : Unextended load, non-temporal
 
         /// <summary>
+        /// svfloat64_t svldnt1_gather_[s64]offset[_f64](svbool_t pg, const float64_t *base, svint64_t offsets)
+        ///   LDNT1D Zresult.D, Pg/Z, [Zoffsets.D, Xbase]
+        /// </summary>
+        public static unsafe Vector<double> GatherVectorNonTemporal(Vector<double> mask, double* address, Vector<long> offsets) => GatherVectorNonTemporal(mask, address, offsets);
+
+        /// <summary>
+        /// svfloat64_t svldnt1_gather_[s64]index[_f64](svbool_t pg, const float64_t *base, svint64_t indices)
+        ///   LDNT1D Zresult.D, Pg/Z, [Zoffsets.D, Xbase]
+        /// </summary>
+        public static unsafe Vector<double> GatherVectorNonTemporal(Vector<double> mask, double* address, Vector<long> indices) => GatherVectorNonTemporal(mask, address, indices);
+
+        /// <summary>
+        /// svfloat64_t svldnt1_gather[_u64base]_f64(svbool_t pg, svuint64_t bases)
+        ///   LDNT1D Zresult.D, Pg/Z, [Zbases.D, XZR]
+        /// </summary>
+        public static unsafe Vector<double> GatherVectorNonTemporal(Vector<double> mask, Vector<ulong> addresses) => GatherVectorNonTemporal(mask, addresses);
+
+        /// <summary>
+        /// svfloat64_t svldnt1_gather_[u64]offset[_f64](svbool_t pg, const float64_t *base, svuint64_t offsets)
+        ///   LDNT1D Zresult.D, Pg/Z, [Zoffsets.D, Xbase]
+        /// </summary>
+        public static unsafe Vector<double> GatherVectorNonTemporal(Vector<double> mask, double* address, Vector<ulong> offsets) => GatherVectorNonTemporal(mask, address, offsets);
+
+        /// <summary>
+        /// svfloat64_t svldnt1_gather_[u64]index[_f64](svbool_t pg, const float64_t *base, svuint64_t indices)
+        ///   LDNT1D Zresult.D, Pg/Z, [Zoffsets.D, Xbase]
+        /// </summary>
+        public static unsafe Vector<double> GatherVectorNonTemporal(Vector<double> mask, double* address, Vector<ulong> indices) => GatherVectorNonTemporal(mask, address, indices);
+
+        /// <summary>
         /// svint32_t svldnt1_gather[_u32base]_s32(svbool_t pg, svuint32_t bases)
         ///   LDNT1W Zresult.S, Pg/Z, [Zbases.S, XZR]
         /// </summary>
@@ -1992,6 +2022,18 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> GatherVectorNonTemporal(Vector<long> mask, long* address, Vector<ulong> indices) => GatherVectorNonTemporal(mask, address, indices);
 
         /// <summary>
+        /// svfloat32_t svldnt1_gather[_u32base]_f32(svbool_t pg, svuint32_t bases)
+        ///   LDNT1W Zresult.S, Pg/Z, [Zbases.S, XZR]
+        /// </summary>
+        public static unsafe Vector<float> GatherVectorNonTemporal(Vector<float> mask, Vector<uint> addresses) => GatherVectorNonTemporal(mask, addresses);
+
+        /// <summary>
+        /// svfloat32_t svldnt1_gather_[u32]offset[_f32](svbool_t pg, const float32_t *base, svuint32_t offsets)
+        ///   LDNT1W Zresult.S, Pg/Z, [Zoffsets.S, Xbase]
+        /// </summary>
+        public static unsafe Vector<float> GatherVectorNonTemporal(Vector<float> mask, float* address, Vector<uint> offsets) => GatherVectorNonTemporal(mask, address, offsets);
+
+        /// <summary>
         /// svuint32_t svldnt1_gather[_u32base]_u32(svbool_t pg, svuint32_t bases)
         ///   LDNT1W Zresult.S, Pg/Z, [Zbases.S, XZR]
         /// </summary>
@@ -2032,48 +2074,6 @@ namespace System.Runtime.Intrinsics.Arm
         ///   LDNT1D Zresult.D, Pg/Z, [Zoffsets.D, Xbase]
         /// </summary>
         public static unsafe Vector<ulong> GatherVectorNonTemporal(Vector<ulong> mask, ulong* address, Vector<ulong> indices) => GatherVectorNonTemporal(mask, address, indices);
-
-        /// <summary>
-        /// svfloat32_t svldnt1_gather[_u32base]_f32(svbool_t pg, svuint32_t bases)
-        ///   LDNT1W Zresult.S, Pg/Z, [Zbases.S, XZR]
-        /// </summary>
-        public static unsafe Vector<float> GatherVectorNonTemporal(Vector<float> mask, Vector<uint> addresses) => GatherVectorNonTemporal(mask, addresses);
-
-        /// <summary>
-        /// svfloat32_t svldnt1_gather_[u32]offset[_f32](svbool_t pg, const float32_t *base, svuint32_t offsets)
-        ///   LDNT1W Zresult.S, Pg/Z, [Zoffsets.S, Xbase]
-        /// </summary>
-        public static unsafe Vector<float> GatherVectorNonTemporal(Vector<float> mask, float* address, Vector<uint> offsets) => GatherVectorNonTemporal(mask, address, offsets);
-
-        /// <summary>
-        /// svfloat64_t svldnt1_gather_[s64]offset[_f64](svbool_t pg, const float64_t *base, svint64_t offsets)
-        ///   LDNT1D Zresult.D, Pg/Z, [Zoffsets.D, Xbase]
-        /// </summary>
-        public static unsafe Vector<double> GatherVectorNonTemporal(Vector<double> mask, double* address, Vector<long> offsets) => GatherVectorNonTemporal(mask, address, offsets);
-
-        /// <summary>
-        /// svfloat64_t svldnt1_gather_[s64]index[_f64](svbool_t pg, const float64_t *base, svint64_t indices)
-        ///   LDNT1D Zresult.D, Pg/Z, [Zoffsets.D, Xbase]
-        /// </summary>
-        public static unsafe Vector<double> GatherVectorNonTemporal(Vector<double> mask, double* address, Vector<long> indices) => GatherVectorNonTemporal(mask, address, indices);
-
-        /// <summary>
-        /// svfloat64_t svldnt1_gather[_u64base]_f64(svbool_t pg, svuint64_t bases)
-        ///   LDNT1D Zresult.D, Pg/Z, [Zbases.D, XZR]
-        /// </summary>
-        public static unsafe Vector<double> GatherVectorNonTemporal(Vector<double> mask, Vector<ulong> addresses) => GatherVectorNonTemporal(mask, addresses);
-
-        /// <summary>
-        /// svfloat64_t svldnt1_gather_[u64]offset[_f64](svbool_t pg, const float64_t *base, svuint64_t offsets)
-        ///   LDNT1D Zresult.D, Pg/Z, [Zoffsets.D, Xbase]
-        /// </summary>
-        public static unsafe Vector<double> GatherVectorNonTemporal(Vector<double> mask, double* address, Vector<ulong> offsets) => GatherVectorNonTemporal(mask, address, offsets);
-
-        /// <summary>
-        /// svfloat64_t svldnt1_gather_[u64]index[_f64](svbool_t pg, const float64_t *base, svuint64_t indices)
-        ///   LDNT1D Zresult.D, Pg/Z, [Zoffsets.D, Xbase]
-        /// </summary>
-        public static unsafe Vector<double> GatherVectorNonTemporal(Vector<double> mask, double* address, Vector<ulong> indices) => GatherVectorNonTemporal(mask, address, indices);
 
 
         ///  GatherVectorSByteSignExtendNonTemporal : Load 8-bit data and sign-extend, non-temporal
@@ -2358,18 +2358,18 @@ namespace System.Runtime.Intrinsics.Arm
         ///  HalvingAdd : Halving add
 
         /// <summary>
-        /// svint8_t svhadd[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svhadd[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   SHADD Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   MOVPRFX Zresult, Zop1; SHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svhadd[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SHADD Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// svuint8_t svhadd[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; UHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svuint8_t svhadd[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   UHADD Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   MOVPRFX Zresult, Zop1; UHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svuint8_t svhadd[_u8]_z(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; UHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; UHADD Zresult.B, Pg/M, Zresult.B, Zop1.B
         /// </summary>
-        public static unsafe Vector<sbyte> HalvingAdd(Vector<sbyte> left, Vector<sbyte> right) => HalvingAdd(left, right);
+        public static unsafe Vector<byte> HalvingAdd(Vector<byte> left, Vector<byte> right) => HalvingAdd(left, right);
 
         /// <summary>
         /// svint16_t svhadd[_s16]_m(svbool_t pg, svint16_t op1, svint16_t op2)
@@ -2414,18 +2414,18 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> HalvingAdd(Vector<long> left, Vector<long> right) => HalvingAdd(left, right);
 
         /// <summary>
-        /// svuint8_t svhadd[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; UHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svuint8_t svhadd[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   UHADD Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   MOVPRFX Zresult, Zop1; UHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svuint8_t svhadd[_u8]_z(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; UHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; UHADD Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// svint8_t svhadd[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svhadd[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   SHADD Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   MOVPRFX Zresult, Zop1; SHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svhadd[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SHADD Zresult.B, Pg/M, Zresult.B, Zop1.B
         /// </summary>
-        public static unsafe Vector<byte> HalvingAdd(Vector<byte> left, Vector<byte> right) => HalvingAdd(left, right);
+        public static unsafe Vector<sbyte> HalvingAdd(Vector<sbyte> left, Vector<sbyte> right) => HalvingAdd(left, right);
 
         /// <summary>
         /// svuint16_t svhadd[_u16]_m(svbool_t pg, svuint16_t op1, svuint16_t op2)
@@ -2473,18 +2473,18 @@ namespace System.Runtime.Intrinsics.Arm
         ///  HalvingSubtract : Halving subtract
 
         /// <summary>
-        /// svint8_t svhsub[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SHSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SHSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svhsub[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SHSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   SHSUBR Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   MOVPRFX Zresult, Zop1; SHSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svhsub[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SHSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SHSUBR Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// svuint8_t svhsub[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UHSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; UHSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svuint8_t svhsub[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UHSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   UHSUBR Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   MOVPRFX Zresult, Zop1; UHSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svuint8_t svhsub[_u8]_z(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; UHSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; UHSUBR Zresult.B, Pg/M, Zresult.B, Zop1.B
         /// </summary>
-        public static unsafe Vector<sbyte> HalvingSubtract(Vector<sbyte> left, Vector<sbyte> right) => HalvingSubtract(left, right);
+        public static unsafe Vector<byte> HalvingSubtract(Vector<byte> left, Vector<byte> right) => HalvingSubtract(left, right);
 
         /// <summary>
         /// svint16_t svhsub[_s16]_m(svbool_t pg, svint16_t op1, svint16_t op2)
@@ -2529,18 +2529,18 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> HalvingSubtract(Vector<long> left, Vector<long> right) => HalvingSubtract(left, right);
 
         /// <summary>
-        /// svuint8_t svhsub[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UHSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; UHSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svuint8_t svhsub[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UHSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   UHSUBR Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   MOVPRFX Zresult, Zop1; UHSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svuint8_t svhsub[_u8]_z(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; UHSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; UHSUBR Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// svint8_t svhsub[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SHSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SHSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svhsub[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SHSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   SHSUBR Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   MOVPRFX Zresult, Zop1; SHSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svhsub[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SHSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SHSUBR Zresult.B, Pg/M, Zresult.B, Zop1.B
         /// </summary>
-        public static unsafe Vector<byte> HalvingSubtract(Vector<byte> left, Vector<byte> right) => HalvingSubtract(left, right);
+        public static unsafe Vector<sbyte> HalvingSubtract(Vector<sbyte> left, Vector<sbyte> right) => HalvingSubtract(left, right);
 
         /// <summary>
         /// svuint16_t svhsub[_u16]_m(svbool_t pg, svuint16_t op1, svuint16_t op2)
@@ -2588,18 +2588,18 @@ namespace System.Runtime.Intrinsics.Arm
         ///  HalvingSubtractReversed : Halving subtract reversed
 
         /// <summary>
-        /// svint8_t svhsubr[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SHSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SHSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svhsubr[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SHSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   SHSUB Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   MOVPRFX Zresult, Zop1; SHSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svhsubr[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SHSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SHSUB Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// svuint8_t svhsubr[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UHSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; UHSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svuint8_t svhsubr[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UHSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   UHSUB Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   MOVPRFX Zresult, Zop1; UHSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svuint8_t svhsubr[_u8]_z(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; UHSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; UHSUB Zresult.B, Pg/M, Zresult.B, Zop1.B
         /// </summary>
-        public static unsafe Vector<sbyte> HalvingSubtractReversed(Vector<sbyte> left, Vector<sbyte> right) => HalvingSubtractReversed(left, right);
+        public static unsafe Vector<byte> HalvingSubtractReversed(Vector<byte> left, Vector<byte> right) => HalvingSubtractReversed(left, right);
 
         /// <summary>
         /// svint16_t svhsubr[_s16]_m(svbool_t pg, svint16_t op1, svint16_t op2)
@@ -2644,18 +2644,18 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> HalvingSubtractReversed(Vector<long> left, Vector<long> right) => HalvingSubtractReversed(left, right);
 
         /// <summary>
-        /// svuint8_t svhsubr[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UHSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; UHSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svuint8_t svhsubr[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UHSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   UHSUB Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   MOVPRFX Zresult, Zop1; UHSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svuint8_t svhsubr[_u8]_z(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; UHSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; UHSUB Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// svint8_t svhsubr[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SHSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SHSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svhsubr[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SHSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   SHSUB Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   MOVPRFX Zresult, Zop1; SHSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svhsubr[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SHSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SHSUB Zresult.B, Pg/M, Zresult.B, Zop1.B
         /// </summary>
-        public static unsafe Vector<byte> HalvingSubtractReversed(Vector<byte> left, Vector<byte> right) => HalvingSubtractReversed(left, right);
+        public static unsafe Vector<sbyte> HalvingSubtractReversed(Vector<sbyte> left, Vector<sbyte> right) => HalvingSubtractReversed(left, right);
 
         /// <summary>
         /// svuint16_t svhsubr[_u16]_m(svbool_t pg, svuint16_t op1, svuint16_t op2)
@@ -2703,11 +2703,11 @@ namespace System.Runtime.Intrinsics.Arm
         ///  InterleavingXorLowerUpper : Interleaving exclusive OR (bottom, top)
 
         /// <summary>
-        /// svint8_t sveorbt[_s8](svint8_t odd, svint8_t op1, svint8_t op2)
+        /// svuint8_t sveorbt[_u8](svuint8_t odd, svuint8_t op1, svuint8_t op2)
         ///   EORBT Ztied.B, Zop1.B, Zop2.B
         ///   MOVPRFX Zresult, Zodd; EORBT Zresult.B, Zop1.B, Zop2.B
         /// </summary>
-        public static unsafe Vector<sbyte> InterleavingXorLowerUpper(Vector<sbyte> odd, Vector<sbyte> left, Vector<sbyte> right) => InterleavingXorLowerUpper(odd, left, right);
+        public static unsafe Vector<byte> InterleavingXorLowerUpper(Vector<byte> odd, Vector<byte> left, Vector<byte> right) => InterleavingXorLowerUpper(odd, left, right);
 
         /// <summary>
         /// svint16_t sveorbt[_s16](svint16_t odd, svint16_t op1, svint16_t op2)
@@ -2731,11 +2731,11 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> InterleavingXorLowerUpper(Vector<long> odd, Vector<long> left, Vector<long> right) => InterleavingXorLowerUpper(odd, left, right);
 
         /// <summary>
-        /// svuint8_t sveorbt[_u8](svuint8_t odd, svuint8_t op1, svuint8_t op2)
+        /// svint8_t sveorbt[_s8](svint8_t odd, svint8_t op1, svint8_t op2)
         ///   EORBT Ztied.B, Zop1.B, Zop2.B
         ///   MOVPRFX Zresult, Zodd; EORBT Zresult.B, Zop1.B, Zop2.B
         /// </summary>
-        public static unsafe Vector<byte> InterleavingXorLowerUpper(Vector<byte> odd, Vector<byte> left, Vector<byte> right) => InterleavingXorLowerUpper(odd, left, right);
+        public static unsafe Vector<sbyte> InterleavingXorLowerUpper(Vector<sbyte> odd, Vector<sbyte> left, Vector<sbyte> right) => InterleavingXorLowerUpper(odd, left, right);
 
         /// <summary>
         /// svuint16_t sveorbt[_u16](svuint16_t odd, svuint16_t op1, svuint16_t op2)
@@ -2762,11 +2762,11 @@ namespace System.Runtime.Intrinsics.Arm
         ///  InterleavingXorUpperLower : Interleaving exclusive OR (top, bottom)
 
         /// <summary>
-        /// svint8_t sveortb[_s8](svint8_t even, svint8_t op1, svint8_t op2)
+        /// svuint8_t sveortb[_u8](svuint8_t even, svuint8_t op1, svuint8_t op2)
         ///   EORTB Ztied.B, Zop1.B, Zop2.B
         ///   MOVPRFX Zresult, Zeven; EORTB Zresult.B, Zop1.B, Zop2.B
         /// </summary>
-        public static unsafe Vector<sbyte> InterleavingXorUpperLower(Vector<sbyte> even, Vector<sbyte> left, Vector<sbyte> right) => InterleavingXorUpperLower(even, left, right);
+        public static unsafe Vector<byte> InterleavingXorUpperLower(Vector<byte> even, Vector<byte> left, Vector<byte> right) => InterleavingXorUpperLower(even, left, right);
 
         /// <summary>
         /// svint16_t sveortb[_s16](svint16_t even, svint16_t op1, svint16_t op2)
@@ -2790,11 +2790,11 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> InterleavingXorUpperLower(Vector<long> even, Vector<long> left, Vector<long> right) => InterleavingXorUpperLower(even, left, right);
 
         /// <summary>
-        /// svuint8_t sveortb[_u8](svuint8_t even, svuint8_t op1, svuint8_t op2)
+        /// svint8_t sveortb[_s8](svint8_t even, svint8_t op1, svint8_t op2)
         ///   EORTB Ztied.B, Zop1.B, Zop2.B
         ///   MOVPRFX Zresult, Zeven; EORTB Zresult.B, Zop1.B, Zop2.B
         /// </summary>
-        public static unsafe Vector<byte> InterleavingXorUpperLower(Vector<byte> even, Vector<byte> left, Vector<byte> right) => InterleavingXorUpperLower(even, left, right);
+        public static unsafe Vector<sbyte> InterleavingXorUpperLower(Vector<sbyte> even, Vector<sbyte> left, Vector<sbyte> right) => InterleavingXorUpperLower(even, left, right);
 
         /// <summary>
         /// svuint16_t sveortb[_u16](svuint16_t even, svuint16_t op1, svuint16_t op2)
@@ -2848,10 +2848,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  Match : Detect any matching elements
 
         /// <summary>
-        /// svbool_t svmatch[_s8](svbool_t pg, svint8_t op1, svint8_t op2)
+        /// svbool_t svmatch[_u8](svbool_t pg, svuint8_t op1, svuint8_t op2)
         ///   MATCH Presult.B, Pg/Z, Zop1.B, Zop2.B
         /// </summary>
-        public static unsafe Vector<sbyte> Match(Vector<sbyte> mask, Vector<sbyte> left, Vector<sbyte> right) => Match(mask, left, right);
+        public static unsafe Vector<byte> Match(Vector<byte> mask, Vector<byte> left, Vector<byte> right) => Match(mask, left, right);
 
         /// <summary>
         /// svbool_t svmatch[_s16](svbool_t pg, svint16_t op1, svint16_t op2)
@@ -2860,10 +2860,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<short> Match(Vector<short> mask, Vector<short> left, Vector<short> right) => Match(mask, left, right);
 
         /// <summary>
-        /// svbool_t svmatch[_u8](svbool_t pg, svuint8_t op1, svuint8_t op2)
+        /// svbool_t svmatch[_s8](svbool_t pg, svint8_t op1, svint8_t op2)
         ///   MATCH Presult.B, Pg/Z, Zop1.B, Zop2.B
         /// </summary>
-        public static unsafe Vector<byte> Match(Vector<byte> mask, Vector<byte> left, Vector<byte> right) => Match(mask, left, right);
+        public static unsafe Vector<sbyte> Match(Vector<sbyte> mask, Vector<sbyte> left, Vector<sbyte> right) => Match(mask, left, right);
 
         /// <summary>
         /// svbool_t svmatch[_u16](svbool_t pg, svuint16_t op1, svuint16_t op2)
@@ -2875,16 +2875,6 @@ namespace System.Runtime.Intrinsics.Arm
         ///  MaxNumberPairwise : Maximum number pairwise
 
         /// <summary>
-        /// svfloat32_t svmaxnmp[_f32]_m(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
-        ///   FMAXNMP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
-        ///   MOVPRFX Zresult, Zop1; FMAXNMP Zresult.S, Pg/M, Zresult.S, Zop2.S
-        /// svfloat32_t svmaxnmp[_f32]_x(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
-        ///   FMAXNMP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
-        ///   MOVPRFX Zresult, Zop1; FMAXNMP Zresult.S, Pg/M, Zresult.S, Zop2.S
-        /// </summary>
-        public static unsafe Vector<float> MaxNumberPairwise(Vector<float> left, Vector<float> right) => MaxNumberPairwise(left, right);
-
-        /// <summary>
         /// svfloat64_t svmaxnmp[_f64]_m(svbool_t pg, svfloat64_t op1, svfloat64_t op2)
         ///   FMAXNMP Ztied1.D, Pg/M, Ztied1.D, Zop2.D
         ///   MOVPRFX Zresult, Zop1; FMAXNMP Zresult.D, Pg/M, Zresult.D, Zop2.D
@@ -2894,18 +2884,38 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<double> MaxNumberPairwise(Vector<double> left, Vector<double> right) => MaxNumberPairwise(left, right);
 
+        /// <summary>
+        /// svfloat32_t svmaxnmp[_f32]_m(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
+        ///   FMAXNMP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
+        ///   MOVPRFX Zresult, Zop1; FMAXNMP Zresult.S, Pg/M, Zresult.S, Zop2.S
+        /// svfloat32_t svmaxnmp[_f32]_x(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
+        ///   FMAXNMP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
+        ///   MOVPRFX Zresult, Zop1; FMAXNMP Zresult.S, Pg/M, Zresult.S, Zop2.S
+        /// </summary>
+        public static unsafe Vector<float> MaxNumberPairwise(Vector<float> left, Vector<float> right) => MaxNumberPairwise(left, right);
+
 
         ///  MaxPairwise : Maximum pairwise
 
         /// <summary>
-        /// svint8_t svmaxp[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SMAXP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SMAXP Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svmaxp[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SMAXP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SMAXP Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svuint8_t svmaxp[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UMAXP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; UMAXP Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svuint8_t svmaxp[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UMAXP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; UMAXP Zresult.B, Pg/M, Zresult.B, Zop2.B
         /// </summary>
-        public static unsafe Vector<sbyte> MaxPairwise(Vector<sbyte> left, Vector<sbyte> right) => MaxPairwise(left, right);
+        public static unsafe Vector<byte> MaxPairwise(Vector<byte> left, Vector<byte> right) => MaxPairwise(left, right);
+
+        /// <summary>
+        /// svfloat64_t svmaxp[_f64]_m(svbool_t pg, svfloat64_t op1, svfloat64_t op2)
+        ///   FMAXP Ztied1.D, Pg/M, Ztied1.D, Zop2.D
+        ///   MOVPRFX Zresult, Zop1; FMAXP Zresult.D, Pg/M, Zresult.D, Zop2.D
+        /// svfloat64_t svmaxp[_f64]_x(svbool_t pg, svfloat64_t op1, svfloat64_t op2)
+        ///   FMAXP Ztied1.D, Pg/M, Ztied1.D, Zop2.D
+        ///   MOVPRFX Zresult, Zop1; FMAXP Zresult.D, Pg/M, Zresult.D, Zop2.D
+        /// </summary>
+        public static unsafe Vector<double> MaxPairwise(Vector<double> left, Vector<double> right) => MaxPairwise(left, right);
 
         /// <summary>
         /// svint16_t svmaxp[_s16]_m(svbool_t pg, svint16_t op1, svint16_t op2)
@@ -2938,14 +2948,24 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> MaxPairwise(Vector<long> left, Vector<long> right) => MaxPairwise(left, right);
 
         /// <summary>
-        /// svuint8_t svmaxp[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UMAXP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; UMAXP Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svuint8_t svmaxp[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UMAXP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; UMAXP Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svmaxp[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SMAXP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SMAXP Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svmaxp[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SMAXP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SMAXP Zresult.B, Pg/M, Zresult.B, Zop2.B
         /// </summary>
-        public static unsafe Vector<byte> MaxPairwise(Vector<byte> left, Vector<byte> right) => MaxPairwise(left, right);
+        public static unsafe Vector<sbyte> MaxPairwise(Vector<sbyte> left, Vector<sbyte> right) => MaxPairwise(left, right);
+
+        /// <summary>
+        /// svfloat32_t svmaxp[_f32]_m(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
+        ///   FMAXP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
+        ///   MOVPRFX Zresult, Zop1; FMAXP Zresult.S, Pg/M, Zresult.S, Zop2.S
+        /// svfloat32_t svmaxp[_f32]_x(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
+        ///   FMAXP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
+        ///   MOVPRFX Zresult, Zop1; FMAXP Zresult.S, Pg/M, Zresult.S, Zop2.S
+        /// </summary>
+        public static unsafe Vector<float> MaxPairwise(Vector<float> left, Vector<float> right) => MaxPairwise(left, right);
 
         /// <summary>
         /// svuint16_t svmaxp[_u16]_m(svbool_t pg, svuint16_t op1, svuint16_t op2)
@@ -2977,38 +2997,8 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<ulong> MaxPairwise(Vector<ulong> left, Vector<ulong> right) => MaxPairwise(left, right);
 
-        /// <summary>
-        /// svfloat32_t svmaxp[_f32]_m(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
-        ///   FMAXP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
-        ///   MOVPRFX Zresult, Zop1; FMAXP Zresult.S, Pg/M, Zresult.S, Zop2.S
-        /// svfloat32_t svmaxp[_f32]_x(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
-        ///   FMAXP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
-        ///   MOVPRFX Zresult, Zop1; FMAXP Zresult.S, Pg/M, Zresult.S, Zop2.S
-        /// </summary>
-        public static unsafe Vector<float> MaxPairwise(Vector<float> left, Vector<float> right) => MaxPairwise(left, right);
-
-        /// <summary>
-        /// svfloat64_t svmaxp[_f64]_m(svbool_t pg, svfloat64_t op1, svfloat64_t op2)
-        ///   FMAXP Ztied1.D, Pg/M, Ztied1.D, Zop2.D
-        ///   MOVPRFX Zresult, Zop1; FMAXP Zresult.D, Pg/M, Zresult.D, Zop2.D
-        /// svfloat64_t svmaxp[_f64]_x(svbool_t pg, svfloat64_t op1, svfloat64_t op2)
-        ///   FMAXP Ztied1.D, Pg/M, Ztied1.D, Zop2.D
-        ///   MOVPRFX Zresult, Zop1; FMAXP Zresult.D, Pg/M, Zresult.D, Zop2.D
-        /// </summary>
-        public static unsafe Vector<double> MaxPairwise(Vector<double> left, Vector<double> right) => MaxPairwise(left, right);
-
 
         ///  MinNumberPairwise : Minimum number pairwise
-
-        /// <summary>
-        /// svfloat32_t svminnmp[_f32]_m(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
-        ///   FMINNMP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
-        ///   MOVPRFX Zresult, Zop1; FMINNMP Zresult.S, Pg/M, Zresult.S, Zop2.S
-        /// svfloat32_t svminnmp[_f32]_x(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
-        ///   FMINNMP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
-        ///   MOVPRFX Zresult, Zop1; FMINNMP Zresult.S, Pg/M, Zresult.S, Zop2.S
-        /// </summary>
-        public static unsafe Vector<float> MinNumberPairwise(Vector<float> left, Vector<float> right) => MinNumberPairwise(left, right);
 
         /// <summary>
         /// svfloat64_t svminnmp[_f64]_m(svbool_t pg, svfloat64_t op1, svfloat64_t op2)
@@ -3020,18 +3010,38 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<double> MinNumberPairwise(Vector<double> left, Vector<double> right) => MinNumberPairwise(left, right);
 
+        /// <summary>
+        /// svfloat32_t svminnmp[_f32]_m(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
+        ///   FMINNMP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
+        ///   MOVPRFX Zresult, Zop1; FMINNMP Zresult.S, Pg/M, Zresult.S, Zop2.S
+        /// svfloat32_t svminnmp[_f32]_x(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
+        ///   FMINNMP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
+        ///   MOVPRFX Zresult, Zop1; FMINNMP Zresult.S, Pg/M, Zresult.S, Zop2.S
+        /// </summary>
+        public static unsafe Vector<float> MinNumberPairwise(Vector<float> left, Vector<float> right) => MinNumberPairwise(left, right);
+
 
         ///  MinPairwise : Minimum pairwise
 
         /// <summary>
-        /// svint8_t svminp[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SMINP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SMINP Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svminp[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SMINP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SMINP Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svuint8_t svminp[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UMINP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; UMINP Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svuint8_t svminp[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UMINP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; UMINP Zresult.B, Pg/M, Zresult.B, Zop2.B
         /// </summary>
-        public static unsafe Vector<sbyte> MinPairwise(Vector<sbyte> left, Vector<sbyte> right) => MinPairwise(left, right);
+        public static unsafe Vector<byte> MinPairwise(Vector<byte> left, Vector<byte> right) => MinPairwise(left, right);
+
+        /// <summary>
+        /// svfloat64_t svminp[_f64]_m(svbool_t pg, svfloat64_t op1, svfloat64_t op2)
+        ///   FMINP Ztied1.D, Pg/M, Ztied1.D, Zop2.D
+        ///   MOVPRFX Zresult, Zop1; FMINP Zresult.D, Pg/M, Zresult.D, Zop2.D
+        /// svfloat64_t svminp[_f64]_x(svbool_t pg, svfloat64_t op1, svfloat64_t op2)
+        ///   FMINP Ztied1.D, Pg/M, Ztied1.D, Zop2.D
+        ///   MOVPRFX Zresult, Zop1; FMINP Zresult.D, Pg/M, Zresult.D, Zop2.D
+        /// </summary>
+        public static unsafe Vector<double> MinPairwise(Vector<double> left, Vector<double> right) => MinPairwise(left, right);
 
         /// <summary>
         /// svint16_t svminp[_s16]_m(svbool_t pg, svint16_t op1, svint16_t op2)
@@ -3064,14 +3074,24 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> MinPairwise(Vector<long> left, Vector<long> right) => MinPairwise(left, right);
 
         /// <summary>
-        /// svuint8_t svminp[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UMINP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; UMINP Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svuint8_t svminp[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UMINP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; UMINP Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svminp[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SMINP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SMINP Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svminp[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SMINP Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SMINP Zresult.B, Pg/M, Zresult.B, Zop2.B
         /// </summary>
-        public static unsafe Vector<byte> MinPairwise(Vector<byte> left, Vector<byte> right) => MinPairwise(left, right);
+        public static unsafe Vector<sbyte> MinPairwise(Vector<sbyte> left, Vector<sbyte> right) => MinPairwise(left, right);
+
+        /// <summary>
+        /// svfloat32_t svminp[_f32]_m(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
+        ///   FMINP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
+        ///   MOVPRFX Zresult, Zop1; FMINP Zresult.S, Pg/M, Zresult.S, Zop2.S
+        /// svfloat32_t svminp[_f32]_x(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
+        ///   FMINP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
+        ///   MOVPRFX Zresult, Zop1; FMINP Zresult.S, Pg/M, Zresult.S, Zop2.S
+        /// </summary>
+        public static unsafe Vector<float> MinPairwise(Vector<float> left, Vector<float> right) => MinPairwise(left, right);
 
         /// <summary>
         /// svuint16_t svminp[_u16]_m(svbool_t pg, svuint16_t op1, svuint16_t op2)
@@ -3102,26 +3122,6 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult, Zop1; UMINP Zresult.D, Pg/M, Zresult.D, Zop2.D
         /// </summary>
         public static unsafe Vector<ulong> MinPairwise(Vector<ulong> left, Vector<ulong> right) => MinPairwise(left, right);
-
-        /// <summary>
-        /// svfloat32_t svminp[_f32]_m(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
-        ///   FMINP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
-        ///   MOVPRFX Zresult, Zop1; FMINP Zresult.S, Pg/M, Zresult.S, Zop2.S
-        /// svfloat32_t svminp[_f32]_x(svbool_t pg, svfloat32_t op1, svfloat32_t op2)
-        ///   FMINP Ztied1.S, Pg/M, Ztied1.S, Zop2.S
-        ///   MOVPRFX Zresult, Zop1; FMINP Zresult.S, Pg/M, Zresult.S, Zop2.S
-        /// </summary>
-        public static unsafe Vector<float> MinPairwise(Vector<float> left, Vector<float> right) => MinPairwise(left, right);
-
-        /// <summary>
-        /// svfloat64_t svminp[_f64]_m(svbool_t pg, svfloat64_t op1, svfloat64_t op2)
-        ///   FMINP Ztied1.D, Pg/M, Ztied1.D, Zop2.D
-        ///   MOVPRFX Zresult, Zop1; FMINP Zresult.D, Pg/M, Zresult.D, Zop2.D
-        /// svfloat64_t svminp[_f64]_x(svbool_t pg, svfloat64_t op1, svfloat64_t op2)
-        ///   FMINP Ztied1.D, Pg/M, Ztied1.D, Zop2.D
-        ///   MOVPRFX Zresult, Zop1; FMINP Zresult.D, Pg/M, Zresult.D, Zop2.D
-        /// </summary>
-        public static unsafe Vector<double> MinPairwise(Vector<double> left, Vector<double> right) => MinPairwise(left, right);
 
 
         ///  MoveWideningLower : Move long (bottom)
@@ -3250,11 +3250,11 @@ namespace System.Runtime.Intrinsics.Arm
         ///  MultiplyAddRotateComplex : Complex multiply-add with rotate
 
         /// <summary>
-        /// svint8_t svcmla[_s8](svint8_t op1, svint8_t op2, svint8_t op3, uint64_t imm_rotation)
+        /// svuint8_t svcmla[_u8](svuint8_t op1, svuint8_t op2, svuint8_t op3, uint64_t imm_rotation)
         ///   CMLA Ztied1.B, Zop2.B, Zop3.B, #imm_rotation
         ///   MOVPRFX Zresult, Zop1; CMLA Zresult.B, Zop2.B, Zop3.B, #imm_rotation
         /// </summary>
-        public static unsafe Vector<sbyte> MultiplyAddRotateComplex(Vector<sbyte> addend, Vector<sbyte> left, Vector<sbyte> right, [ConstantExpected] byte rotation) => MultiplyAddRotateComplex(addend, left, right, rotation);
+        public static unsafe Vector<byte> MultiplyAddRotateComplex(Vector<byte> addend, Vector<byte> left, Vector<byte> right, [ConstantExpected] byte rotation) => MultiplyAddRotateComplex(addend, left, right, rotation);
 
         /// <summary>
         /// svint16_t svcmla[_s16](svint16_t op1, svint16_t op2, svint16_t op3, uint64_t imm_rotation)
@@ -3278,11 +3278,11 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> MultiplyAddRotateComplex(Vector<long> addend, Vector<long> left, Vector<long> right, [ConstantExpected] byte rotation) => MultiplyAddRotateComplex(addend, left, right, rotation);
 
         /// <summary>
-        /// svuint8_t svcmla[_u8](svuint8_t op1, svuint8_t op2, svuint8_t op3, uint64_t imm_rotation)
+        /// svint8_t svcmla[_s8](svint8_t op1, svint8_t op2, svint8_t op3, uint64_t imm_rotation)
         ///   CMLA Ztied1.B, Zop2.B, Zop3.B, #imm_rotation
         ///   MOVPRFX Zresult, Zop1; CMLA Zresult.B, Zop2.B, Zop3.B, #imm_rotation
         /// </summary>
-        public static unsafe Vector<byte> MultiplyAddRotateComplex(Vector<byte> addend, Vector<byte> left, Vector<byte> right, [ConstantExpected] byte rotation) => MultiplyAddRotateComplex(addend, left, right, rotation);
+        public static unsafe Vector<sbyte> MultiplyAddRotateComplex(Vector<sbyte> addend, Vector<sbyte> left, Vector<sbyte> right, [ConstantExpected] byte rotation) => MultiplyAddRotateComplex(addend, left, right, rotation);
 
         /// <summary>
         /// svuint16_t svcmla[_u16](svuint16_t op1, svuint16_t op2, svuint16_t op3, uint64_t imm_rotation)
@@ -3842,10 +3842,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  NoMatch : Detect no matching elements
 
         /// <summary>
-        /// svbool_t svnmatch[_s8](svbool_t pg, svint8_t op1, svint8_t op2)
+        /// svbool_t svnmatch[_u8](svbool_t pg, svuint8_t op1, svuint8_t op2)
         ///   NMATCH Presult.B, Pg/Z, Zop1.B, Zop2.B
         /// </summary>
-        public static unsafe Vector<sbyte> NoMatch(Vector<sbyte> mask, Vector<sbyte> left, Vector<sbyte> right) => NoMatch(mask, left, right);
+        public static unsafe Vector<byte> NoMatch(Vector<byte> mask, Vector<byte> left, Vector<byte> right) => NoMatch(mask, left, right);
 
         /// <summary>
         /// svbool_t svnmatch[_s16](svbool_t pg, svint16_t op1, svint16_t op2)
@@ -3854,10 +3854,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<short> NoMatch(Vector<short> mask, Vector<short> left, Vector<short> right) => NoMatch(mask, left, right);
 
         /// <summary>
-        /// svbool_t svnmatch[_u8](svbool_t pg, svuint8_t op1, svuint8_t op2)
+        /// svbool_t svnmatch[_s8](svbool_t pg, svint8_t op1, svint8_t op2)
         ///   NMATCH Presult.B, Pg/Z, Zop1.B, Zop2.B
         /// </summary>
-        public static unsafe Vector<byte> NoMatch(Vector<byte> mask, Vector<byte> left, Vector<byte> right) => NoMatch(mask, left, right);
+        public static unsafe Vector<sbyte> NoMatch(Vector<sbyte> mask, Vector<sbyte> left, Vector<sbyte> right) => NoMatch(mask, left, right);
 
         /// <summary>
         /// svbool_t svnmatch[_u16](svbool_t pg, svuint16_t op1, svuint16_t op2)
@@ -3962,10 +3962,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  RoundingAddHighNarowingLower : Rounding add narrow high part (bottom)
 
         /// <summary>
-        /// svint8_t svraddhnb[_s16](svint16_t op1, svint16_t op2)
+        /// svuint8_t svraddhnb[_u16](svuint16_t op1, svuint16_t op2)
         ///   RADDHNB Zresult.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<sbyte> RoundingAddHighNarowingLower(Vector<short> left, Vector<short> right) => RoundingAddHighNarowingLower(left, right);
+        public static unsafe Vector<byte> RoundingAddHighNarowingLower(Vector<ushort> left, Vector<ushort> right) => RoundingAddHighNarowingLower(left, right);
 
         /// <summary>
         /// svint16_t svraddhnb[_s32](svint32_t op1, svint32_t op2)
@@ -3980,10 +3980,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> RoundingAddHighNarowingLower(Vector<long> left, Vector<long> right) => RoundingAddHighNarowingLower(left, right);
 
         /// <summary>
-        /// svuint8_t svraddhnb[_u16](svuint16_t op1, svuint16_t op2)
+        /// svint8_t svraddhnb[_s16](svint16_t op1, svint16_t op2)
         ///   RADDHNB Zresult.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<byte> RoundingAddHighNarowingLower(Vector<ushort> left, Vector<ushort> right) => RoundingAddHighNarowingLower(left, right);
+        public static unsafe Vector<sbyte> RoundingAddHighNarowingLower(Vector<short> left, Vector<short> right) => RoundingAddHighNarowingLower(left, right);
 
         /// <summary>
         /// svuint16_t svraddhnb[_u32](svuint32_t op1, svuint32_t op2)
@@ -4001,10 +4001,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  RoundingAddHighNarowingUpper : Rounding add narrow high part (top)
 
         /// <summary>
-        /// svint8_t svraddhnt[_s16](svint8_t even, svint16_t op1, svint16_t op2)
+        /// svuint8_t svraddhnt[_u16](svuint8_t even, svuint16_t op1, svuint16_t op2)
         ///   RADDHNT Ztied.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<sbyte> RoundingAddHighNarowingUpper(Vector<sbyte> even, Vector<short> left, Vector<short> right) => RoundingAddHighNarowingUpper(even, left, right);
+        public static unsafe Vector<byte> RoundingAddHighNarowingUpper(Vector<byte> even, Vector<ushort> left, Vector<ushort> right) => RoundingAddHighNarowingUpper(even, left, right);
 
         /// <summary>
         /// svint16_t svraddhnt[_s32](svint16_t even, svint32_t op1, svint32_t op2)
@@ -4019,10 +4019,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> RoundingAddHighNarowingUpper(Vector<int> even, Vector<long> left, Vector<long> right) => RoundingAddHighNarowingUpper(even, left, right);
 
         /// <summary>
-        /// svuint8_t svraddhnt[_u16](svuint8_t even, svuint16_t op1, svuint16_t op2)
+        /// svint8_t svraddhnt[_s16](svint8_t even, svint16_t op1, svint16_t op2)
         ///   RADDHNT Ztied.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<byte> RoundingAddHighNarowingUpper(Vector<byte> even, Vector<ushort> left, Vector<ushort> right) => RoundingAddHighNarowingUpper(even, left, right);
+        public static unsafe Vector<sbyte> RoundingAddHighNarowingUpper(Vector<sbyte> even, Vector<short> left, Vector<short> right) => RoundingAddHighNarowingUpper(even, left, right);
 
         /// <summary>
         /// svuint16_t svraddhnt[_u32](svuint16_t even, svuint32_t op1, svuint32_t op2)
@@ -4040,18 +4040,18 @@ namespace System.Runtime.Intrinsics.Arm
         ///  RoundingHalvingAdd : Rounding halving add
 
         /// <summary>
-        /// svint8_t svrhadd[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SRHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SRHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svrhadd[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SRHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   SRHADD Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   MOVPRFX Zresult, Zop1; SRHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svrhadd[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SRHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SRHADD Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// svuint8_t svrhadd[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   URHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; URHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svuint8_t svrhadd[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   URHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   URHADD Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   MOVPRFX Zresult, Zop1; URHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svuint8_t svrhadd[_u8]_z(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; URHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; URHADD Zresult.B, Pg/M, Zresult.B, Zop1.B
         /// </summary>
-        public static unsafe Vector<sbyte> RoundingHalvingAdd(Vector<sbyte> left, Vector<sbyte> right) => RoundingHalvingAdd(left, right);
+        public static unsafe Vector<byte> RoundingHalvingAdd(Vector<byte> left, Vector<byte> right) => RoundingHalvingAdd(left, right);
 
         /// <summary>
         /// svint16_t svrhadd[_s16]_m(svbool_t pg, svint16_t op1, svint16_t op2)
@@ -4096,18 +4096,18 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> RoundingHalvingAdd(Vector<long> left, Vector<long> right) => RoundingHalvingAdd(left, right);
 
         /// <summary>
-        /// svuint8_t svrhadd[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   URHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; URHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svuint8_t svrhadd[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   URHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   URHADD Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   MOVPRFX Zresult, Zop1; URHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svuint8_t svrhadd[_u8]_z(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; URHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; URHADD Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// svint8_t svrhadd[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SRHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SRHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svrhadd[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SRHADD Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   SRHADD Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   MOVPRFX Zresult, Zop1; SRHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svrhadd[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SRHADD Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SRHADD Zresult.B, Pg/M, Zresult.B, Zop1.B
         /// </summary>
-        public static unsafe Vector<byte> RoundingHalvingAdd(Vector<byte> left, Vector<byte> right) => RoundingHalvingAdd(left, right);
+        public static unsafe Vector<sbyte> RoundingHalvingAdd(Vector<sbyte> left, Vector<sbyte> right) => RoundingHalvingAdd(left, right);
 
         /// <summary>
         /// svuint16_t svrhadd[_u16]_m(svbool_t pg, svuint16_t op1, svuint16_t op2)
@@ -4155,10 +4155,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  RoundingSubtractHighNarowingLower : Rounding subtract narrow high part (bottom)
 
         /// <summary>
-        /// svint8_t svrsubhnb[_s16](svint16_t op1, svint16_t op2)
+        /// svuint8_t svrsubhnb[_u16](svuint16_t op1, svuint16_t op2)
         ///   RSUBHNB Zresult.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<sbyte> RoundingSubtractHighNarowingLower(Vector<short> left, Vector<short> right) => RoundingSubtractHighNarowingLower(left, right);
+        public static unsafe Vector<byte> RoundingSubtractHighNarowingLower(Vector<ushort> left, Vector<ushort> right) => RoundingSubtractHighNarowingLower(left, right);
 
         /// <summary>
         /// svint16_t svrsubhnb[_s32](svint32_t op1, svint32_t op2)
@@ -4173,10 +4173,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> RoundingSubtractHighNarowingLower(Vector<long> left, Vector<long> right) => RoundingSubtractHighNarowingLower(left, right);
 
         /// <summary>
-        /// svuint8_t svrsubhnb[_u16](svuint16_t op1, svuint16_t op2)
+        /// svint8_t svrsubhnb[_s16](svint16_t op1, svint16_t op2)
         ///   RSUBHNB Zresult.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<byte> RoundingSubtractHighNarowingLower(Vector<ushort> left, Vector<ushort> right) => RoundingSubtractHighNarowingLower(left, right);
+        public static unsafe Vector<sbyte> RoundingSubtractHighNarowingLower(Vector<short> left, Vector<short> right) => RoundingSubtractHighNarowingLower(left, right);
 
         /// <summary>
         /// svuint16_t svrsubhnb[_u32](svuint32_t op1, svuint32_t op2)
@@ -4194,10 +4194,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  RoundingSubtractHighNarowingUpper : Rounding subtract narrow high part (top)
 
         /// <summary>
-        /// svint8_t svrsubhnt[_s16](svint8_t even, svint16_t op1, svint16_t op2)
+        /// svuint8_t svrsubhnt[_u16](svuint8_t even, svuint16_t op1, svuint16_t op2)
         ///   RSUBHNT Ztied.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<sbyte> RoundingSubtractHighNarowingUpper(Vector<sbyte> even, Vector<short> left, Vector<short> right) => RoundingSubtractHighNarowingUpper(even, left, right);
+        public static unsafe Vector<byte> RoundingSubtractHighNarowingUpper(Vector<byte> even, Vector<ushort> left, Vector<ushort> right) => RoundingSubtractHighNarowingUpper(even, left, right);
 
         /// <summary>
         /// svint16_t svrsubhnt[_s32](svint16_t even, svint32_t op1, svint32_t op2)
@@ -4212,10 +4212,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> RoundingSubtractHighNarowingUpper(Vector<int> even, Vector<long> left, Vector<long> right) => RoundingSubtractHighNarowingUpper(even, left, right);
 
         /// <summary>
-        /// svuint8_t svrsubhnt[_u16](svuint8_t even, svuint16_t op1, svuint16_t op2)
+        /// svint8_t svrsubhnt[_s16](svint8_t even, svint16_t op1, svint16_t op2)
         ///   RSUBHNT Ztied.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<byte> RoundingSubtractHighNarowingUpper(Vector<byte> even, Vector<ushort> left, Vector<ushort> right) => RoundingSubtractHighNarowingUpper(even, left, right);
+        public static unsafe Vector<sbyte> RoundingSubtractHighNarowingUpper(Vector<sbyte> even, Vector<short> left, Vector<short> right) => RoundingSubtractHighNarowingUpper(even, left, right);
 
         /// <summary>
         /// svuint16_t svrsubhnt[_u32](svuint16_t even, svuint32_t op1, svuint32_t op2)
@@ -4231,18 +4231,6 @@ namespace System.Runtime.Intrinsics.Arm
 
 
         ///  SaturatingAbs : Saturating absolute value
-
-        /// <summary>
-        /// svint8_t svqabs[_s8]_m(svint8_t inactive, svbool_t pg, svint8_t op)
-        ///   SQABS Ztied.B, Pg/M, Zop.B
-        ///   MOVPRFX Zresult, Zinactive; SQABS Zresult.B, Pg/M, Zop.B
-        /// svint8_t svqabs[_s8]_x(svbool_t pg, svint8_t op)
-        ///   SQABS Ztied.B, Pg/M, Ztied.B
-        ///   MOVPRFX Zresult, Zop; SQABS Zresult.B, Pg/M, Zop.B
-        /// svint8_t svqabs[_s8]_z(svbool_t pg, svint8_t op)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop.B; SQABS Zresult.B, Pg/M, Zop.B
-        /// </summary>
-        public static unsafe Vector<sbyte> SaturatingAbs(Vector<sbyte> value) => SaturatingAbs(value);
 
         /// <summary>
         /// svint16_t svqabs[_s16]_m(svint16_t inactive, svbool_t pg, svint16_t op)
@@ -4280,15 +4268,20 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<long> SaturatingAbs(Vector<long> value) => SaturatingAbs(value);
 
+        /// <summary>
+        /// svint8_t svqabs[_s8]_m(svint8_t inactive, svbool_t pg, svint8_t op)
+        ///   SQABS Ztied.B, Pg/M, Zop.B
+        ///   MOVPRFX Zresult, Zinactive; SQABS Zresult.B, Pg/M, Zop.B
+        /// svint8_t svqabs[_s8]_x(svbool_t pg, svint8_t op)
+        ///   SQABS Ztied.B, Pg/M, Ztied.B
+        ///   MOVPRFX Zresult, Zop; SQABS Zresult.B, Pg/M, Zop.B
+        /// svint8_t svqabs[_s8]_z(svbool_t pg, svint8_t op)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop.B; SQABS Zresult.B, Pg/M, Zop.B
+        /// </summary>
+        public static unsafe Vector<sbyte> SaturatingAbs(Vector<sbyte> value) => SaturatingAbs(value);
+
 
         ///  SaturatingComplexAddRotate : Saturating complex add with rotate
-
-        /// <summary>
-        /// svint8_t svqcadd[_s8](svint8_t op1, svint8_t op2, uint64_t imm_rotation)
-        ///   SQCADD Ztied1.B, Ztied1.B, Zop2.B, #imm_rotation
-        ///   MOVPRFX Zresult, Zop1; SQCADD Zresult.B, Zresult.B, Zop2.B, #imm_rotation
-        /// </summary>
-        public static unsafe Vector<sbyte> SaturatingComplexAddRotate(Vector<sbyte> op1, Vector<sbyte> op2, [ConstantExpected] byte rotation) => SaturatingComplexAddRotate(op1, op2, rotation);
 
         /// <summary>
         /// svint16_t svqcadd[_s16](svint16_t op1, svint16_t op2, uint64_t imm_rotation)
@@ -4310,6 +4303,13 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult, Zop1; SQCADD Zresult.D, Zresult.D, Zop2.D, #imm_rotation
         /// </summary>
         public static unsafe Vector<long> SaturatingComplexAddRotate(Vector<long> op1, Vector<long> op2, [ConstantExpected] byte rotation) => SaturatingComplexAddRotate(op1, op2, rotation);
+
+        /// <summary>
+        /// svint8_t svqcadd[_s8](svint8_t op1, svint8_t op2, uint64_t imm_rotation)
+        ///   SQCADD Ztied1.B, Ztied1.B, Zop2.B, #imm_rotation
+        ///   MOVPRFX Zresult, Zop1; SQCADD Zresult.B, Zresult.B, Zop2.B, #imm_rotation
+        /// </summary>
+        public static unsafe Vector<sbyte> SaturatingComplexAddRotate(Vector<sbyte> op1, Vector<sbyte> op2, [ConstantExpected] byte rotation) => SaturatingComplexAddRotate(op1, op2, rotation);
 
 
         ///  SaturatingDoublingMultiplyAddWideningLower : Saturating doubling multiply-add long (bottom)
@@ -4415,12 +4415,6 @@ namespace System.Runtime.Intrinsics.Arm
         ///  SaturatingDoublingMultiplyHigh : Saturating doubling multiply high
 
         /// <summary>
-        /// svint8_t svqdmulh[_s8](svint8_t op1, svint8_t op2)
-        ///   SQDMULH Zresult.B, Zop1.B, Zop2.B
-        /// </summary>
-        public static unsafe Vector<sbyte> SaturatingDoublingMultiplyHigh(Vector<sbyte> left, Vector<sbyte> right) => SaturatingDoublingMultiplyHigh(left, right);
-
-        /// <summary>
         /// svint16_t svqdmulh[_s16](svint16_t op1, svint16_t op2)
         ///   SQDMULH Zresult.H, Zop1.H, Zop2.H
         /// </summary>
@@ -4455,6 +4449,12 @@ namespace System.Runtime.Intrinsics.Arm
         ///   SQDMULH Zresult.D, Zop1.D, Zop2.D[imm_index]
         /// </summary>
         public static unsafe Vector<long> SaturatingDoublingMultiplyHigh(Vector<long> op1, Vector<long> op2, ulong imm_index) => SaturatingDoublingMultiplyHigh(op1, op2, imm_index);
+
+        /// <summary>
+        /// svint8_t svqdmulh[_s8](svint8_t op1, svint8_t op2)
+        ///   SQDMULH Zresult.B, Zop1.B, Zop2.B
+        /// </summary>
+        public static unsafe Vector<sbyte> SaturatingDoublingMultiplyHigh(Vector<sbyte> left, Vector<sbyte> right) => SaturatingDoublingMultiplyHigh(left, right);
 
 
         ///  SaturatingDoublingMultiplySubtractWideningLower : Saturating doubling multiply-subtract long (bottom)
@@ -4626,10 +4626,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  SaturatingExtractNarrowingLower : Saturating extract narrow (bottom)
 
         /// <summary>
-        /// svint8_t svqxtnb[_s16](svint16_t op)
-        ///   SQXTNB Zresult.B, Zop.H
+        /// svuint8_t svqxtnb[_u16](svuint16_t op)
+        ///   UQXTNB Zresult.B, Zop.H
         /// </summary>
-        public static unsafe Vector<sbyte> SaturatingExtractNarrowingLower(Vector<short> value) => SaturatingExtractNarrowingLower(value);
+        public static unsafe Vector<byte> SaturatingExtractNarrowingLower(Vector<ushort> value) => SaturatingExtractNarrowingLower(value);
 
         /// <summary>
         /// svint16_t svqxtnb[_s32](svint32_t op)
@@ -4644,10 +4644,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> SaturatingExtractNarrowingLower(Vector<long> value) => SaturatingExtractNarrowingLower(value);
 
         /// <summary>
-        /// svuint8_t svqxtnb[_u16](svuint16_t op)
-        ///   UQXTNB Zresult.B, Zop.H
+        /// svint8_t svqxtnb[_s16](svint16_t op)
+        ///   SQXTNB Zresult.B, Zop.H
         /// </summary>
-        public static unsafe Vector<byte> SaturatingExtractNarrowingLower(Vector<ushort> value) => SaturatingExtractNarrowingLower(value);
+        public static unsafe Vector<sbyte> SaturatingExtractNarrowingLower(Vector<short> value) => SaturatingExtractNarrowingLower(value);
 
         /// <summary>
         /// svuint16_t svqxtnb[_u32](svuint32_t op)
@@ -4665,10 +4665,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  SaturatingExtractNarrowingUpper : Saturating extract narrow (top)
 
         /// <summary>
-        /// svint8_t svqxtnt[_s16](svint8_t even, svint16_t op)
-        ///   SQXTNT Ztied.B, Zop.H
+        /// svuint8_t svqxtnt[_u16](svuint8_t even, svuint16_t op)
+        ///   UQXTNT Ztied.B, Zop.H
         /// </summary>
-        public static unsafe Vector<sbyte> SaturatingExtractNarrowingUpper(Vector<sbyte> even, Vector<short> op) => SaturatingExtractNarrowingUpper(even, op);
+        public static unsafe Vector<byte> SaturatingExtractNarrowingUpper(Vector<byte> even, Vector<ushort> op) => SaturatingExtractNarrowingUpper(even, op);
 
         /// <summary>
         /// svint16_t svqxtnt[_s32](svint16_t even, svint32_t op)
@@ -4683,10 +4683,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> SaturatingExtractNarrowingUpper(Vector<int> even, Vector<long> op) => SaturatingExtractNarrowingUpper(even, op);
 
         /// <summary>
-        /// svuint8_t svqxtnt[_u16](svuint8_t even, svuint16_t op)
-        ///   UQXTNT Ztied.B, Zop.H
+        /// svint8_t svqxtnt[_s16](svint8_t even, svint16_t op)
+        ///   SQXTNT Ztied.B, Zop.H
         /// </summary>
-        public static unsafe Vector<byte> SaturatingExtractNarrowingUpper(Vector<byte> even, Vector<ushort> op) => SaturatingExtractNarrowingUpper(even, op);
+        public static unsafe Vector<sbyte> SaturatingExtractNarrowingUpper(Vector<sbyte> even, Vector<short> op) => SaturatingExtractNarrowingUpper(even, op);
 
         /// <summary>
         /// svuint16_t svqxtnt[_u32](svuint16_t even, svuint32_t op)
@@ -4746,18 +4746,6 @@ namespace System.Runtime.Intrinsics.Arm
         ///  SaturatingNegate : Saturating negate
 
         /// <summary>
-        /// svint8_t svqneg[_s8]_m(svint8_t inactive, svbool_t pg, svint8_t op)
-        ///   SQNEG Ztied.B, Pg/M, Zop.B
-        ///   MOVPRFX Zresult, Zinactive; SQNEG Zresult.B, Pg/M, Zop.B
-        /// svint8_t svqneg[_s8]_x(svbool_t pg, svint8_t op)
-        ///   SQNEG Ztied.B, Pg/M, Ztied.B
-        ///   MOVPRFX Zresult, Zop; SQNEG Zresult.B, Pg/M, Zop.B
-        /// svint8_t svqneg[_s8]_z(svbool_t pg, svint8_t op)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop.B; SQNEG Zresult.B, Pg/M, Zop.B
-        /// </summary>
-        public static unsafe Vector<sbyte> SaturatingNegate(Vector<sbyte> value) => SaturatingNegate(value);
-
-        /// <summary>
         /// svint16_t svqneg[_s16]_m(svint16_t inactive, svbool_t pg, svint16_t op)
         ///   SQNEG Ztied.H, Pg/M, Zop.H
         ///   MOVPRFX Zresult, Zinactive; SQNEG Zresult.H, Pg/M, Zop.H
@@ -4793,15 +4781,20 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<long> SaturatingNegate(Vector<long> value) => SaturatingNegate(value);
 
+        /// <summary>
+        /// svint8_t svqneg[_s8]_m(svint8_t inactive, svbool_t pg, svint8_t op)
+        ///   SQNEG Ztied.B, Pg/M, Zop.B
+        ///   MOVPRFX Zresult, Zinactive; SQNEG Zresult.B, Pg/M, Zop.B
+        /// svint8_t svqneg[_s8]_x(svbool_t pg, svint8_t op)
+        ///   SQNEG Ztied.B, Pg/M, Ztied.B
+        ///   MOVPRFX Zresult, Zop; SQNEG Zresult.B, Pg/M, Zop.B
+        /// svint8_t svqneg[_s8]_z(svbool_t pg, svint8_t op)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop.B; SQNEG Zresult.B, Pg/M, Zop.B
+        /// </summary>
+        public static unsafe Vector<sbyte> SaturatingNegate(Vector<sbyte> value) => SaturatingNegate(value);
+
 
         ///  SaturatingRoundingDoublingComplexMultiplyAddHighRotate : Saturating rounding doubling complex multiply-add high with rotate
-
-        /// <summary>
-        /// svint8_t svqrdcmlah[_s8](svint8_t op1, svint8_t op2, svint8_t op3, uint64_t imm_rotation)
-        ///   SQRDCMLAH Ztied1.B, Zop2.B, Zop3.B, #imm_rotation
-        ///   MOVPRFX Zresult, Zop1; SQRDCMLAH Zresult.B, Zop2.B, Zop3.B, #imm_rotation
-        /// </summary>
-        public static unsafe Vector<sbyte> SaturatingRoundingDoublingComplexMultiplyAddHighRotate(Vector<sbyte> op1, Vector<sbyte> op2, Vector<sbyte> op3, [ConstantExpected] byte rotation) => SaturatingRoundingDoublingComplexMultiplyAddHighRotate(op1, op2, op3, rotation);
 
         /// <summary>
         /// svint16_t svqrdcmlah[_s16](svint16_t op1, svint16_t op2, svint16_t op3, uint64_t imm_rotation)
@@ -4838,15 +4831,15 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<long> SaturatingRoundingDoublingComplexMultiplyAddHighRotate(Vector<long> op1, Vector<long> op2, Vector<long> op3, [ConstantExpected] byte rotation) => SaturatingRoundingDoublingComplexMultiplyAddHighRotate(op1, op2, op3, rotation);
 
+        /// <summary>
+        /// svint8_t svqrdcmlah[_s8](svint8_t op1, svint8_t op2, svint8_t op3, uint64_t imm_rotation)
+        ///   SQRDCMLAH Ztied1.B, Zop2.B, Zop3.B, #imm_rotation
+        ///   MOVPRFX Zresult, Zop1; SQRDCMLAH Zresult.B, Zop2.B, Zop3.B, #imm_rotation
+        /// </summary>
+        public static unsafe Vector<sbyte> SaturatingRoundingDoublingComplexMultiplyAddHighRotate(Vector<sbyte> op1, Vector<sbyte> op2, Vector<sbyte> op3, [ConstantExpected] byte rotation) => SaturatingRoundingDoublingComplexMultiplyAddHighRotate(op1, op2, op3, rotation);
+
 
         ///  SaturatingRoundingDoublingMultiplyAddHigh : Saturating rounding doubling multiply-add high
-
-        /// <summary>
-        /// svint8_t svqrdmlah[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
-        ///   SQRDMLAH Ztied1.B, Zop2.B, Zop3.B
-        ///   MOVPRFX Zresult, Zop1; SQRDMLAH Zresult.B, Zop2.B, Zop3.B
-        /// </summary>
-        public static unsafe Vector<sbyte> SaturatingRoundingDoublingMultiplyAddHigh(Vector<sbyte> op1, Vector<sbyte> op2, Vector<sbyte> op3) => SaturatingRoundingDoublingMultiplyAddHigh(op1, op2, op3);
 
         /// <summary>
         /// svint16_t svqrdmlah[_s16](svint16_t op1, svint16_t op2, svint16_t op3)
@@ -4890,14 +4883,15 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<long> SaturatingRoundingDoublingMultiplyAddHigh(Vector<long> op1, Vector<long> op2, Vector<long> op3, ulong imm_index) => SaturatingRoundingDoublingMultiplyAddHigh(op1, op2, op3, imm_index);
 
+        /// <summary>
+        /// svint8_t svqrdmlah[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
+        ///   SQRDMLAH Ztied1.B, Zop2.B, Zop3.B
+        ///   MOVPRFX Zresult, Zop1; SQRDMLAH Zresult.B, Zop2.B, Zop3.B
+        /// </summary>
+        public static unsafe Vector<sbyte> SaturatingRoundingDoublingMultiplyAddHigh(Vector<sbyte> op1, Vector<sbyte> op2, Vector<sbyte> op3) => SaturatingRoundingDoublingMultiplyAddHigh(op1, op2, op3);
+
 
         ///  SaturatingRoundingDoublingMultiplyHigh : Saturating rounding doubling multiply high
-
-        /// <summary>
-        /// svint8_t svqrdmulh[_s8](svint8_t op1, svint8_t op2)
-        ///   SQRDMULH Zresult.B, Zop1.B, Zop2.B
-        /// </summary>
-        public static unsafe Vector<sbyte> SaturatingRoundingDoublingMultiplyHigh(Vector<sbyte> left, Vector<sbyte> right) => SaturatingRoundingDoublingMultiplyHigh(left, right);
 
         /// <summary>
         /// svint16_t svqrdmulh[_s16](svint16_t op1, svint16_t op2)
@@ -4935,15 +4929,14 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<long> SaturatingRoundingDoublingMultiplyHigh(Vector<long> op1, Vector<long> op2, ulong imm_index) => SaturatingRoundingDoublingMultiplyHigh(op1, op2, imm_index);
 
+        /// <summary>
+        /// svint8_t svqrdmulh[_s8](svint8_t op1, svint8_t op2)
+        ///   SQRDMULH Zresult.B, Zop1.B, Zop2.B
+        /// </summary>
+        public static unsafe Vector<sbyte> SaturatingRoundingDoublingMultiplyHigh(Vector<sbyte> left, Vector<sbyte> right) => SaturatingRoundingDoublingMultiplyHigh(left, right);
+
 
         ///  SaturatingRoundingDoublingMultiplySubtractHigh : Saturating rounding doubling multiply-subtract high
-
-        /// <summary>
-        /// svint8_t svqrdmlsh[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
-        ///   SQRDMLSH Ztied1.B, Zop2.B, Zop3.B
-        ///   MOVPRFX Zresult, Zop1; SQRDMLSH Zresult.B, Zop2.B, Zop3.B
-        /// </summary>
-        public static unsafe Vector<sbyte> SaturatingRoundingDoublingMultiplySubtractHigh(Vector<sbyte> op1, Vector<sbyte> op2, Vector<sbyte> op3) => SaturatingRoundingDoublingMultiplySubtractHigh(op1, op2, op3);
 
         /// <summary>
         /// svint16_t svqrdmlsh[_s16](svint16_t op1, svint16_t op2, svint16_t op3)
@@ -4986,6 +4979,13 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult, Zop1; SQRDMLSH Zresult.D, Zop2.D, Zop3.D[imm_index]
         /// </summary>
         public static unsafe Vector<long> SaturatingRoundingDoublingMultiplySubtractHigh(Vector<long> op1, Vector<long> op2, Vector<long> op3, ulong imm_index) => SaturatingRoundingDoublingMultiplySubtractHigh(op1, op2, op3, imm_index);
+
+        /// <summary>
+        /// svint8_t svqrdmlsh[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
+        ///   SQRDMLSH Ztied1.B, Zop2.B, Zop3.B
+        ///   MOVPRFX Zresult, Zop1; SQRDMLSH Zresult.B, Zop2.B, Zop3.B
+        /// </summary>
+        public static unsafe Vector<sbyte> SaturatingRoundingDoublingMultiplySubtractHigh(Vector<sbyte> op1, Vector<sbyte> op2, Vector<sbyte> op3) => SaturatingRoundingDoublingMultiplySubtractHigh(op1, op2, op3);
 
 
         ///  Scatter16BitNarrowing : Truncate to 16 bits and store, non-temporal
@@ -5213,6 +5213,36 @@ namespace System.Runtime.Intrinsics.Arm
         ///  ScatterNonTemporal : Non-truncating store, non-temporal
 
         /// <summary>
+        /// void svstnt1_scatter_[s64]offset[_f64](svbool_t pg, float64_t *base, svint64_t offsets, svfloat64_t data)
+        ///   STNT1D Zdata.D, Pg, [Zoffsets.D, Xbase]
+        /// </summary>
+        public static unsafe void ScatterNonTemporal(Vector<double> mask, double* base, Vector<long> offsets, Vector<double> data) => ScatterNonTemporal(mask, base, offsets, data);
+
+        /// <summary>
+        /// void svstnt1_scatter_[s64]index[_f64](svbool_t pg, float64_t *base, svint64_t indices, svfloat64_t data)
+        ///   STNT1D Zdata.D, Pg, [Zoffsets.D, Xbase]
+        /// </summary>
+        public static unsafe void ScatterNonTemporal(Vector<double> mask, double* base, Vector<long> indices, Vector<double> data) => ScatterNonTemporal(mask, base, indices, data);
+
+        /// <summary>
+        /// void svstnt1_scatter[_u64base_f64](svbool_t pg, svuint64_t bases, svfloat64_t data)
+        ///   STNT1D Zdata.D, Pg, [Zbases.D, XZR]
+        /// </summary>
+        public static unsafe void ScatterNonTemporal(Vector<double> mask, Vector<ulong> addresses, Vector<double> data) => ScatterNonTemporal(mask, addresses, data);
+
+        /// <summary>
+        /// void svstnt1_scatter_[u64]offset[_f64](svbool_t pg, float64_t *base, svuint64_t offsets, svfloat64_t data)
+        ///   STNT1D Zdata.D, Pg, [Zoffsets.D, Xbase]
+        /// </summary>
+        public static unsafe void ScatterNonTemporal(Vector<double> mask, double* base, Vector<ulong> offsets, Vector<double> data) => ScatterNonTemporal(mask, base, offsets, data);
+
+        /// <summary>
+        /// void svstnt1_scatter_[u64]index[_f64](svbool_t pg, float64_t *base, svuint64_t indices, svfloat64_t data)
+        ///   STNT1D Zdata.D, Pg, [Zoffsets.D, Xbase]
+        /// </summary>
+        public static unsafe void ScatterNonTemporal(Vector<double> mask, double* base, Vector<ulong> indices, Vector<double> data) => ScatterNonTemporal(mask, base, indices, data);
+
+        /// <summary>
         /// void svstnt1_scatter[_u32base_s32](svbool_t pg, svuint32_t bases, svint32_t data)
         ///   STNT1W Zdata.S, Pg, [Zbases.S, XZR]
         /// </summary>
@@ -5253,6 +5283,18 @@ namespace System.Runtime.Intrinsics.Arm
         ///   STNT1D Zdata.D, Pg, [Zoffsets.D, Xbase]
         /// </summary>
         public static unsafe void ScatterNonTemporal(Vector<long> mask, long* base, Vector<ulong> indices, Vector<long> data) => ScatterNonTemporal(mask, base, indices, data);
+
+        /// <summary>
+        /// void svstnt1_scatter[_u32base_f32](svbool_t pg, svuint32_t bases, svfloat32_t data)
+        ///   STNT1W Zdata.S, Pg, [Zbases.S, XZR]
+        /// </summary>
+        public static unsafe void ScatterNonTemporal(Vector<float> mask, Vector<uint> addresses, Vector<float> data) => ScatterNonTemporal(mask, addresses, data);
+
+        /// <summary>
+        /// void svstnt1_scatter_[u32]offset[_f32](svbool_t pg, float32_t *base, svuint32_t offsets, svfloat32_t data)
+        ///   STNT1W Zdata.S, Pg, [Zoffsets.S, Xbase]
+        /// </summary>
+        public static unsafe void ScatterNonTemporal(Vector<float> mask, float* base, Vector<uint> offsets, Vector<float> data) => ScatterNonTemporal(mask, base, offsets, data);
 
         /// <summary>
         /// void svstnt1_scatter[_u32base_u32](svbool_t pg, svuint32_t bases, svuint32_t data)
@@ -5296,64 +5338,8 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe void ScatterNonTemporal(Vector<ulong> mask, ulong* base, Vector<ulong> indices, Vector<ulong> data) => ScatterNonTemporal(mask, base, indices, data);
 
-        /// <summary>
-        /// void svstnt1_scatter[_u32base_f32](svbool_t pg, svuint32_t bases, svfloat32_t data)
-        ///   STNT1W Zdata.S, Pg, [Zbases.S, XZR]
-        /// </summary>
-        public static unsafe void ScatterNonTemporal(Vector<float> mask, Vector<uint> addresses, Vector<float> data) => ScatterNonTemporal(mask, addresses, data);
-
-        /// <summary>
-        /// void svstnt1_scatter_[u32]offset[_f32](svbool_t pg, float32_t *base, svuint32_t offsets, svfloat32_t data)
-        ///   STNT1W Zdata.S, Pg, [Zoffsets.S, Xbase]
-        /// </summary>
-        public static unsafe void ScatterNonTemporal(Vector<float> mask, float* base, Vector<uint> offsets, Vector<float> data) => ScatterNonTemporal(mask, base, offsets, data);
-
-        /// <summary>
-        /// void svstnt1_scatter_[s64]offset[_f64](svbool_t pg, float64_t *base, svint64_t offsets, svfloat64_t data)
-        ///   STNT1D Zdata.D, Pg, [Zoffsets.D, Xbase]
-        /// </summary>
-        public static unsafe void ScatterNonTemporal(Vector<double> mask, double* base, Vector<long> offsets, Vector<double> data) => ScatterNonTemporal(mask, base, offsets, data);
-
-        /// <summary>
-        /// void svstnt1_scatter_[s64]index[_f64](svbool_t pg, float64_t *base, svint64_t indices, svfloat64_t data)
-        ///   STNT1D Zdata.D, Pg, [Zoffsets.D, Xbase]
-        /// </summary>
-        public static unsafe void ScatterNonTemporal(Vector<double> mask, double* base, Vector<long> indices, Vector<double> data) => ScatterNonTemporal(mask, base, indices, data);
-
-        /// <summary>
-        /// void svstnt1_scatter[_u64base_f64](svbool_t pg, svuint64_t bases, svfloat64_t data)
-        ///   STNT1D Zdata.D, Pg, [Zbases.D, XZR]
-        /// </summary>
-        public static unsafe void ScatterNonTemporal(Vector<double> mask, Vector<ulong> addresses, Vector<double> data) => ScatterNonTemporal(mask, addresses, data);
-
-        /// <summary>
-        /// void svstnt1_scatter_[u64]offset[_f64](svbool_t pg, float64_t *base, svuint64_t offsets, svfloat64_t data)
-        ///   STNT1D Zdata.D, Pg, [Zoffsets.D, Xbase]
-        /// </summary>
-        public static unsafe void ScatterNonTemporal(Vector<double> mask, double* base, Vector<ulong> offsets, Vector<double> data) => ScatterNonTemporal(mask, base, offsets, data);
-
-        /// <summary>
-        /// void svstnt1_scatter_[u64]index[_f64](svbool_t pg, float64_t *base, svuint64_t indices, svfloat64_t data)
-        ///   STNT1D Zdata.D, Pg, [Zoffsets.D, Xbase]
-        /// </summary>
-        public static unsafe void ScatterNonTemporal(Vector<double> mask, double* base, Vector<ulong> indices, Vector<double> data) => ScatterNonTemporal(mask, base, indices, data);
-
 
         ///  ShiftArithmeticRounded : Rounding shift left
-
-        /// <summary>
-        /// svint8_t svrshl[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SRSHL Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SRSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svrshl[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SRSHL Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   SRSHLR Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   MOVPRFX Zresult, Zop1; SRSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svrshl[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SRSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SRSHLR Zresult.B, Pg/M, Zresult.B, Zop1.B
-        /// </summary>
-        public static unsafe Vector<sbyte> ShiftArithmeticRounded(Vector<sbyte> value, Vector<sbyte> count) => ShiftArithmeticRounded(value, count);
 
         /// <summary>
         /// svint16_t svrshl[_s16]_m(svbool_t pg, svint16_t op1, svint16_t op2)
@@ -5397,22 +5383,22 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<long> ShiftArithmeticRounded(Vector<long> value, Vector<long> count) => ShiftArithmeticRounded(value, count);
 
+        /// <summary>
+        /// svint8_t svrshl[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SRSHL Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SRSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svrshl[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SRSHL Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   SRSHLR Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   MOVPRFX Zresult, Zop1; SRSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svrshl[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SRSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SRSHLR Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// </summary>
+        public static unsafe Vector<sbyte> ShiftArithmeticRounded(Vector<sbyte> value, Vector<sbyte> count) => ShiftArithmeticRounded(value, count);
+
 
         ///  ShiftArithmeticRoundedSaturate : Saturating rounding shift left
-
-        /// <summary>
-        /// svint8_t svqrshl[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SQRSHL Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SQRSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svqrshl[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SQRSHL Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   SQRSHLR Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   MOVPRFX Zresult, Zop1; SQRSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svqrshl[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SQRSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SQRSHLR Zresult.B, Pg/M, Zresult.B, Zop1.B
-        /// </summary>
-        public static unsafe Vector<sbyte> ShiftArithmeticRoundedSaturate(Vector<sbyte> value, Vector<sbyte> count) => ShiftArithmeticRoundedSaturate(value, count);
 
         /// <summary>
         /// svint16_t svqrshl[_s16]_m(svbool_t pg, svint16_t op1, svint16_t op2)
@@ -5456,22 +5442,22 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<long> ShiftArithmeticRoundedSaturate(Vector<long> value, Vector<long> count) => ShiftArithmeticRoundedSaturate(value, count);
 
+        /// <summary>
+        /// svint8_t svqrshl[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SQRSHL Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SQRSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svqrshl[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SQRSHL Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   SQRSHLR Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   MOVPRFX Zresult, Zop1; SQRSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svqrshl[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SQRSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SQRSHLR Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// </summary>
+        public static unsafe Vector<sbyte> ShiftArithmeticRoundedSaturate(Vector<sbyte> value, Vector<sbyte> count) => ShiftArithmeticRoundedSaturate(value, count);
+
 
         ///  ShiftArithmeticSaturate : Saturating shift left
-
-        /// <summary>
-        /// svint8_t svqshl[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SQSHL Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SQSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svqshl[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SQSHL Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   SQSHLR Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   MOVPRFX Zresult, Zop1; SQSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svqshl[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SQSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SQSHLR Zresult.B, Pg/M, Zresult.B, Zop1.B
-        /// </summary>
-        public static unsafe Vector<sbyte> ShiftArithmeticSaturate(Vector<sbyte> value, Vector<sbyte> count) => ShiftArithmeticSaturate(value, count);
 
         /// <summary>
         /// svint16_t svqshl[_s16]_m(svbool_t pg, svint16_t op1, svint16_t op2)
@@ -5515,14 +5501,28 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<long> ShiftArithmeticSaturate(Vector<long> value, Vector<long> count) => ShiftArithmeticSaturate(value, count);
 
+        /// <summary>
+        /// svint8_t svqshl[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SQSHL Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SQSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svqshl[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SQSHL Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   SQSHLR Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   MOVPRFX Zresult, Zop1; SQSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svqshl[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SQSHL Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SQSHLR Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// </summary>
+        public static unsafe Vector<sbyte> ShiftArithmeticSaturate(Vector<sbyte> value, Vector<sbyte> count) => ShiftArithmeticSaturate(value, count);
+
 
         ///  ShiftLeftAndInsert : Shift left and insert
 
         /// <summary>
-        /// svint8_t svsli[_n_s8](svint8_t op1, svint8_t op2, uint64_t imm3)
+        /// svuint8_t svsli[_n_u8](svuint8_t op1, svuint8_t op2, uint64_t imm3)
         ///   SLI Ztied1.B, Zop2.B, #imm3
         /// </summary>
-        public static unsafe Vector<sbyte> ShiftLeftAndInsert(Vector<sbyte> left, Vector<sbyte> right, [ConstantExpected] byte shift) => ShiftLeftAndInsert(left, right, shift);
+        public static unsafe Vector<byte> ShiftLeftAndInsert(Vector<byte> left, Vector<byte> right, [ConstantExpected] byte shift) => ShiftLeftAndInsert(left, right, shift);
 
         /// <summary>
         /// svint16_t svsli[_n_s16](svint16_t op1, svint16_t op2, uint64_t imm3)
@@ -5543,10 +5543,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> ShiftLeftAndInsert(Vector<long> left, Vector<long> right, [ConstantExpected] byte shift) => ShiftLeftAndInsert(left, right, shift);
 
         /// <summary>
-        /// svuint8_t svsli[_n_u8](svuint8_t op1, svuint8_t op2, uint64_t imm3)
+        /// svint8_t svsli[_n_s8](svint8_t op1, svint8_t op2, uint64_t imm3)
         ///   SLI Ztied1.B, Zop2.B, #imm3
         /// </summary>
-        public static unsafe Vector<byte> ShiftLeftAndInsert(Vector<byte> left, Vector<byte> right, [ConstantExpected] byte shift) => ShiftLeftAndInsert(left, right, shift);
+        public static unsafe Vector<sbyte> ShiftLeftAndInsert(Vector<sbyte> left, Vector<sbyte> right, [ConstantExpected] byte shift) => ShiftLeftAndInsert(left, right, shift);
 
         /// <summary>
         /// svuint16_t svsli[_n_u16](svuint16_t op1, svuint16_t op2, uint64_t imm3)
@@ -5876,10 +5876,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  ShiftRightAndInsert : Shift right and insert
 
         /// <summary>
-        /// svint8_t svsri[_n_s8](svint8_t op1, svint8_t op2, uint64_t imm3)
+        /// svuint8_t svsri[_n_u8](svuint8_t op1, svuint8_t op2, uint64_t imm3)
         ///   SRI Ztied1.B, Zop2.B, #imm3
         /// </summary>
-        public static unsafe Vector<sbyte> ShiftRightAndInsert(Vector<sbyte> left, Vector<sbyte> right, [ConstantExpected] byte shift) => ShiftRightAndInsert(left, right, shift);
+        public static unsafe Vector<byte> ShiftRightAndInsert(Vector<byte> left, Vector<byte> right, [ConstantExpected] byte shift) => ShiftRightAndInsert(left, right, shift);
 
         /// <summary>
         /// svint16_t svsri[_n_s16](svint16_t op1, svint16_t op2, uint64_t imm3)
@@ -5900,10 +5900,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> ShiftRightAndInsert(Vector<long> left, Vector<long> right, [ConstantExpected] byte shift) => ShiftRightAndInsert(left, right, shift);
 
         /// <summary>
-        /// svuint8_t svsri[_n_u8](svuint8_t op1, svuint8_t op2, uint64_t imm3)
+        /// svint8_t svsri[_n_s8](svint8_t op1, svint8_t op2, uint64_t imm3)
         ///   SRI Ztied1.B, Zop2.B, #imm3
         /// </summary>
-        public static unsafe Vector<byte> ShiftRightAndInsert(Vector<byte> left, Vector<byte> right, [ConstantExpected] byte shift) => ShiftRightAndInsert(left, right, shift);
+        public static unsafe Vector<sbyte> ShiftRightAndInsert(Vector<sbyte> left, Vector<sbyte> right, [ConstantExpected] byte shift) => ShiftRightAndInsert(left, right, shift);
 
         /// <summary>
         /// svuint16_t svsri[_n_u16](svuint16_t op1, svuint16_t op2, uint64_t imm3)
@@ -5927,13 +5927,6 @@ namespace System.Runtime.Intrinsics.Arm
         ///  ShiftRightArithmeticAdd : Shift right and accumulate
 
         /// <summary>
-        /// svint8_t svsra[_n_s8](svint8_t op1, svint8_t op2, uint64_t imm3)
-        ///   SSRA Ztied1.B, Zop2.B, #imm3
-        ///   MOVPRFX Zresult, Zop1; SSRA Zresult.B, Zop2.B, #imm3
-        /// </summary>
-        public static unsafe Vector<sbyte> ShiftRightArithmeticAdd(Vector<sbyte> addend, Vector<sbyte> value, [ConstantExpected] byte count) => ShiftRightArithmeticAdd(addend, value, count);
-
-        /// <summary>
         /// svint16_t svsra[_n_s16](svint16_t op1, svint16_t op2, uint64_t imm3)
         ///   SSRA Ztied1.H, Zop2.H, #imm3
         ///   MOVPRFX Zresult, Zop1; SSRA Zresult.H, Zop2.H, #imm3
@@ -5954,14 +5947,21 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<long> ShiftRightArithmeticAdd(Vector<long> addend, Vector<long> value, [ConstantExpected] byte count) => ShiftRightArithmeticAdd(addend, value, count);
 
+        /// <summary>
+        /// svint8_t svsra[_n_s8](svint8_t op1, svint8_t op2, uint64_t imm3)
+        ///   SSRA Ztied1.B, Zop2.B, #imm3
+        ///   MOVPRFX Zresult, Zop1; SSRA Zresult.B, Zop2.B, #imm3
+        /// </summary>
+        public static unsafe Vector<sbyte> ShiftRightArithmeticAdd(Vector<sbyte> addend, Vector<sbyte> value, [ConstantExpected] byte count) => ShiftRightArithmeticAdd(addend, value, count);
+
 
         ///  ShiftRightArithmeticNarrowingSaturateEven : Saturating shift right narrow (bottom)
 
         /// <summary>
-        /// svint8_t svqshrnb[_n_s16](svint16_t op1, uint64_t imm2)
-        ///   SQSHRNB Zresult.B, Zop1.H, #imm2
+        /// svuint8_t svqshrnb[_n_u16](svuint16_t op1, uint64_t imm2)
+        ///   UQSHRNB Zresult.B, Zop1.H, #imm2
         /// </summary>
-        public static unsafe Vector<sbyte> ShiftRightArithmeticNarrowingSaturateEven(Vector<short> value, [ConstantExpected] byte count) => ShiftRightArithmeticNarrowingSaturateEven(value, count);
+        public static unsafe Vector<byte> ShiftRightArithmeticNarrowingSaturateEven(Vector<ushort> value, [ConstantExpected] byte count) => ShiftRightArithmeticNarrowingSaturateEven(value, count);
 
         /// <summary>
         /// svint16_t svqshrnb[_n_s32](svint32_t op1, uint64_t imm2)
@@ -5976,10 +5976,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> ShiftRightArithmeticNarrowingSaturateEven(Vector<long> value, [ConstantExpected] byte count) => ShiftRightArithmeticNarrowingSaturateEven(value, count);
 
         /// <summary>
-        /// svuint8_t svqshrnb[_n_u16](svuint16_t op1, uint64_t imm2)
-        ///   UQSHRNB Zresult.B, Zop1.H, #imm2
+        /// svint8_t svqshrnb[_n_s16](svint16_t op1, uint64_t imm2)
+        ///   SQSHRNB Zresult.B, Zop1.H, #imm2
         /// </summary>
-        public static unsafe Vector<byte> ShiftRightArithmeticNarrowingSaturateEven(Vector<ushort> value, [ConstantExpected] byte count) => ShiftRightArithmeticNarrowingSaturateEven(value, count);
+        public static unsafe Vector<sbyte> ShiftRightArithmeticNarrowingSaturateEven(Vector<short> value, [ConstantExpected] byte count) => ShiftRightArithmeticNarrowingSaturateEven(value, count);
 
         /// <summary>
         /// svuint16_t svqshrnb[_n_u32](svuint32_t op1, uint64_t imm2)
@@ -5997,10 +5997,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  ShiftRightArithmeticNarrowingSaturateOdd : Saturating shift right narrow (top)
 
         /// <summary>
-        /// svint8_t svqshrnt[_n_s16](svint8_t even, svint16_t op1, uint64_t imm2)
-        ///   SQSHRNT Ztied.B, Zop1.H, #imm2
+        /// svuint8_t svqshrnt[_n_u16](svuint8_t even, svuint16_t op1, uint64_t imm2)
+        ///   UQSHRNT Ztied.B, Zop1.H, #imm2
         /// </summary>
-        public static unsafe Vector<sbyte> ShiftRightArithmeticNarrowingSaturateOdd(Vector<sbyte> even, Vector<short> value, [ConstantExpected] byte count) => ShiftRightArithmeticNarrowingSaturateOdd(even, value, count);
+        public static unsafe Vector<byte> ShiftRightArithmeticNarrowingSaturateOdd(Vector<byte> even, Vector<ushort> value, [ConstantExpected] byte count) => ShiftRightArithmeticNarrowingSaturateOdd(even, value, count);
 
         /// <summary>
         /// svint16_t svqshrnt[_n_s32](svint16_t even, svint32_t op1, uint64_t imm2)
@@ -6015,10 +6015,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> ShiftRightArithmeticNarrowingSaturateOdd(Vector<int> even, Vector<long> value, [ConstantExpected] byte count) => ShiftRightArithmeticNarrowingSaturateOdd(even, value, count);
 
         /// <summary>
-        /// svuint8_t svqshrnt[_n_u16](svuint8_t even, svuint16_t op1, uint64_t imm2)
-        ///   UQSHRNT Ztied.B, Zop1.H, #imm2
+        /// svint8_t svqshrnt[_n_s16](svint8_t even, svint16_t op1, uint64_t imm2)
+        ///   SQSHRNT Ztied.B, Zop1.H, #imm2
         /// </summary>
-        public static unsafe Vector<byte> ShiftRightArithmeticNarrowingSaturateOdd(Vector<byte> even, Vector<ushort> value, [ConstantExpected] byte count) => ShiftRightArithmeticNarrowingSaturateOdd(even, value, count);
+        public static unsafe Vector<sbyte> ShiftRightArithmeticNarrowingSaturateOdd(Vector<sbyte> even, Vector<short> value, [ConstantExpected] byte count) => ShiftRightArithmeticNarrowingSaturateOdd(even, value, count);
 
         /// <summary>
         /// svuint16_t svqshrnt[_n_u32](svuint16_t even, svuint32_t op1, uint64_t imm2)
@@ -6078,18 +6078,6 @@ namespace System.Runtime.Intrinsics.Arm
         ///  ShiftRightArithmeticRounded : Rounding shift right
 
         /// <summary>
-        /// svint8_t svrshr[_n_s8]_m(svbool_t pg, svint8_t op1, uint64_t imm2)
-        ///   SRSHR Ztied1.B, Pg/M, Ztied1.B, #imm2
-        ///   MOVPRFX Zresult, Zop1; SRSHR Zresult.B, Pg/M, Zresult.B, #imm2
-        /// svint8_t svrshr[_n_s8]_x(svbool_t pg, svint8_t op1, uint64_t imm2)
-        ///   SRSHR Ztied1.B, Pg/M, Ztied1.B, #imm2
-        ///   MOVPRFX Zresult, Zop1; SRSHR Zresult.B, Pg/M, Zresult.B, #imm2
-        /// svint8_t svrshr[_n_s8]_z(svbool_t pg, svint8_t op1, uint64_t imm2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SRSHR Zresult.B, Pg/M, Zresult.B, #imm2
-        /// </summary>
-        public static unsafe Vector<sbyte> ShiftRightArithmeticRounded(Vector<sbyte> value, [ConstantExpected] byte count) => ShiftRightArithmeticRounded(value, count);
-
-        /// <summary>
         /// svint16_t svrshr[_n_s16]_m(svbool_t pg, svint16_t op1, uint64_t imm2)
         ///   SRSHR Ztied1.H, Pg/M, Ztied1.H, #imm2
         ///   MOVPRFX Zresult, Zop1; SRSHR Zresult.H, Pg/M, Zresult.H, #imm2
@@ -6125,15 +6113,20 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<long> ShiftRightArithmeticRounded(Vector<long> value, [ConstantExpected] byte count) => ShiftRightArithmeticRounded(value, count);
 
+        /// <summary>
+        /// svint8_t svrshr[_n_s8]_m(svbool_t pg, svint8_t op1, uint64_t imm2)
+        ///   SRSHR Ztied1.B, Pg/M, Ztied1.B, #imm2
+        ///   MOVPRFX Zresult, Zop1; SRSHR Zresult.B, Pg/M, Zresult.B, #imm2
+        /// svint8_t svrshr[_n_s8]_x(svbool_t pg, svint8_t op1, uint64_t imm2)
+        ///   SRSHR Ztied1.B, Pg/M, Ztied1.B, #imm2
+        ///   MOVPRFX Zresult, Zop1; SRSHR Zresult.B, Pg/M, Zresult.B, #imm2
+        /// svint8_t svrshr[_n_s8]_z(svbool_t pg, svint8_t op1, uint64_t imm2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SRSHR Zresult.B, Pg/M, Zresult.B, #imm2
+        /// </summary>
+        public static unsafe Vector<sbyte> ShiftRightArithmeticRounded(Vector<sbyte> value, [ConstantExpected] byte count) => ShiftRightArithmeticRounded(value, count);
+
 
         ///  ShiftRightArithmeticRoundedAdd : Rounding shift right and accumulate
-
-        /// <summary>
-        /// svint8_t svrsra[_n_s8](svint8_t op1, svint8_t op2, uint64_t imm3)
-        ///   SRSRA Ztied1.B, Zop2.B, #imm3
-        ///   MOVPRFX Zresult, Zop1; SRSRA Zresult.B, Zop2.B, #imm3
-        /// </summary>
-        public static unsafe Vector<sbyte> ShiftRightArithmeticRoundedAdd(Vector<sbyte> addend, Vector<sbyte> value, [ConstantExpected] byte count) => ShiftRightArithmeticRoundedAdd(addend, value, count);
 
         /// <summary>
         /// svint16_t svrsra[_n_s16](svint16_t op1, svint16_t op2, uint64_t imm3)
@@ -6156,14 +6149,15 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<long> ShiftRightArithmeticRoundedAdd(Vector<long> addend, Vector<long> value, [ConstantExpected] byte count) => ShiftRightArithmeticRoundedAdd(addend, value, count);
 
+        /// <summary>
+        /// svint8_t svrsra[_n_s8](svint8_t op1, svint8_t op2, uint64_t imm3)
+        ///   SRSRA Ztied1.B, Zop2.B, #imm3
+        ///   MOVPRFX Zresult, Zop1; SRSRA Zresult.B, Zop2.B, #imm3
+        /// </summary>
+        public static unsafe Vector<sbyte> ShiftRightArithmeticRoundedAdd(Vector<sbyte> addend, Vector<sbyte> value, [ConstantExpected] byte count) => ShiftRightArithmeticRoundedAdd(addend, value, count);
+
 
         ///  ShiftRightArithmeticRoundedNarrowingSaturateEven : Saturating rounding shift right narrow (bottom)
-
-        /// <summary>
-        /// svint8_t svqrshrnb[_n_s16](svint16_t op1, uint64_t imm2)
-        ///   SQRSHRNB Zresult.B, Zop1.H, #imm2
-        /// </summary>
-        public static unsafe Vector<sbyte> ShiftRightArithmeticRoundedNarrowingSaturateEven(Vector<short> value, [ConstantExpected] byte count) => ShiftRightArithmeticRoundedNarrowingSaturateEven(value, count);
 
         /// <summary>
         /// svint16_t svqrshrnb[_n_s32](svint32_t op1, uint64_t imm2)
@@ -6177,14 +6171,14 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<int> ShiftRightArithmeticRoundedNarrowingSaturateEven(Vector<long> value, [ConstantExpected] byte count) => ShiftRightArithmeticRoundedNarrowingSaturateEven(value, count);
 
+        /// <summary>
+        /// svint8_t svqrshrnb[_n_s16](svint16_t op1, uint64_t imm2)
+        ///   SQRSHRNB Zresult.B, Zop1.H, #imm2
+        /// </summary>
+        public static unsafe Vector<sbyte> ShiftRightArithmeticRoundedNarrowingSaturateEven(Vector<short> value, [ConstantExpected] byte count) => ShiftRightArithmeticRoundedNarrowingSaturateEven(value, count);
+
 
         ///  ShiftRightArithmeticRoundedNarrowingSaturateOdd : Saturating rounding shift right narrow (top)
-
-        /// <summary>
-        /// svint8_t svqrshrnt[_n_s16](svint8_t even, svint16_t op1, uint64_t imm2)
-        ///   SQRSHRNT Ztied.B, Zop1.H, #imm2
-        /// </summary>
-        public static unsafe Vector<sbyte> ShiftRightArithmeticRoundedNarrowingSaturateOdd(Vector<sbyte> even, Vector<short> value, [ConstantExpected] byte count) => ShiftRightArithmeticRoundedNarrowingSaturateOdd(even, value, count);
 
         /// <summary>
         /// svint16_t svqrshrnt[_n_s32](svint16_t even, svint32_t op1, uint64_t imm2)
@@ -6197,6 +6191,12 @@ namespace System.Runtime.Intrinsics.Arm
         ///   SQRSHRNT Ztied.S, Zop1.D, #imm2
         /// </summary>
         public static unsafe Vector<int> ShiftRightArithmeticRoundedNarrowingSaturateOdd(Vector<int> even, Vector<long> value, [ConstantExpected] byte count) => ShiftRightArithmeticRoundedNarrowingSaturateOdd(even, value, count);
+
+        /// <summary>
+        /// svint8_t svqrshrnt[_n_s16](svint8_t even, svint16_t op1, uint64_t imm2)
+        ///   SQRSHRNT Ztied.B, Zop1.H, #imm2
+        /// </summary>
+        public static unsafe Vector<sbyte> ShiftRightArithmeticRoundedNarrowingSaturateOdd(Vector<sbyte> even, Vector<short> value, [ConstantExpected] byte count) => ShiftRightArithmeticRoundedNarrowingSaturateOdd(even, value, count);
 
 
         ///  ShiftRightArithmeticRoundedNarrowingSaturateUnsignedEven : Saturating rounding shift right unsigned narrow (bottom)
@@ -6275,10 +6275,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  ShiftRightLogicalNarrowingEven : Shift right narrow (bottom)
 
         /// <summary>
-        /// svint8_t svshrnb[_n_s16](svint16_t op1, uint64_t imm2)
+        /// svuint8_t svshrnb[_n_u16](svuint16_t op1, uint64_t imm2)
         ///   SHRNB Zresult.B, Zop1.H, #imm2
         /// </summary>
-        public static unsafe Vector<sbyte> ShiftRightLogicalNarrowingEven(Vector<short> value, [ConstantExpected] byte count) => ShiftRightLogicalNarrowingEven(value, count);
+        public static unsafe Vector<byte> ShiftRightLogicalNarrowingEven(Vector<ushort> value, [ConstantExpected] byte count) => ShiftRightLogicalNarrowingEven(value, count);
 
         /// <summary>
         /// svint16_t svshrnb[_n_s32](svint32_t op1, uint64_t imm2)
@@ -6293,10 +6293,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> ShiftRightLogicalNarrowingEven(Vector<long> value, [ConstantExpected] byte count) => ShiftRightLogicalNarrowingEven(value, count);
 
         /// <summary>
-        /// svuint8_t svshrnb[_n_u16](svuint16_t op1, uint64_t imm2)
+        /// svint8_t svshrnb[_n_s16](svint16_t op1, uint64_t imm2)
         ///   SHRNB Zresult.B, Zop1.H, #imm2
         /// </summary>
-        public static unsafe Vector<byte> ShiftRightLogicalNarrowingEven(Vector<ushort> value, [ConstantExpected] byte count) => ShiftRightLogicalNarrowingEven(value, count);
+        public static unsafe Vector<sbyte> ShiftRightLogicalNarrowingEven(Vector<short> value, [ConstantExpected] byte count) => ShiftRightLogicalNarrowingEven(value, count);
 
         /// <summary>
         /// svuint16_t svshrnb[_n_u32](svuint32_t op1, uint64_t imm2)
@@ -6314,10 +6314,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  ShiftRightLogicalNarrowingOdd : Shift right narrow (top)
 
         /// <summary>
-        /// svint8_t svshrnt[_n_s16](svint8_t even, svint16_t op1, uint64_t imm2)
+        /// svuint8_t svshrnt[_n_u16](svuint8_t even, svuint16_t op1, uint64_t imm2)
         ///   SHRNT Ztied.B, Zop1.H, #imm2
         /// </summary>
-        public static unsafe Vector<sbyte> ShiftRightLogicalNarrowingOdd(Vector<sbyte> even, Vector<short> value, [ConstantExpected] byte count) => ShiftRightLogicalNarrowingOdd(even, value, count);
+        public static unsafe Vector<byte> ShiftRightLogicalNarrowingOdd(Vector<byte> even, Vector<ushort> value, [ConstantExpected] byte count) => ShiftRightLogicalNarrowingOdd(even, value, count);
 
         /// <summary>
         /// svint16_t svshrnt[_n_s32](svint16_t even, svint32_t op1, uint64_t imm2)
@@ -6332,10 +6332,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> ShiftRightLogicalNarrowingOdd(Vector<int> even, Vector<long> value, [ConstantExpected] byte count) => ShiftRightLogicalNarrowingOdd(even, value, count);
 
         /// <summary>
-        /// svuint8_t svshrnt[_n_u16](svuint8_t even, svuint16_t op1, uint64_t imm2)
+        /// svint8_t svshrnt[_n_s16](svint8_t even, svint16_t op1, uint64_t imm2)
         ///   SHRNT Ztied.B, Zop1.H, #imm2
         /// </summary>
-        public static unsafe Vector<byte> ShiftRightLogicalNarrowingOdd(Vector<byte> even, Vector<ushort> value, [ConstantExpected] byte count) => ShiftRightLogicalNarrowingOdd(even, value, count);
+        public static unsafe Vector<sbyte> ShiftRightLogicalNarrowingOdd(Vector<sbyte> even, Vector<short> value, [ConstantExpected] byte count) => ShiftRightLogicalNarrowingOdd(even, value, count);
 
         /// <summary>
         /// svuint16_t svshrnt[_n_u32](svuint16_t even, svuint32_t op1, uint64_t imm2)
@@ -6435,10 +6435,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  ShiftRightLogicalRoundedNarrowingEven : Rounding shift right narrow (bottom)
 
         /// <summary>
-        /// svint8_t svrshrnb[_n_s16](svint16_t op1, uint64_t imm2)
+        /// svuint8_t svrshrnb[_n_u16](svuint16_t op1, uint64_t imm2)
         ///   RSHRNB Zresult.B, Zop1.H, #imm2
         /// </summary>
-        public static unsafe Vector<sbyte> ShiftRightLogicalRoundedNarrowingEven(Vector<short> value, [ConstantExpected] byte count) => ShiftRightLogicalRoundedNarrowingEven(value, count);
+        public static unsafe Vector<byte> ShiftRightLogicalRoundedNarrowingEven(Vector<ushort> value, [ConstantExpected] byte count) => ShiftRightLogicalRoundedNarrowingEven(value, count);
 
         /// <summary>
         /// svint16_t svrshrnb[_n_s32](svint32_t op1, uint64_t imm2)
@@ -6453,10 +6453,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> ShiftRightLogicalRoundedNarrowingEven(Vector<long> value, [ConstantExpected] byte count) => ShiftRightLogicalRoundedNarrowingEven(value, count);
 
         /// <summary>
-        /// svuint8_t svrshrnb[_n_u16](svuint16_t op1, uint64_t imm2)
+        /// svint8_t svrshrnb[_n_s16](svint16_t op1, uint64_t imm2)
         ///   RSHRNB Zresult.B, Zop1.H, #imm2
         /// </summary>
-        public static unsafe Vector<byte> ShiftRightLogicalRoundedNarrowingEven(Vector<ushort> value, [ConstantExpected] byte count) => ShiftRightLogicalRoundedNarrowingEven(value, count);
+        public static unsafe Vector<sbyte> ShiftRightLogicalRoundedNarrowingEven(Vector<short> value, [ConstantExpected] byte count) => ShiftRightLogicalRoundedNarrowingEven(value, count);
 
         /// <summary>
         /// svuint16_t svrshrnb[_n_u32](svuint32_t op1, uint64_t imm2)
@@ -6474,10 +6474,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  ShiftRightLogicalRoundedNarrowingOdd : Rounding shift right narrow (top)
 
         /// <summary>
-        /// svint8_t svrshrnt[_n_s16](svint8_t even, svint16_t op1, uint64_t imm2)
+        /// svuint8_t svrshrnt[_n_u16](svuint8_t even, svuint16_t op1, uint64_t imm2)
         ///   RSHRNT Ztied.B, Zop1.H, #imm2
         /// </summary>
-        public static unsafe Vector<sbyte> ShiftRightLogicalRoundedNarrowingOdd(Vector<sbyte> even, Vector<short> value, [ConstantExpected] byte count) => ShiftRightLogicalRoundedNarrowingOdd(even, value, count);
+        public static unsafe Vector<byte> ShiftRightLogicalRoundedNarrowingOdd(Vector<byte> even, Vector<ushort> value, [ConstantExpected] byte count) => ShiftRightLogicalRoundedNarrowingOdd(even, value, count);
 
         /// <summary>
         /// svint16_t svrshrnt[_n_s32](svint16_t even, svint32_t op1, uint64_t imm2)
@@ -6492,10 +6492,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> ShiftRightLogicalRoundedNarrowingOdd(Vector<int> even, Vector<long> value, [ConstantExpected] byte count) => ShiftRightLogicalRoundedNarrowingOdd(even, value, count);
 
         /// <summary>
-        /// svuint8_t svrshrnt[_n_u16](svuint8_t even, svuint16_t op1, uint64_t imm2)
+        /// svint8_t svrshrnt[_n_s16](svint8_t even, svint16_t op1, uint64_t imm2)
         ///   RSHRNT Ztied.B, Zop1.H, #imm2
         /// </summary>
-        public static unsafe Vector<byte> ShiftRightLogicalRoundedNarrowingOdd(Vector<byte> even, Vector<ushort> value, [ConstantExpected] byte count) => ShiftRightLogicalRoundedNarrowingOdd(even, value, count);
+        public static unsafe Vector<sbyte> ShiftRightLogicalRoundedNarrowingOdd(Vector<sbyte> even, Vector<short> value, [ConstantExpected] byte count) => ShiftRightLogicalRoundedNarrowingOdd(even, value, count);
 
         /// <summary>
         /// svuint16_t svrshrnt[_n_u32](svuint16_t even, svuint32_t op1, uint64_t imm2)
@@ -6555,10 +6555,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  SubtractHighNarowingLower : Subtract narrow high part (bottom)
 
         /// <summary>
-        /// svint8_t svsubhnb[_s16](svint16_t op1, svint16_t op2)
+        /// svuint8_t svsubhnb[_u16](svuint16_t op1, svuint16_t op2)
         ///   SUBHNB Zresult.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<sbyte> SubtractHighNarowingLower(Vector<short> left, Vector<short> right) => SubtractHighNarowingLower(left, right);
+        public static unsafe Vector<byte> SubtractHighNarowingLower(Vector<ushort> left, Vector<ushort> right) => SubtractHighNarowingLower(left, right);
 
         /// <summary>
         /// svint16_t svsubhnb[_s32](svint32_t op1, svint32_t op2)
@@ -6573,10 +6573,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> SubtractHighNarowingLower(Vector<long> left, Vector<long> right) => SubtractHighNarowingLower(left, right);
 
         /// <summary>
-        /// svuint8_t svsubhnb[_u16](svuint16_t op1, svuint16_t op2)
+        /// svint8_t svsubhnb[_s16](svint16_t op1, svint16_t op2)
         ///   SUBHNB Zresult.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<byte> SubtractHighNarowingLower(Vector<ushort> left, Vector<ushort> right) => SubtractHighNarowingLower(left, right);
+        public static unsafe Vector<sbyte> SubtractHighNarowingLower(Vector<short> left, Vector<short> right) => SubtractHighNarowingLower(left, right);
 
         /// <summary>
         /// svuint16_t svsubhnb[_u32](svuint32_t op1, svuint32_t op2)
@@ -6594,10 +6594,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  SubtractHighNarowingUpper : Subtract narrow high part (top)
 
         /// <summary>
-        /// svint8_t svsubhnt[_s16](svint8_t even, svint16_t op1, svint16_t op2)
+        /// svuint8_t svsubhnt[_u16](svuint8_t even, svuint16_t op1, svuint16_t op2)
         ///   SUBHNT Ztied.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<sbyte> SubtractHighNarowingUpper(Vector<sbyte> even, Vector<short> left, Vector<short> right) => SubtractHighNarowingUpper(even, left, right);
+        public static unsafe Vector<byte> SubtractHighNarowingUpper(Vector<byte> even, Vector<ushort> left, Vector<ushort> right) => SubtractHighNarowingUpper(even, left, right);
 
         /// <summary>
         /// svint16_t svsubhnt[_s32](svint16_t even, svint32_t op1, svint32_t op2)
@@ -6612,10 +6612,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<int> SubtractHighNarowingUpper(Vector<int> even, Vector<long> left, Vector<long> right) => SubtractHighNarowingUpper(even, left, right);
 
         /// <summary>
-        /// svuint8_t svsubhnt[_u16](svuint8_t even, svuint16_t op1, svuint16_t op2)
+        /// svint8_t svsubhnt[_s16](svint8_t even, svint16_t op1, svint16_t op2)
         ///   SUBHNT Ztied.B, Zop1.H, Zop2.H
         /// </summary>
-        public static unsafe Vector<byte> SubtractHighNarowingUpper(Vector<byte> even, Vector<ushort> left, Vector<ushort> right) => SubtractHighNarowingUpper(even, left, right);
+        public static unsafe Vector<sbyte> SubtractHighNarowingUpper(Vector<sbyte> even, Vector<short> left, Vector<short> right) => SubtractHighNarowingUpper(even, left, right);
 
         /// <summary>
         /// svuint16_t svsubhnt[_u32](svuint16_t even, svuint32_t op1, svuint32_t op2)
@@ -6633,18 +6633,18 @@ namespace System.Runtime.Intrinsics.Arm
         ///  SubtractSaturate : Saturating subtract
 
         /// <summary>
-        /// svint8_t svqsub[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SQSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SQSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svqsub[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SQSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   SQSUBR Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   SQSUB Zresult.B, Zop1.B, Zop2.B
-        /// svint8_t svqsub[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SQSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SQSUBR Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// svuint8_t svqsub[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UQSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; UQSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svuint8_t svqsub[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UQSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   UQSUBR Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   UQSUB Zresult.B, Zop1.B, Zop2.B
+        /// svuint8_t svqsub[_u8]_z(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; UQSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; UQSUBR Zresult.B, Pg/M, Zresult.B, Zop1.B
         /// </summary>
-        public static unsafe Vector<sbyte> SubtractSaturate(Vector<sbyte> left, Vector<sbyte> right) => SubtractSaturate(left, right);
+        public static unsafe Vector<byte> SubtractSaturate(Vector<byte> left, Vector<byte> right) => SubtractSaturate(left, right);
 
         /// <summary>
         /// svint16_t svqsub[_s16]_m(svbool_t pg, svint16_t op1, svint16_t op2)
@@ -6689,18 +6689,18 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> SubtractSaturate(Vector<long> left, Vector<long> right) => SubtractSaturate(left, right);
 
         /// <summary>
-        /// svuint8_t svqsub[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UQSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; UQSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svuint8_t svqsub[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UQSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   UQSUBR Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   UQSUB Zresult.B, Zop1.B, Zop2.B
-        /// svuint8_t svqsub[_u8]_z(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; UQSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; UQSUBR Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// svint8_t svqsub[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SQSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SQSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svqsub[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SQSUB Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   SQSUBR Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   SQSUB Zresult.B, Zop1.B, Zop2.B
+        /// svint8_t svqsub[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SQSUB Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SQSUBR Zresult.B, Pg/M, Zresult.B, Zop1.B
         /// </summary>
-        public static unsafe Vector<byte> SubtractSaturate(Vector<byte> left, Vector<byte> right) => SubtractSaturate(left, right);
+        public static unsafe Vector<sbyte> SubtractSaturate(Vector<sbyte> left, Vector<sbyte> right) => SubtractSaturate(left, right);
 
         /// <summary>
         /// svuint16_t svqsub[_u16]_m(svbool_t pg, svuint16_t op1, svuint16_t op2)
@@ -6748,18 +6748,18 @@ namespace System.Runtime.Intrinsics.Arm
         ///  SubtractSaturateReversed : Saturating subtract reversed
 
         /// <summary>
-        /// svint8_t svqsubr[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SQSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; SQSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svint8_t svqsubr[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   SQSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   SQSUB Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   SQSUB Zresult.B, Zop2.B, Zop1.B
-        /// svint8_t svqsubr[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SQSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SQSUB Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// svuint8_t svqsubr[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UQSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; UQSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svuint8_t svqsubr[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   UQSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   UQSUB Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   UQSUB Zresult.B, Zop2.B, Zop1.B
+        /// svuint8_t svqsubr[_u8]_z(svbool_t pg, svuint8_t op1, svuint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; UQSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; UQSUB Zresult.B, Pg/M, Zresult.B, Zop1.B
         /// </summary>
-        public static unsafe Vector<sbyte> SubtractSaturateReversed(Vector<sbyte> left, Vector<sbyte> right) => SubtractSaturateReversed(left, right);
+        public static unsafe Vector<byte> SubtractSaturateReversed(Vector<byte> left, Vector<byte> right) => SubtractSaturateReversed(left, right);
 
         /// <summary>
         /// svint16_t svqsubr[_s16]_m(svbool_t pg, svint16_t op1, svint16_t op2)
@@ -6804,18 +6804,18 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> SubtractSaturateReversed(Vector<long> left, Vector<long> right) => SubtractSaturateReversed(left, right);
 
         /// <summary>
-        /// svuint8_t svqsubr[_u8]_m(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UQSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   MOVPRFX Zresult, Zop1; UQSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
-        /// svuint8_t svqsubr[_u8]_x(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   UQSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
-        ///   UQSUB Ztied2.B, Pg/M, Ztied2.B, Zop1.B
-        ///   UQSUB Zresult.B, Zop2.B, Zop1.B
-        /// svuint8_t svqsubr[_u8]_z(svbool_t pg, svuint8_t op1, svuint8_t op2)
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; UQSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
-        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; UQSUB Zresult.B, Pg/M, Zresult.B, Zop1.B
+        /// svint8_t svqsubr[_s8]_m(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SQSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   MOVPRFX Zresult, Zop1; SQSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
+        /// svint8_t svqsubr[_s8]_x(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   SQSUBR Ztied1.B, Pg/M, Ztied1.B, Zop2.B
+        ///   SQSUB Ztied2.B, Pg/M, Ztied2.B, Zop1.B
+        ///   SQSUB Zresult.B, Zop2.B, Zop1.B
+        /// svint8_t svqsubr[_s8]_z(svbool_t pg, svint8_t op1, svint8_t op2)
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop1.B; SQSUBR Zresult.B, Pg/M, Zresult.B, Zop2.B
+        ///   MOVPRFX Zresult.B, Pg/Z, Zop2.B; SQSUB Zresult.B, Pg/M, Zresult.B, Zop1.B
         /// </summary>
-        public static unsafe Vector<byte> SubtractSaturateReversed(Vector<byte> left, Vector<byte> right) => SubtractSaturateReversed(left, right);
+        public static unsafe Vector<sbyte> SubtractSaturateReversed(Vector<sbyte> left, Vector<sbyte> right) => SubtractSaturateReversed(left, right);
 
         /// <summary>
         /// svuint16_t svqsubr[_u16]_m(svbool_t pg, svuint16_t op1, svuint16_t op2)
@@ -7106,10 +7106,16 @@ namespace System.Runtime.Intrinsics.Arm
         ///  VectorTableLookup : Table lookup in two-vector table
 
         /// <summary>
-        /// svint8_t svtbl2[_s8](svint8x2_t data, svuint8_t indices)
+        /// svuint8_t svtbl2[_u8](svuint8x2_t data, svuint8_t indices)
         ///   TBL Zresult.B, {Zdata0.B, Zdata1.B}, Zindices.B
         /// </summary>
-        public static unsafe Vector<sbyte> VectorTableLookup((Vector<sbyte> data1, Vector<sbyte> data2), Vector<byte> indices) => VectorTableLookup(data1,, indices);
+        public static unsafe Vector<byte> VectorTableLookup((Vector<byte> data1, Vector<byte> data2), Vector<byte> indices) => VectorTableLookup(data1,, indices);
+
+        /// <summary>
+        /// svfloat64_t svtbl2[_f64](svfloat64x2_t data, svuint64_t indices)
+        ///   TBL Zresult.D, {Zdata0.D, Zdata1.D}, Zindices.D
+        /// </summary>
+        public static unsafe Vector<double> VectorTableLookup((Vector<double> data1, Vector<double> data2), Vector<ulong> indices) => VectorTableLookup(data1,, indices);
 
         /// <summary>
         /// svint16_t svtbl2[_s16](svint16x2_t data, svuint16_t indices)
@@ -7130,10 +7136,16 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> VectorTableLookup((Vector<long> data1, Vector<long> data2), Vector<ulong> indices) => VectorTableLookup(data1,, indices);
 
         /// <summary>
-        /// svuint8_t svtbl2[_u8](svuint8x2_t data, svuint8_t indices)
+        /// svint8_t svtbl2[_s8](svint8x2_t data, svuint8_t indices)
         ///   TBL Zresult.B, {Zdata0.B, Zdata1.B}, Zindices.B
         /// </summary>
-        public static unsafe Vector<byte> VectorTableLookup((Vector<byte> data1, Vector<byte> data2), Vector<byte> indices) => VectorTableLookup(data1,, indices);
+        public static unsafe Vector<sbyte> VectorTableLookup((Vector<sbyte> data1, Vector<sbyte> data2), Vector<byte> indices) => VectorTableLookup(data1,, indices);
+
+        /// <summary>
+        /// svfloat32_t svtbl2[_f32](svfloat32x2_t data, svuint32_t indices)
+        ///   TBL Zresult.S, {Zdata0.S, Zdata1.S}, Zindices.S
+        /// </summary>
+        public static unsafe Vector<float> VectorTableLookup((Vector<float> data1, Vector<float> data2), Vector<uint> indices) => VectorTableLookup(data1,, indices);
 
         /// <summary>
         /// svuint16_t svtbl2[_u16](svuint16x2_t data, svuint16_t indices)
@@ -7153,26 +7165,20 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<ulong> VectorTableLookup((Vector<ulong> data1, Vector<ulong> data2), Vector<ulong> indices) => VectorTableLookup(data1,, indices);
 
-        /// <summary>
-        /// svfloat32_t svtbl2[_f32](svfloat32x2_t data, svuint32_t indices)
-        ///   TBL Zresult.S, {Zdata0.S, Zdata1.S}, Zindices.S
-        /// </summary>
-        public static unsafe Vector<float> VectorTableLookup((Vector<float> data1, Vector<float> data2), Vector<uint> indices) => VectorTableLookup(data1,, indices);
-
-        /// <summary>
-        /// svfloat64_t svtbl2[_f64](svfloat64x2_t data, svuint64_t indices)
-        ///   TBL Zresult.D, {Zdata0.D, Zdata1.D}, Zindices.D
-        /// </summary>
-        public static unsafe Vector<double> VectorTableLookup((Vector<double> data1, Vector<double> data2), Vector<ulong> indices) => VectorTableLookup(data1,, indices);
-
 
         ///  VectorTableLookupExtension : Table lookup in single-vector table (merging)
 
         /// <summary>
-        /// svint8_t svtbx[_s8](svint8_t fallback, svint8_t data, svuint8_t indices)
+        /// svuint8_t svtbx[_u8](svuint8_t fallback, svuint8_t data, svuint8_t indices)
         ///   TBX Ztied.B, Zdata.B, Zindices.B
         /// </summary>
-        public static unsafe Vector<sbyte> VectorTableLookupExtension(Vector<sbyte> fallback, Vector<sbyte> data, Vector<byte> indices) => VectorTableLookupExtension(fallback, data, indices);
+        public static unsafe Vector<byte> VectorTableLookupExtension(Vector<byte> fallback, Vector<byte> data, Vector<byte> indices) => VectorTableLookupExtension(fallback, data, indices);
+
+        /// <summary>
+        /// svfloat64_t svtbx[_f64](svfloat64_t fallback, svfloat64_t data, svuint64_t indices)
+        ///   TBX Ztied.D, Zdata.D, Zindices.D
+        /// </summary>
+        public static unsafe Vector<double> VectorTableLookupExtension(Vector<double> fallback, Vector<double> data, Vector<ulong> indices) => VectorTableLookupExtension(fallback, data, indices);
 
         /// <summary>
         /// svint16_t svtbx[_s16](svint16_t fallback, svint16_t data, svuint16_t indices)
@@ -7193,10 +7199,16 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> VectorTableLookupExtension(Vector<long> fallback, Vector<long> data, Vector<ulong> indices) => VectorTableLookupExtension(fallback, data, indices);
 
         /// <summary>
-        /// svuint8_t svtbx[_u8](svuint8_t fallback, svuint8_t data, svuint8_t indices)
+        /// svint8_t svtbx[_s8](svint8_t fallback, svint8_t data, svuint8_t indices)
         ///   TBX Ztied.B, Zdata.B, Zindices.B
         /// </summary>
-        public static unsafe Vector<byte> VectorTableLookupExtension(Vector<byte> fallback, Vector<byte> data, Vector<byte> indices) => VectorTableLookupExtension(fallback, data, indices);
+        public static unsafe Vector<sbyte> VectorTableLookupExtension(Vector<sbyte> fallback, Vector<sbyte> data, Vector<byte> indices) => VectorTableLookupExtension(fallback, data, indices);
+
+        /// <summary>
+        /// svfloat32_t svtbx[_f32](svfloat32_t fallback, svfloat32_t data, svuint32_t indices)
+        ///   TBX Ztied.S, Zdata.S, Zindices.S
+        /// </summary>
+        public static unsafe Vector<float> VectorTableLookupExtension(Vector<float> fallback, Vector<float> data, Vector<uint> indices) => VectorTableLookupExtension(fallback, data, indices);
 
         /// <summary>
         /// svuint16_t svtbx[_u16](svuint16_t fallback, svuint16_t data, svuint16_t indices)
@@ -7216,29 +7228,17 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<ulong> VectorTableLookupExtension(Vector<ulong> fallback, Vector<ulong> data, Vector<ulong> indices) => VectorTableLookupExtension(fallback, data, indices);
 
-        /// <summary>
-        /// svfloat32_t svtbx[_f32](svfloat32_t fallback, svfloat32_t data, svuint32_t indices)
-        ///   TBX Ztied.S, Zdata.S, Zindices.S
-        /// </summary>
-        public static unsafe Vector<float> VectorTableLookupExtension(Vector<float> fallback, Vector<float> data, Vector<uint> indices) => VectorTableLookupExtension(fallback, data, indices);
-
-        /// <summary>
-        /// svfloat64_t svtbx[_f64](svfloat64_t fallback, svfloat64_t data, svuint64_t indices)
-        ///   TBX Ztied.D, Zdata.D, Zindices.D
-        /// </summary>
-        public static unsafe Vector<double> VectorTableLookupExtension(Vector<double> fallback, Vector<double> data, Vector<ulong> indices) => VectorTableLookupExtension(fallback, data, indices);
-
 
         ///  Xor : Bitwise exclusive OR of three vectors
 
         /// <summary>
-        /// svint8_t sveor3[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
+        /// svuint8_t sveor3[_u8](svuint8_t op1, svuint8_t op2, svuint8_t op3)
         ///   EOR3 Ztied1.D, Ztied1.D, Zop2.D, Zop3.D
         ///   EOR3 Ztied2.D, Ztied2.D, Zop3.D, Zop1.D
         ///   EOR3 Ztied3.D, Ztied3.D, Zop1.D, Zop2.D
         ///   MOVPRFX Zresult, Zop1; EOR3 Zresult.D, Zresult.D, Zop2.D, Zop3.D
         /// </summary>
-        public static unsafe Vector<sbyte> Xor(Vector<sbyte> value1, Vector<sbyte> value2, Vector<sbyte> value3) => Xor(value1, value2, value3);
+        public static unsafe Vector<byte> Xor(Vector<byte> value1, Vector<byte> value2, Vector<byte> value3) => Xor(value1, value2, value3);
 
         /// <summary>
         /// svint16_t sveor3[_s16](svint16_t op1, svint16_t op2, svint16_t op3)
@@ -7268,13 +7268,13 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> Xor(Vector<long> value1, Vector<long> value2, Vector<long> value3) => Xor(value1, value2, value3);
 
         /// <summary>
-        /// svuint8_t sveor3[_u8](svuint8_t op1, svuint8_t op2, svuint8_t op3)
+        /// svint8_t sveor3[_s8](svint8_t op1, svint8_t op2, svint8_t op3)
         ///   EOR3 Ztied1.D, Ztied1.D, Zop2.D, Zop3.D
         ///   EOR3 Ztied2.D, Ztied2.D, Zop3.D, Zop1.D
         ///   EOR3 Ztied3.D, Ztied3.D, Zop1.D, Zop2.D
         ///   MOVPRFX Zresult, Zop1; EOR3 Zresult.D, Zresult.D, Zop2.D, Zop3.D
         /// </summary>
-        public static unsafe Vector<byte> Xor(Vector<byte> value1, Vector<byte> value2, Vector<byte> value3) => Xor(value1, value2, value3);
+        public static unsafe Vector<sbyte> Xor(Vector<sbyte> value1, Vector<sbyte> value2, Vector<sbyte> value3) => Xor(value1, value2, value3);
 
         /// <summary>
         /// svuint16_t sveor3[_u16](svuint16_t op1, svuint16_t op2, svuint16_t op3)
@@ -7307,12 +7307,12 @@ namespace System.Runtime.Intrinsics.Arm
         ///  XorRotateRight : Bitwise exclusive OR and rotate right
 
         /// <summary>
-        /// svint8_t svxar[_n_s8](svint8_t op1, svint8_t op2, uint64_t imm3)
+        /// svuint8_t svxar[_n_u8](svuint8_t op1, svuint8_t op2, uint64_t imm3)
         ///   XAR Ztied1.B, Ztied1.B, Zop2.B, #imm3
         ///   XAR Ztied2.B, Ztied2.B, Zop1.B, #imm3
         ///   MOVPRFX Zresult, Zop1; XAR Zresult.B, Zresult.B, Zop2.B, #imm3
         /// </summary>
-        public static unsafe Vector<sbyte> XorRotateRight(Vector<sbyte> left, Vector<sbyte> right, [ConstantExpected] byte count) => XorRotateRight(left, right, count);
+        public static unsafe Vector<byte> XorRotateRight(Vector<byte> left, Vector<byte> right, [ConstantExpected] byte count) => XorRotateRight(left, right, count);
 
         /// <summary>
         /// svint16_t svxar[_n_s16](svint16_t op1, svint16_t op2, uint64_t imm3)
@@ -7339,12 +7339,12 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> XorRotateRight(Vector<long> left, Vector<long> right, [ConstantExpected] byte count) => XorRotateRight(left, right, count);
 
         /// <summary>
-        /// svuint8_t svxar[_n_u8](svuint8_t op1, svuint8_t op2, uint64_t imm3)
+        /// svint8_t svxar[_n_s8](svint8_t op1, svint8_t op2, uint64_t imm3)
         ///   XAR Ztied1.B, Ztied1.B, Zop2.B, #imm3
         ///   XAR Ztied2.B, Ztied2.B, Zop1.B, #imm3
         ///   MOVPRFX Zresult, Zop1; XAR Zresult.B, Zresult.B, Zop2.B, #imm3
         /// </summary>
-        public static unsafe Vector<byte> XorRotateRight(Vector<byte> left, Vector<byte> right, [ConstantExpected] byte count) => XorRotateRight(left, right, count);
+        public static unsafe Vector<sbyte> XorRotateRight(Vector<sbyte> left, Vector<sbyte> right, [ConstantExpected] byte count) => XorRotateRight(left, right, count);
 
         /// <summary>
         /// svuint16_t svxar[_n_u16](svuint16_t op1, svuint16_t op2, uint64_t imm3)

@@ -327,6 +327,18 @@ namespace System.Runtime.Intrinsics.Arm
         ///  ConvertToHalf : Floating-point convert
 
         /// <summary>
+        /// svfloat16_t svcvt_f16[_f64]_m(svfloat16_t inactive, svbool_t pg, svfloat64_t op)
+        ///   FCVT Ztied.H, Pg/M, Zop.D
+        ///   MOVPRFX Zresult, Zinactive; FCVT Zresult.H, Pg/M, Zop.D
+        /// svfloat16_t svcvt_f16[_f64]_x(svbool_t pg, svfloat64_t op)
+        ///   FCVT Ztied.H, Pg/M, Ztied.D
+        ///   MOVPRFX Zresult, Zop; FCVT Zresult.H, Pg/M, Zop.D
+        /// svfloat16_t svcvt_f16[_f64]_z(svbool_t pg, svfloat64_t op)
+        ///   MOVPRFX Zresult.D, Pg/Z, Zop.D; FCVT Zresult.H, Pg/M, Zop.D
+        /// </summary>
+        public static unsafe Vector<half> ConvertToHalf(Vector<double> value) => ConvertToHalf(value);
+
+        /// <summary>
         /// svfloat16_t svcvt_f16[_s16]_m(svfloat16_t inactive, svbool_t pg, svint16_t op)
         ///   SCVTF Ztied.H, Pg/M, Zop.H
         ///   MOVPRFX Zresult, Zinactive; SCVTF Zresult.H, Pg/M, Zop.H
@@ -363,6 +375,18 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<half> ConvertToHalf(Vector<long> value) => ConvertToHalf(value);
 
         /// <summary>
+        /// svfloat16_t svcvt_f16[_f32]_m(svfloat16_t inactive, svbool_t pg, svfloat32_t op)
+        ///   FCVT Ztied.H, Pg/M, Zop.S
+        ///   MOVPRFX Zresult, Zinactive; FCVT Zresult.H, Pg/M, Zop.S
+        /// svfloat16_t svcvt_f16[_f32]_x(svbool_t pg, svfloat32_t op)
+        ///   FCVT Ztied.H, Pg/M, Ztied.S
+        ///   MOVPRFX Zresult, Zop; FCVT Zresult.H, Pg/M, Zop.S
+        /// svfloat16_t svcvt_f16[_f32]_z(svbool_t pg, svfloat32_t op)
+        ///   MOVPRFX Zresult.S, Pg/Z, Zop.S; FCVT Zresult.H, Pg/M, Zop.S
+        /// </summary>
+        public static unsafe Vector<half> ConvertToHalf(Vector<float> value) => ConvertToHalf(value);
+
+        /// <summary>
         /// svfloat16_t svcvt_f16[_u16]_m(svfloat16_t inactive, svbool_t pg, svuint16_t op)
         ///   UCVTF Ztied.H, Pg/M, Zop.H
         ///   MOVPRFX Zresult, Zinactive; UCVTF Zresult.H, Pg/M, Zop.H
@@ -397,30 +421,6 @@ namespace System.Runtime.Intrinsics.Arm
         ///   MOVPRFX Zresult.D, Pg/Z, Zop.D; UCVTF Zresult.H, Pg/M, Zop.D
         /// </summary>
         public static unsafe Vector<half> ConvertToHalf(Vector<ulong> value) => ConvertToHalf(value);
-
-        /// <summary>
-        /// svfloat16_t svcvt_f16[_f32]_m(svfloat16_t inactive, svbool_t pg, svfloat32_t op)
-        ///   FCVT Ztied.H, Pg/M, Zop.S
-        ///   MOVPRFX Zresult, Zinactive; FCVT Zresult.H, Pg/M, Zop.S
-        /// svfloat16_t svcvt_f16[_f32]_x(svbool_t pg, svfloat32_t op)
-        ///   FCVT Ztied.H, Pg/M, Ztied.S
-        ///   MOVPRFX Zresult, Zop; FCVT Zresult.H, Pg/M, Zop.S
-        /// svfloat16_t svcvt_f16[_f32]_z(svbool_t pg, svfloat32_t op)
-        ///   MOVPRFX Zresult.S, Pg/Z, Zop.S; FCVT Zresult.H, Pg/M, Zop.S
-        /// </summary>
-        public static unsafe Vector<half> ConvertToHalf(Vector<float> value) => ConvertToHalf(value);
-
-        /// <summary>
-        /// svfloat16_t svcvt_f16[_f64]_m(svfloat16_t inactive, svbool_t pg, svfloat64_t op)
-        ///   FCVT Ztied.H, Pg/M, Zop.D
-        ///   MOVPRFX Zresult, Zinactive; FCVT Zresult.H, Pg/M, Zop.D
-        /// svfloat16_t svcvt_f16[_f64]_x(svbool_t pg, svfloat64_t op)
-        ///   FCVT Ztied.H, Pg/M, Ztied.D
-        ///   MOVPRFX Zresult, Zop; FCVT Zresult.H, Pg/M, Zop.D
-        /// svfloat16_t svcvt_f16[_f64]_z(svbool_t pg, svfloat64_t op)
-        ///   MOVPRFX Zresult.D, Pg/Z, Zop.D; FCVT Zresult.H, Pg/M, Zop.D
-        /// </summary>
-        public static unsafe Vector<half> ConvertToHalf(Vector<double> value) => ConvertToHalf(value);
 
 
         ///  ConvertToInt16 : Floating-point convert

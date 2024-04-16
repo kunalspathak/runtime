@@ -30,10 +30,16 @@ namespace System.Runtime.Intrinsics.Arm
         ///  ConcatenateEvenInt128FromTwoInputs : Concatenate even quadwords from two inputs
 
         /// <summary>
-        /// svint8_t svuzp1q[_s8](svint8_t op1, svint8_t op2)
+        /// svuint8_t svuzp1q[_u8](svuint8_t op1, svuint8_t op2)
         ///   UZP1 Zresult.Q, Zop1.Q, Zop2.Q
         /// </summary>
-        public static unsafe Vector<sbyte> ConcatenateEvenInt128FromTwoInputs(Vector<sbyte> left, Vector<sbyte> right) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector<byte> ConcatenateEvenInt128FromTwoInputs(Vector<byte> left, Vector<byte> right) { throw new PlatformNotSupportedException(); }
+
+        /// <summary>
+        /// svfloat64_t svuzp1q[_f64](svfloat64_t op1, svfloat64_t op2)
+        ///   UZP1 Zresult.Q, Zop1.Q, Zop2.Q
+        /// </summary>
+        public static unsafe Vector<double> ConcatenateEvenInt128FromTwoInputs(Vector<double> left, Vector<double> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// svint16_t svuzp1q[_s16](svint16_t op1, svint16_t op2)
@@ -54,10 +60,16 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> ConcatenateEvenInt128FromTwoInputs(Vector<long> left, Vector<long> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
-        /// svuint8_t svuzp1q[_u8](svuint8_t op1, svuint8_t op2)
+        /// svint8_t svuzp1q[_s8](svint8_t op1, svint8_t op2)
         ///   UZP1 Zresult.Q, Zop1.Q, Zop2.Q
         /// </summary>
-        public static unsafe Vector<byte> ConcatenateEvenInt128FromTwoInputs(Vector<byte> left, Vector<byte> right) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector<sbyte> ConcatenateEvenInt128FromTwoInputs(Vector<sbyte> left, Vector<sbyte> right) { throw new PlatformNotSupportedException(); }
+
+        /// <summary>
+        /// svfloat32_t svuzp1q[_f32](svfloat32_t op1, svfloat32_t op2)
+        ///   UZP1 Zresult.Q, Zop1.Q, Zop2.Q
+        /// </summary>
+        public static unsafe Vector<float> ConcatenateEvenInt128FromTwoInputs(Vector<float> left, Vector<float> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// svuint16_t svuzp1q[_u16](svuint16_t op1, svuint16_t op2)
@@ -77,26 +89,20 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<ulong> ConcatenateEvenInt128FromTwoInputs(Vector<ulong> left, Vector<ulong> right) { throw new PlatformNotSupportedException(); }
 
-        /// <summary>
-        /// svfloat32_t svuzp1q[_f32](svfloat32_t op1, svfloat32_t op2)
-        ///   UZP1 Zresult.Q, Zop1.Q, Zop2.Q
-        /// </summary>
-        public static unsafe Vector<float> ConcatenateEvenInt128FromTwoInputs(Vector<float> left, Vector<float> right) { throw new PlatformNotSupportedException(); }
-
-        /// <summary>
-        /// svfloat64_t svuzp1q[_f64](svfloat64_t op1, svfloat64_t op2)
-        ///   UZP1 Zresult.Q, Zop1.Q, Zop2.Q
-        /// </summary>
-        public static unsafe Vector<double> ConcatenateEvenInt128FromTwoInputs(Vector<double> left, Vector<double> right) { throw new PlatformNotSupportedException(); }
-
 
         ///  ConcatenateOddInt128FromTwoInputs : Concatenate odd quadwords from two inputs
 
         /// <summary>
-        /// svint8_t svuzp2q[_s8](svint8_t op1, svint8_t op2)
+        /// svuint8_t svuzp2q[_u8](svuint8_t op1, svuint8_t op2)
         ///   UZP2 Zresult.Q, Zop1.Q, Zop2.Q
         /// </summary>
-        public static unsafe Vector<sbyte> ConcatenateOddInt128FromTwoInputs(Vector<sbyte> left, Vector<sbyte> right) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector<byte> ConcatenateOddInt128FromTwoInputs(Vector<byte> left, Vector<byte> right) { throw new PlatformNotSupportedException(); }
+
+        /// <summary>
+        /// svfloat64_t svuzp2q[_f64](svfloat64_t op1, svfloat64_t op2)
+        ///   UZP2 Zresult.Q, Zop1.Q, Zop2.Q
+        /// </summary>
+        public static unsafe Vector<double> ConcatenateOddInt128FromTwoInputs(Vector<double> left, Vector<double> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// svint16_t svuzp2q[_s16](svint16_t op1, svint16_t op2)
@@ -117,10 +123,16 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> ConcatenateOddInt128FromTwoInputs(Vector<long> left, Vector<long> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
-        /// svuint8_t svuzp2q[_u8](svuint8_t op1, svuint8_t op2)
+        /// svint8_t svuzp2q[_s8](svint8_t op1, svint8_t op2)
         ///   UZP2 Zresult.Q, Zop1.Q, Zop2.Q
         /// </summary>
-        public static unsafe Vector<byte> ConcatenateOddInt128FromTwoInputs(Vector<byte> left, Vector<byte> right) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector<sbyte> ConcatenateOddInt128FromTwoInputs(Vector<sbyte> left, Vector<sbyte> right) { throw new PlatformNotSupportedException(); }
+
+        /// <summary>
+        /// svfloat32_t svuzp2q[_f32](svfloat32_t op1, svfloat32_t op2)
+        ///   UZP2 Zresult.Q, Zop1.Q, Zop2.Q
+        /// </summary>
+        public static unsafe Vector<float> ConcatenateOddInt128FromTwoInputs(Vector<float> left, Vector<float> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// svuint16_t svuzp2q[_u16](svuint16_t op1, svuint16_t op2)
@@ -140,26 +152,20 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<ulong> ConcatenateOddInt128FromTwoInputs(Vector<ulong> left, Vector<ulong> right) { throw new PlatformNotSupportedException(); }
 
-        /// <summary>
-        /// svfloat32_t svuzp2q[_f32](svfloat32_t op1, svfloat32_t op2)
-        ///   UZP2 Zresult.Q, Zop1.Q, Zop2.Q
-        /// </summary>
-        public static unsafe Vector<float> ConcatenateOddInt128FromTwoInputs(Vector<float> left, Vector<float> right) { throw new PlatformNotSupportedException(); }
-
-        /// <summary>
-        /// svfloat64_t svuzp2q[_f64](svfloat64_t op1, svfloat64_t op2)
-        ///   UZP2 Zresult.Q, Zop1.Q, Zop2.Q
-        /// </summary>
-        public static unsafe Vector<double> ConcatenateOddInt128FromTwoInputs(Vector<double> left, Vector<double> right) { throw new PlatformNotSupportedException(); }
-
 
         ///  InterleaveEvenInt128FromTwoInputs : Interleave even quadwords from two inputs
 
         /// <summary>
-        /// svint8_t svtrn1q[_s8](svint8_t op1, svint8_t op2)
+        /// svuint8_t svtrn1q[_u8](svuint8_t op1, svuint8_t op2)
         ///   TRN1 Zresult.Q, Zop1.Q, Zop2.Q
         /// </summary>
-        public static unsafe Vector<sbyte> InterleaveEvenInt128FromTwoInputs(Vector<sbyte> left, Vector<sbyte> right) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector<byte> InterleaveEvenInt128FromTwoInputs(Vector<byte> left, Vector<byte> right) { throw new PlatformNotSupportedException(); }
+
+        /// <summary>
+        /// svfloat64_t svtrn1q[_f64](svfloat64_t op1, svfloat64_t op2)
+        ///   TRN1 Zresult.Q, Zop1.Q, Zop2.Q
+        /// </summary>
+        public static unsafe Vector<double> InterleaveEvenInt128FromTwoInputs(Vector<double> left, Vector<double> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// svint16_t svtrn1q[_s16](svint16_t op1, svint16_t op2)
@@ -180,10 +186,16 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> InterleaveEvenInt128FromTwoInputs(Vector<long> left, Vector<long> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
-        /// svuint8_t svtrn1q[_u8](svuint8_t op1, svuint8_t op2)
+        /// svint8_t svtrn1q[_s8](svint8_t op1, svint8_t op2)
         ///   TRN1 Zresult.Q, Zop1.Q, Zop2.Q
         /// </summary>
-        public static unsafe Vector<byte> InterleaveEvenInt128FromTwoInputs(Vector<byte> left, Vector<byte> right) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector<sbyte> InterleaveEvenInt128FromTwoInputs(Vector<sbyte> left, Vector<sbyte> right) { throw new PlatformNotSupportedException(); }
+
+        /// <summary>
+        /// svfloat32_t svtrn1q[_f32](svfloat32_t op1, svfloat32_t op2)
+        ///   TRN1 Zresult.Q, Zop1.Q, Zop2.Q
+        /// </summary>
+        public static unsafe Vector<float> InterleaveEvenInt128FromTwoInputs(Vector<float> left, Vector<float> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// svuint16_t svtrn1q[_u16](svuint16_t op1, svuint16_t op2)
@@ -203,26 +215,20 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<ulong> InterleaveEvenInt128FromTwoInputs(Vector<ulong> left, Vector<ulong> right) { throw new PlatformNotSupportedException(); }
 
-        /// <summary>
-        /// svfloat32_t svtrn1q[_f32](svfloat32_t op1, svfloat32_t op2)
-        ///   TRN1 Zresult.Q, Zop1.Q, Zop2.Q
-        /// </summary>
-        public static unsafe Vector<float> InterleaveEvenInt128FromTwoInputs(Vector<float> left, Vector<float> right) { throw new PlatformNotSupportedException(); }
-
-        /// <summary>
-        /// svfloat64_t svtrn1q[_f64](svfloat64_t op1, svfloat64_t op2)
-        ///   TRN1 Zresult.Q, Zop1.Q, Zop2.Q
-        /// </summary>
-        public static unsafe Vector<double> InterleaveEvenInt128FromTwoInputs(Vector<double> left, Vector<double> right) { throw new PlatformNotSupportedException(); }
-
 
         ///  InterleaveInt128FromHighHalvesOfTwoInputs : Interleave quadwords from high halves of two inputs
 
         /// <summary>
-        /// svint8_t svzip2q[_s8](svint8_t op1, svint8_t op2)
+        /// svuint8_t svzip2q[_u8](svuint8_t op1, svuint8_t op2)
         ///   ZIP2 Zresult.Q, Zop1.Q, Zop2.Q
         /// </summary>
-        public static unsafe Vector<sbyte> InterleaveInt128FromHighHalvesOfTwoInputs(Vector<sbyte> left, Vector<sbyte> right) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector<byte> InterleaveInt128FromHighHalvesOfTwoInputs(Vector<byte> left, Vector<byte> right) { throw new PlatformNotSupportedException(); }
+
+        /// <summary>
+        /// svfloat64_t svzip2q[_f64](svfloat64_t op1, svfloat64_t op2)
+        ///   ZIP2 Zresult.Q, Zop1.Q, Zop2.Q
+        /// </summary>
+        public static unsafe Vector<double> InterleaveInt128FromHighHalvesOfTwoInputs(Vector<double> left, Vector<double> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// svint16_t svzip2q[_s16](svint16_t op1, svint16_t op2)
@@ -243,10 +249,16 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> InterleaveInt128FromHighHalvesOfTwoInputs(Vector<long> left, Vector<long> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
-        /// svuint8_t svzip2q[_u8](svuint8_t op1, svuint8_t op2)
+        /// svint8_t svzip2q[_s8](svint8_t op1, svint8_t op2)
         ///   ZIP2 Zresult.Q, Zop1.Q, Zop2.Q
         /// </summary>
-        public static unsafe Vector<byte> InterleaveInt128FromHighHalvesOfTwoInputs(Vector<byte> left, Vector<byte> right) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector<sbyte> InterleaveInt128FromHighHalvesOfTwoInputs(Vector<sbyte> left, Vector<sbyte> right) { throw new PlatformNotSupportedException(); }
+
+        /// <summary>
+        /// svfloat32_t svzip2q[_f32](svfloat32_t op1, svfloat32_t op2)
+        ///   ZIP2 Zresult.Q, Zop1.Q, Zop2.Q
+        /// </summary>
+        public static unsafe Vector<float> InterleaveInt128FromHighHalvesOfTwoInputs(Vector<float> left, Vector<float> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// svuint16_t svzip2q[_u16](svuint16_t op1, svuint16_t op2)
@@ -266,26 +278,20 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<ulong> InterleaveInt128FromHighHalvesOfTwoInputs(Vector<ulong> left, Vector<ulong> right) { throw new PlatformNotSupportedException(); }
 
-        /// <summary>
-        /// svfloat32_t svzip2q[_f32](svfloat32_t op1, svfloat32_t op2)
-        ///   ZIP2 Zresult.Q, Zop1.Q, Zop2.Q
-        /// </summary>
-        public static unsafe Vector<float> InterleaveInt128FromHighHalvesOfTwoInputs(Vector<float> left, Vector<float> right) { throw new PlatformNotSupportedException(); }
-
-        /// <summary>
-        /// svfloat64_t svzip2q[_f64](svfloat64_t op1, svfloat64_t op2)
-        ///   ZIP2 Zresult.Q, Zop1.Q, Zop2.Q
-        /// </summary>
-        public static unsafe Vector<double> InterleaveInt128FromHighHalvesOfTwoInputs(Vector<double> left, Vector<double> right) { throw new PlatformNotSupportedException(); }
-
 
         ///  InterleaveInt128FromLowHalvesOfTwoInputs : Interleave quadwords from low halves of two inputs
 
         /// <summary>
-        /// svint8_t svzip1q[_s8](svint8_t op1, svint8_t op2)
+        /// svuint8_t svzip1q[_u8](svuint8_t op1, svuint8_t op2)
         ///   ZIP1 Zresult.Q, Zop1.Q, Zop2.Q
         /// </summary>
-        public static unsafe Vector<sbyte> InterleaveInt128FromLowHalvesOfTwoInputs(Vector<sbyte> left, Vector<sbyte> right) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector<byte> InterleaveInt128FromLowHalvesOfTwoInputs(Vector<byte> left, Vector<byte> right) { throw new PlatformNotSupportedException(); }
+
+        /// <summary>
+        /// svfloat64_t svzip1q[_f64](svfloat64_t op1, svfloat64_t op2)
+        ///   ZIP1 Zresult.Q, Zop1.Q, Zop2.Q
+        /// </summary>
+        public static unsafe Vector<double> InterleaveInt128FromLowHalvesOfTwoInputs(Vector<double> left, Vector<double> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// svint16_t svzip1q[_s16](svint16_t op1, svint16_t op2)
@@ -306,10 +312,16 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> InterleaveInt128FromLowHalvesOfTwoInputs(Vector<long> left, Vector<long> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
-        /// svuint8_t svzip1q[_u8](svuint8_t op1, svuint8_t op2)
+        /// svint8_t svzip1q[_s8](svint8_t op1, svint8_t op2)
         ///   ZIP1 Zresult.Q, Zop1.Q, Zop2.Q
         /// </summary>
-        public static unsafe Vector<byte> InterleaveInt128FromLowHalvesOfTwoInputs(Vector<byte> left, Vector<byte> right) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector<sbyte> InterleaveInt128FromLowHalvesOfTwoInputs(Vector<sbyte> left, Vector<sbyte> right) { throw new PlatformNotSupportedException(); }
+
+        /// <summary>
+        /// svfloat32_t svzip1q[_f32](svfloat32_t op1, svfloat32_t op2)
+        ///   ZIP1 Zresult.Q, Zop1.Q, Zop2.Q
+        /// </summary>
+        public static unsafe Vector<float> InterleaveInt128FromLowHalvesOfTwoInputs(Vector<float> left, Vector<float> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// svuint16_t svzip1q[_u16](svuint16_t op1, svuint16_t op2)
@@ -329,26 +341,20 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<ulong> InterleaveInt128FromLowHalvesOfTwoInputs(Vector<ulong> left, Vector<ulong> right) { throw new PlatformNotSupportedException(); }
 
-        /// <summary>
-        /// svfloat32_t svzip1q[_f32](svfloat32_t op1, svfloat32_t op2)
-        ///   ZIP1 Zresult.Q, Zop1.Q, Zop2.Q
-        /// </summary>
-        public static unsafe Vector<float> InterleaveInt128FromLowHalvesOfTwoInputs(Vector<float> left, Vector<float> right) { throw new PlatformNotSupportedException(); }
-
-        /// <summary>
-        /// svfloat64_t svzip1q[_f64](svfloat64_t op1, svfloat64_t op2)
-        ///   ZIP1 Zresult.Q, Zop1.Q, Zop2.Q
-        /// </summary>
-        public static unsafe Vector<double> InterleaveInt128FromLowHalvesOfTwoInputs(Vector<double> left, Vector<double> right) { throw new PlatformNotSupportedException(); }
-
 
         ///  InterleaveOddInt128FromTwoInputs : Interleave odd quadwords from two inputs
 
         /// <summary>
-        /// svint8_t svtrn2q[_s8](svint8_t op1, svint8_t op2)
+        /// svuint8_t svtrn2q[_u8](svuint8_t op1, svuint8_t op2)
         ///   TRN2 Zresult.Q, Zop1.Q, Zop2.Q
         /// </summary>
-        public static unsafe Vector<sbyte> InterleaveOddInt128FromTwoInputs(Vector<sbyte> left, Vector<sbyte> right) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector<byte> InterleaveOddInt128FromTwoInputs(Vector<byte> left, Vector<byte> right) { throw new PlatformNotSupportedException(); }
+
+        /// <summary>
+        /// svfloat64_t svtrn2q[_f64](svfloat64_t op1, svfloat64_t op2)
+        ///   TRN2 Zresult.Q, Zop1.Q, Zop2.Q
+        /// </summary>
+        public static unsafe Vector<double> InterleaveOddInt128FromTwoInputs(Vector<double> left, Vector<double> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// svint16_t svtrn2q[_s16](svint16_t op1, svint16_t op2)
@@ -369,10 +375,16 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> InterleaveOddInt128FromTwoInputs(Vector<long> left, Vector<long> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
-        /// svuint8_t svtrn2q[_u8](svuint8_t op1, svuint8_t op2)
+        /// svint8_t svtrn2q[_s8](svint8_t op1, svint8_t op2)
         ///   TRN2 Zresult.Q, Zop1.Q, Zop2.Q
         /// </summary>
-        public static unsafe Vector<byte> InterleaveOddInt128FromTwoInputs(Vector<byte> left, Vector<byte> right) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector<sbyte> InterleaveOddInt128FromTwoInputs(Vector<sbyte> left, Vector<sbyte> right) { throw new PlatformNotSupportedException(); }
+
+        /// <summary>
+        /// svfloat32_t svtrn2q[_f32](svfloat32_t op1, svfloat32_t op2)
+        ///   TRN2 Zresult.Q, Zop1.Q, Zop2.Q
+        /// </summary>
+        public static unsafe Vector<float> InterleaveOddInt128FromTwoInputs(Vector<float> left, Vector<float> right) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// svuint16_t svtrn2q[_u16](svuint16_t op1, svuint16_t op2)
@@ -392,28 +404,24 @@ namespace System.Runtime.Intrinsics.Arm
         /// </summary>
         public static unsafe Vector<ulong> InterleaveOddInt128FromTwoInputs(Vector<ulong> left, Vector<ulong> right) { throw new PlatformNotSupportedException(); }
 
-        /// <summary>
-        /// svfloat32_t svtrn2q[_f32](svfloat32_t op1, svfloat32_t op2)
-        ///   TRN2 Zresult.Q, Zop1.Q, Zop2.Q
-        /// </summary>
-        public static unsafe Vector<float> InterleaveOddInt128FromTwoInputs(Vector<float> left, Vector<float> right) { throw new PlatformNotSupportedException(); }
-
-        /// <summary>
-        /// svfloat64_t svtrn2q[_f64](svfloat64_t op1, svfloat64_t op2)
-        ///   TRN2 Zresult.Q, Zop1.Q, Zop2.Q
-        /// </summary>
-        public static unsafe Vector<double> InterleaveOddInt128FromTwoInputs(Vector<double> left, Vector<double> right) { throw new PlatformNotSupportedException(); }
-
 
         ///  LoadVector256AndReplicateToVector : Load and replicate 256 bits of data
 
         /// <summary>
-        /// svint8_t svld1ro[_s8](svbool_t pg, const int8_t *base)
+        /// svuint8_t svld1ro[_u8](svbool_t pg, const uint8_t *base)
         ///   LD1ROB Zresult.B, Pg/Z, [Xarray, Xindex]
         ///   LD1ROB Zresult.B, Pg/Z, [Xarray, #index]
         ///   LD1ROB Zresult.B, Pg/Z, [Xbase, #0]
         /// </summary>
-        public static unsafe Vector<sbyte> LoadVector256AndReplicateToVector(Vector<sbyte> mask, sbyte* address) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector<byte> LoadVector256AndReplicateToVector(Vector<byte> mask, byte* address) { throw new PlatformNotSupportedException(); }
+
+        /// <summary>
+        /// svfloat64_t svld1ro[_f64](svbool_t pg, const float64_t *base)
+        ///   LD1ROD Zresult.D, Pg/Z, [Xarray, Xindex, LSL #3]
+        ///   LD1ROD Zresult.D, Pg/Z, [Xarray, #index * 8]
+        ///   LD1ROD Zresult.D, Pg/Z, [Xbase, #0]
+        /// </summary>
+        public static unsafe Vector<double> LoadVector256AndReplicateToVector(Vector<double> mask, double* address) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// svint16_t svld1ro[_s16](svbool_t pg, const int16_t *base)
@@ -440,12 +448,20 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector<long> LoadVector256AndReplicateToVector(Vector<long> mask, long* address) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
-        /// svuint8_t svld1ro[_u8](svbool_t pg, const uint8_t *base)
+        /// svint8_t svld1ro[_s8](svbool_t pg, const int8_t *base)
         ///   LD1ROB Zresult.B, Pg/Z, [Xarray, Xindex]
         ///   LD1ROB Zresult.B, Pg/Z, [Xarray, #index]
         ///   LD1ROB Zresult.B, Pg/Z, [Xbase, #0]
         /// </summary>
-        public static unsafe Vector<byte> LoadVector256AndReplicateToVector(Vector<byte> mask, byte* address) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector<sbyte> LoadVector256AndReplicateToVector(Vector<sbyte> mask, sbyte* address) { throw new PlatformNotSupportedException(); }
+
+        /// <summary>
+        /// svfloat32_t svld1ro[_f32](svbool_t pg, const float32_t *base)
+        ///   LD1ROW Zresult.S, Pg/Z, [Xarray, Xindex, LSL #2]
+        ///   LD1ROW Zresult.S, Pg/Z, [Xarray, #index * 4]
+        ///   LD1ROW Zresult.S, Pg/Z, [Xbase, #0]
+        /// </summary>
+        public static unsafe Vector<float> LoadVector256AndReplicateToVector(Vector<float> mask, float* address) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// svuint16_t svld1ro[_u16](svbool_t pg, const uint16_t *base)
@@ -470,22 +486,6 @@ namespace System.Runtime.Intrinsics.Arm
         ///   LD1ROD Zresult.D, Pg/Z, [Xbase, #0]
         /// </summary>
         public static unsafe Vector<ulong> LoadVector256AndReplicateToVector(Vector<ulong> mask, ulong* address) { throw new PlatformNotSupportedException(); }
-
-        /// <summary>
-        /// svfloat32_t svld1ro[_f32](svbool_t pg, const float32_t *base)
-        ///   LD1ROW Zresult.S, Pg/Z, [Xarray, Xindex, LSL #2]
-        ///   LD1ROW Zresult.S, Pg/Z, [Xarray, #index * 4]
-        ///   LD1ROW Zresult.S, Pg/Z, [Xbase, #0]
-        /// </summary>
-        public static unsafe Vector<float> LoadVector256AndReplicateToVector(Vector<float> mask, float* address) { throw new PlatformNotSupportedException(); }
-
-        /// <summary>
-        /// svfloat64_t svld1ro[_f64](svbool_t pg, const float64_t *base)
-        ///   LD1ROD Zresult.D, Pg/Z, [Xarray, Xindex, LSL #3]
-        ///   LD1ROD Zresult.D, Pg/Z, [Xarray, #index * 8]
-        ///   LD1ROD Zresult.D, Pg/Z, [Xbase, #0]
-        /// </summary>
-        public static unsafe Vector<double> LoadVector256AndReplicateToVector(Vector<double> mask, double* address) { throw new PlatformNotSupportedException(); }
 
 
         ///  MatrixMultiplyAccumulate : Matrix multiply-accumulate

@@ -30,10 +30,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  BitwiseClearXor : Bit Clear and Exclusive OR performs a bitwise AND of the 128-bit vector in a source SIMD&FP register and the complement of the vector in another source SIMD&FP register, then performs a bitwise exclusive OR of the resulting vector and the vector in a third source SIMD&FP register, and writes the result to the destination SIMD&FP register.
 
         /// <summary>
-        /// int8x16_t vbcaxq_s8(int8x16_t a, int8x16_t b, int8x16_t c)
+        /// uint8x16_t vbcaxq_u8(uint8x16_t a, uint8x16_t b, uint8x16_t c)
         ///   BCAX Vd.16B,Vn.16B,Vm.16B,Va.16B
         /// </summary>
-        public static unsafe Vector128<sbyte> BitwiseClearXor(Vector128<sbyte> xor, Vector128<sbyte> value, Vector128<sbyte> mask) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector128<byte> BitwiseClearXor(Vector128<byte> xor, Vector128<byte> value, Vector128<byte> mask) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// int16x8_t vbcaxq_s16(int16x8_t a, int16x8_t b, int16x8_t c)
@@ -54,10 +54,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector128<long> BitwiseClearXor(Vector128<long> xor, Vector128<long> value, Vector128<long> mask) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
-        /// uint8x16_t vbcaxq_u8(uint8x16_t a, uint8x16_t b, uint8x16_t c)
+        /// int8x16_t vbcaxq_s8(int8x16_t a, int8x16_t b, int8x16_t c)
         ///   BCAX Vd.16B,Vn.16B,Vm.16B,Va.16B
         /// </summary>
-        public static unsafe Vector128<byte> BitwiseClearXor(Vector128<byte> xor, Vector128<byte> value, Vector128<byte> mask) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector128<sbyte> BitwiseClearXor(Vector128<sbyte> xor, Vector128<sbyte> value, Vector128<sbyte> mask) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// uint16x8_t vbcaxq_u16(uint16x8_t a, uint16x8_t b, uint16x8_t c)
@@ -90,10 +90,10 @@ namespace System.Runtime.Intrinsics.Arm
         ///  Xor : Three-way Exclusive OR performs a three-way exclusive OR of the values in the three source SIMD&FP registers, and writes the result to the destination SIMD&FP register.
 
         /// <summary>
-        /// int8x16_t veor3q_s8(int8x16_t a, int8x16_t b, int8x16_t c)
+        /// uint8x16_t veor3q_u8(uint8x16_t a, uint8x16_t b, uint8x16_t c)
         ///   EOR3 Vd.16B,Vn.16B,Vm.16B,Va.16B
         /// </summary>
-        public static unsafe Vector128<sbyte> Xor(Vector128<sbyte> value1, Vector128<sbyte> value2, Vector128<sbyte> value3) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector128<byte> Xor(Vector128<byte> value1, Vector128<byte> value2, Vector128<byte> value3) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// int16x8_t veor3q_s16(int16x8_t a, int16x8_t b, int16x8_t c)
@@ -114,10 +114,10 @@ namespace System.Runtime.Intrinsics.Arm
         public static unsafe Vector128<long> Xor(Vector128<long> value1, Vector128<long> value2, Vector128<long> value3) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
-        /// uint8x16_t veor3q_u8(uint8x16_t a, uint8x16_t b, uint8x16_t c)
+        /// int8x16_t veor3q_s8(int8x16_t a, int8x16_t b, int8x16_t c)
         ///   EOR3 Vd.16B,Vn.16B,Vm.16B,Va.16B
         /// </summary>
-        public static unsafe Vector128<byte> Xor(Vector128<byte> value1, Vector128<byte> value2, Vector128<byte> value3) { throw new PlatformNotSupportedException(); }
+        public static unsafe Vector128<sbyte> Xor(Vector128<sbyte> value1, Vector128<sbyte> value2, Vector128<sbyte> value3) { throw new PlatformNotSupportedException(); }
 
         /// <summary>
         /// uint16x8_t veor3q_u16(uint16x8_t a, uint16x8_t b, uint16x8_t c)

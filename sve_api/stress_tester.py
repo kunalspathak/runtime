@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+
+import os
+import subprocess
+import sys
+
+def invoke_test(env_vars, args):
+    print(env_vars)
+    # Prepare environment variables dictionary
+    env = {}
+    disable_tiering = True
+    for var_name in env_vars:
+        if (var_name == 'JitMinOpts') or (var_name == 'TieredCompilation'):
+            disable_tiering = False
+        env['DOTNET_' + var_name] = env_vars[var_name]
+
+    if disable_tiering:
+        env['DOTNET_TieredCompilation'] = '0'
+
+    try:
+        # Run the command and capture output and errors
+        result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+        if 'fail' in result.stdout.lower():
+            print("Test failed:")
+            print(result.stdout)
+
+        # Print the errors, if any
+        if result.stderr:
+            print("Errors:")
+            print(result.stderr)
+    except subprocess.CalledProcessError as e:
+        print(f"Error invoking utility: {e}")
+
+
+test_environments = {
+    'default' : [
+        {},
+    ],
+    'jitstress' : [
+        {'JitMinOpts': '1'},
+        {'JitStress': '1'},
+        {'JitStress': '2'},
+        {'JitStress': '1', 'TieredCompilation' : '1'},
+        {'JitStress': '2', 'TieredCompilation' : '1'},
+        {'TailcallStress': '1'},
+        {'ReadyToRun': '0'},
+    ],
+    'jitstressregs' : [
+        {'JitStressRegs': '1'},
+        {'JitStressRegs': '2'},
+        {'JitStressRegs': '3'},
+        {'JitStressRegs': '4'},
+        {'JitStressRegs': '8'},
+        {'JitStressRegs': '0x10'},
+        {'JitStressRegs': '0x80'},
+        {'JitStressRegs': '0x1000'},
+        {'JitStressRegs': '0x2000'},
+    ],
+    'jitstress2-jitstressregs' : [
+        {'JitStress' : '2', 'JitStressRegs' : '1'},
+        {'JitStress' : '2', 'JitStressRegs' : '2'},
+        {'JitStress' : '2', 'JitStressRegs' : '3'},
+        {'JitStress' : '2', 'JitStressRegs' : '4'},
+        {'JitStress' : '2', 'JitStressRegs' : '8'},
+        {'JitStress' : '2', 'JitStressRegs' : '0x10'},
+        {'JitStress' : '2', 'JitStressRegs' : '0x80'},
+        {'JitStress' : '2', 'JitStressRegs' : '0x1000'},
+        {'JitStress' : '2', 'JitStressRegs' : '0x2000'},
+    ]
+}
+
+if len(sys.argv) <= 1:
+    print("Usage {} test_to_run test_args...".format(sys.argv))
+    exit(2)
+
+args = sys.argv[1:]
+
+for mode in test_environments:
+    print(f"===================Running {mode}===================")
+    test_legs = test_environments[mode]
+    for test_leg in test_legs:
+        invoke_test(test_leg, args)
+
+

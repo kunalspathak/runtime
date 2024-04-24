@@ -5,7 +5,7 @@ import subprocess
 import sys
 
 def invoke_test(env_vars, args):
-    print(env_vars)
+    print(f"------------------- {env_vars} -------------------")
     # Prepare environment variables dictionary
     env = {}
     disable_tiering = True
@@ -23,7 +23,18 @@ def invoke_test(env_vars, args):
 
         if 'fail' in result.stdout.lower():
             print("Test failed:")
-            print(result.stdout)
+            output_batch_lines = False
+            for line in result.stdout.splitlines():
+                if 'failed:' in line:
+                    print("..........................................")
+                    output_batch_lines = True
+                if len(line.strip()) == 0:
+                    output_batch_lines = False
+                    print("..........................................")
+
+                if output_batch_lines or ('System.Exception' in line) or ('at ' in line.strip()):
+                    print(line)
+
 
         # Print the errors, if any
         if result.stderr:
@@ -81,5 +92,3 @@ for mode in test_environments:
     test_legs = test_environments[mode]
     for test_leg in test_legs:
         invoke_test(test_leg, args)
-
-

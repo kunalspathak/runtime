@@ -100,6 +100,7 @@ if len(sys.argv) <= 1:
     exit(2)
 
 args = sys.argv[1:]
+print(f"Starting test: {' '.join(args)}")
 
 for mode in test_environments:
     print(f"===================Running {mode}===================")

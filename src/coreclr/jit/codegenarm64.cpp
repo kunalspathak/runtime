@@ -1429,16 +1429,11 @@ void CodeGen::genFuncletProlog(BasicBlock* block)
 
     compiler->unwindBegProlog();
 
-    regMaskFloat maskSaveRegsFloat = genFuncletInfo.fiSaveFloatRegs;
-    regMaskGpr   maskSaveRegsInt   = genFuncletInfo.fiSaveGprRegs;
-
-#ifdef FEATURE_MASKED_HW_INTRINSICS
-    regMaskPredicate maskSaveRegsPredicate = genFuncletInfo.fiSavePredicateRegs;
-#endif
+    AllRegsMask maskSaveRegs = genFuncletInfo.fiSaveRegs;
 
     // Funclets must always save LR and FP, since when we have funclets we must have an FP frame.
-    assert((maskSaveRegsInt & RBM_LR) != 0);
-    assert((maskSaveRegsInt & RBM_FP) != 0);
+    assert((genFuncletInfo.fiSaveRegs.gprRegs() & RBM_LR) != 0);
+    assert((genFuncletInfo.fiSaveRegs.gprRegs() & RBM_FP) != 0);
 
     bool isFilter = (block->bbCatchTyp == BBCT_FILTER);
 
@@ -1475,7 +1470,7 @@ void CodeGen::genFuncletProlog(BasicBlock* block)
             compiler->unwindSaveRegPairPreindexed(REG_FP, REG_LR, genFuncletInfo.fiSpDelta1);
         }
 
-        maskSaveRegsInt &= ~(RBM_LR | RBM_FP); // We've saved these now
+        maskSaveRegs.RemoveRegTypeFromMask((RBM_LR | RBM_FP), IntRegisterType); // We've saved these now
 
         assert(genFuncletInfo.fiSpDelta2 == 0);
         assert(genFuncletInfo.fiSP_to_FPLR_save_delta == 0);
@@ -1495,7 +1490,7 @@ void CodeGen::genFuncletProlog(BasicBlock* block)
                                       genFuncletInfo.fiSP_to_FPLR_save_delta);
         compiler->unwindSaveRegPair(REG_FP, REG_LR, genFuncletInfo.fiSP_to_FPLR_save_delta);
 
-        maskSaveRegsInt &= ~(RBM_LR | RBM_FP); // We've saved these now
+        maskSaveRegs.RemoveRegTypeFromMask(RBM_LR | RBM_FP, TYP_INT); // We've saved these now
     }
     else if (genFuncletInfo.fiFrameType == 3)
     {
@@ -1516,7 +1511,7 @@ void CodeGen::genFuncletProlog(BasicBlock* block)
             compiler->unwindSaveRegPairPreindexed(REG_FP, REG_LR, genFuncletInfo.fiSpDelta1);
         }
 
-        maskSaveRegsInt &= ~(RBM_LR | RBM_FP); // We've saved these now
+        maskSaveRegs.RemoveRegTypeFromMask(RBM_LR | RBM_FP, TYP_INT); // We've saved these now
     }
     else if (genFuncletInfo.fiFrameType == 4)
     {
@@ -1552,13 +1547,7 @@ void CodeGen::genFuncletProlog(BasicBlock* block)
     int lowestCalleeSavedOffset = genFuncletInfo.fiSP_to_CalleeSave_delta +
                                   genFuncletInfo.fiSpDelta2; // We haven't done the second adjustment of SP yet (if any)
 
-    genSaveCalleeSavedRegistersHelp(AllRegsMask(maskSaveRegsInt, maskSaveRegsFloat
-#ifdef FEATURE_MASKED_HW_INTRINSICS
-                                                ,
-                                                maskSaveRegsPredicate
-#endif
-                                                ),
-                                    lowestCalleeSavedOffset, 0);
+    genSaveCalleeSavedRegistersHelp(maskSaveRegs, lowestCalleeSavedOffset, 0);
 
     if ((genFuncletInfo.fiFrameType == 3) || (genFuncletInfo.fiFrameType == 5))
     {
@@ -1644,16 +1633,9 @@ void CodeGen::genFuncletEpilog()
         unwindStarted = true;
     }
 
-    regMaskFloat maskRestoreRegsFloat = genFuncletInfo.fiSaveFloatRegs;
-    regMaskGpr   maskRestoreRegsInt   = genFuncletInfo.fiSaveGprRegs;
-
-#ifdef FEATURE_MASKED_HW_INTRINSICS
-    regMaskPredicate maskRestoreRegsPredicate = genFuncletInfo.fiSavePredicateRegs;
-#endif
-
     // Funclets must always save LR and FP, since when we have funclets we must have an FP frame.
-    assert((maskRestoreRegsInt & RBM_LR) != 0);
-    assert((maskRestoreRegsInt & RBM_FP) != 0);
+    assert((genFuncletInfo.fiSaveRegs.gprRegs() & RBM_LR) != 0);
+    assert((genFuncletInfo.fiSaveRegs.gprRegs() & RBM_FP) != 0);
 
     if ((genFuncletInfo.fiFrameType == 3) || (genFuncletInfo.fiFrameType == 5))
     {
@@ -1674,16 +1656,10 @@ void CodeGen::genFuncletEpilog()
 
     if ((genFuncletInfo.fiFrameType == 1) || (genFuncletInfo.fiFrameType == 2) || (genFuncletInfo.fiFrameType == 3))
     {
-        maskRestoreRegsInt &= ~(RBM_LR | RBM_FP); // We restore FP/LR at the end
+        genFuncletInfo.fiSaveRegs.RemoveRegTypeFromMask((RBM_LR | RBM_FP), IntRegisterType);
     }
     int lowestCalleeSavedOffset = genFuncletInfo.fiSP_to_CalleeSave_delta + genFuncletInfo.fiSpDelta2;
-    genRestoreCalleeSavedRegistersHelp(AllRegsMask(maskRestoreRegsInt, maskRestoreRegsFloat
-#ifdef FEATURE_MASKED_HW_INSTRINSICS
-                                                   ,
-                                                   maskRestoreRegsPredicate
-#endif
-                                                   ),
-                                       lowestCalleeSavedOffset, 0);
+    genRestoreCalleeSavedRegistersHelp(genFuncletInfo.fiSaveRegs, lowestCalleeSavedOffset, 0);
 
     if (genFuncletInfo.fiFrameType == 1)
     {
@@ -1944,10 +1920,10 @@ void CodeGen::genCaptureFuncletPrologEpilogInfo()
 
     /* Now save it for future use */
 
-    genFuncletInfo.fiSaveGprRegs   = rsMaskSaveGprRegs;
-    genFuncletInfo.fiSaveFloatRegs = rsMaskSaveFloatRegs;
+    genFuncletInfo.fiSaveRegs = AllRegsMask(rsMaskSaveGprRegs, rsMaskSaveFloatRegs
 #ifdef FEATURE_MASKED_HW_INTRINSICS
-    genFuncletInfo.fiSavePredicateRegs = rsMaskSavePredicateRegs;
+                                            ,
+                                            rsMaskSavePredicateRegs);
 #endif
     genFuncletInfo.fiSP_to_FPLR_save_delta      = SP_to_FPLR_save_delta;
     genFuncletInfo.fiSP_to_PSP_slot_delta       = SP_to_PSP_slot_delta;
@@ -1960,12 +1936,7 @@ void CodeGen::genCaptureFuncletPrologEpilogInfo()
         printf("\n");
         printf("Funclet prolog / epilog info\n");
         printf("                        Save regs: ");
-        dspRegMask(AllRegsMask(genFuncletInfo.fiSaveGprRegs, genFuncletInfo.fiSaveFloatRegs
-#ifdef FEATURE_MASKED_HW_INTRINSICS
-                               ,
-                               genFuncletInfo.fiSavePredicateRegs
-#endif
-                               ));
+        dspRegMask(genFuncletInfo.fiSaveRegs);
         printf("\n");
         if (compiler->opts.IsOSR())
         {

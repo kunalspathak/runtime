@@ -180,11 +180,10 @@ public:
 private:
     AllRegsMask _rsAllMaskVars; // backing store for rsMaskVars property
 
-#if defined(TARGET_ARMARCH)
+#if defined(TARGET_ARMARCH) || defined(TARGET_LOONGARCH64) || defined(TARGET_RISCV64)
+    // mask of the registers pushed/popped in the prolog/epilog
     regMaskGpr   rsGprMaskCalleeSaved;
     regMaskFloat rsFloatMaskCalleeSaved;
-#elif defined(TARGET_LOONGARCH64) || defined(TARGET_RISCV64)
-    regMaskMixed rsMaskCalleeSaved; // mask of the registers pushed/popped in the prolog/epilog
 #endif // TARGET_ARMARCH || TARGET_LOONGARCH64 || TARGET_LOONGARCH64
 
 #ifdef FEATURE_MASKED_HW_INTRINSICS

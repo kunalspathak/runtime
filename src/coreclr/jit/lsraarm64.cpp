@@ -743,6 +743,16 @@ int LinearScan::BuildNode(GenTree* tree)
             break;
         }
 
+#ifdef SWIFT_SUPPORT
+        case GT_SWIFT_ERROR_RET:
+            BuildUse(tree->gtGetOp1(), RBM_SWIFT_ERROR);
+            // Plus one for error register
+            srcCount = BuildReturn(tree) + 1;
+            killMask = getKillSetForReturn();
+            BuildDefsWithKills(tree, 0, RBM_NONE, killMask);
+            break;
+#endif // SWIFT_SUPPORT
+
         case GT_RETFILT:
             assert(dstCount == 0);
             if (tree->TypeGet() == TYP_VOID)
@@ -1456,6 +1466,10 @@ int LinearScan::BuildHWIntrinsic(GenTreeHWIntrinsic* intrinsicTree, int* pDstCou
                     case NI_Sve_CreateTrueMaskUInt16:
                     case NI_Sve_CreateTrueMaskUInt32:
                     case NI_Sve_CreateTrueMaskUInt64:
+                    case NI_Sve_Count16BitElements:
+                    case NI_Sve_Count32BitElements:
+                    case NI_Sve_Count64BitElements:
+                    case NI_Sve_Count8BitElements:
                         needBranchTargetReg = !intrin.op1->isContainedIntOrIImmed();
                         break;
 

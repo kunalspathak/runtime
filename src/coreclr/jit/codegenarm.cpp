@@ -2319,8 +2319,8 @@ void CodeGen::genFuncletProlog(BasicBlock* block)
 
     compiler->unwindBegProlog();
 
-    regMaskFloat maskPushRegsFloat = genFuncletInfo.fiSaveFloatRegs;
-    regMaskGpr   maskPushRegsInt   = genFuncletInfo.fiSaveGprRegs;
+    regMaskFloat maskPushRegsFloat = genFuncletInfo.fiSaveRegs.floatRegs(compiler);
+    regMaskGpr   maskPushRegsInt   = genFuncletInfo.fiSaveRegs.gprRegs();
 
     regMaskGpr maskStackAlloc = genStackAllocRegisterMask(genFuncletInfo.fiSpDelta, maskPushRegsFloat);
     maskPushRegsInt |= maskStackAlloc;
@@ -2413,10 +2413,10 @@ void CodeGen::genFuncletEpilog()
     bool unwindStarted = false;
 
     /* The saved regs info saves the LR register. We need to pop the PC register to return */
-    assert(genFuncletInfo.fiSaveGprRegs & RBM_LR);
+    assert(genFuncletInfo.fiSaveRegs.gprRegs() & RBM_LR);
 
-    regMaskFloat maskPopRegsFloat = genFuncletInfo.fiSaveFloatRegs;
-    regMaskGpr   maskPopRegsInt   = genFuncletInfo.fiSaveGprRegs;
+    regMaskFloat maskPopRegsFloat = genFuncletInfo.fiSaveRegs.floatRegs(compiler);
+    regMaskGpr   maskPopRegsInt   = genFuncletInfo.fiSaveRegs.gprRegs();
 
     regMaskGpr maskStackAlloc = genStackAllocRegisterMask(genFuncletInfo.fiSpDelta, maskPopRegsFloat);
     maskPopRegsInt |= maskStackAlloc;
@@ -2497,8 +2497,7 @@ void CodeGen::genCaptureFuncletPrologEpilogInfo()
 
         /* Now save it for future use */
 
-        genFuncletInfo.fiSaveGprRegs              = rsGprMaskSaveRegs;
-        genFuncletInfo.fiSaveFloatRegs            = rsFloatMaskSaveRegs;
+        genFuncletInfo.fiSaveRegs                 = AllRegsMask(rsGprMaskSaveRegs, rsFloatMaskSaveRegs);
         genFuncletInfo.fiSpDelta                  = spDelta;
         genFuncletInfo.fiPSP_slot_SP_offset       = PSP_slot_SP_offset;
         genFuncletInfo.fiPSP_slot_CallerSP_offset = PSP_slot_CallerSP_offset;

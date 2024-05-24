@@ -229,14 +229,25 @@ typedef uint64_t regMaskSmall;
 #define REG_MASK_ALL_FMT "%016llX"
 #endif
 
-typedef regMaskSmall SingleTypeRegSet;
+typedef regMaskSmall    SingleTypeRegSet;
+inline SingleTypeRegSet genRegMask(regNumber reg);
+inline SingleTypeRegSet genRegMaskFloat(regNumber reg ARM_ARG(var_types type = TYP_DOUBLE));
 
 struct regMaskTP
 {
 private:
     regMaskSmall low;
+    regMaskSmall high;
+
 public:
-    constexpr regMaskTP(regMaskSmall regMask)
+
+    regMaskTP(regMaskSmall lowMask, regMaskSmall highMask)
+        : low(lowMask)
+        , high(highMask)
+    {
+    }
+
+    regMaskTP(regMaskSmall regMask)
         : low(regMask)
     {
     }
@@ -278,12 +289,12 @@ public:
         return low;
     }
 
-    bool IsEmpty()
+    bool IsEmpty() const
     {
         return low == RBM_NONE;
     }
 
-    bool IsNonEmpty()
+    bool IsNonEmpty() const
     {
         return !IsEmpty();
     }
@@ -296,50 +307,52 @@ public:
     void RemoveRegNumFromMask(regNumber reg);
 
     bool IsRegNumInMask(regNumber reg);
+
+    void operator|=(const regMaskTP& second)
+    {
+        low |= second.getLow();
+    }
+
+    void operator^=(const regMaskTP& second)
+    {
+        low ^= second.getLow();
+    }
+
+    void operator^=(const regNumber reg)
+    {
+        low ^= genRegMask(reg);
+    }
+
+    void operator&=(const regMaskTP& second)
+    {
+        low &= second.getLow();
+    }
 };
 
-static regMaskTP operator^(regMaskTP first, regMaskTP second)
+static regMaskTP operator^(const regMaskTP& first, const regMaskTP& second)
 {
     regMaskTP result(first.getLow() ^ second.getLow());
     return result;
 }
 
-static regMaskTP operator&(regMaskTP first, regMaskTP second)
+static regMaskTP operator&(const regMaskTP& first, const regMaskTP& second)
 {
     regMaskTP result(first.getLow() & second.getLow());
     return result;
 }
 
-static regMaskTP operator|(regMaskTP first, regMaskTP second)
+static regMaskTP operator|(const regMaskTP& first, const regMaskTP& second)
 {
     regMaskTP result(first.getLow() | second.getLow());
     return result;
 }
 
-static regMaskTP& operator|=(regMaskTP& first, regMaskTP second)
-{
-    first = first | second;
-    return first;
-}
-
-static regMaskTP& operator^=(regMaskTP& first, regMaskTP second)
-{
-    first = first ^ second;
-    return first;
-}
-
-static regMaskTP& operator&=(regMaskTP& first, regMaskTP second)
-{
-    first = first & second;
-    return first;
-}
-
-static bool operator==(regMaskTP first, regMaskTP second)
+static bool operator==(const regMaskTP& first, const regMaskTP& second)
 {
     return (first.getLow() == second.getLow());
 }
 
-static bool operator!=(regMaskTP first, regMaskTP second)
+static bool operator!=(const regMaskTP& first, const regMaskTP& second)
 {
     return !(first == second);
 }
@@ -375,18 +388,18 @@ static regMaskTP& operator<<=(regMaskTP& first, const int b)
 }
 #endif
 
-static regMaskTP operator~(regMaskTP first)
+static regMaskTP operator~(const regMaskTP& first)
 {
     regMaskTP result(~first.getLow());
     return result;
 }
 
-static uint32_t PopCount(regMaskTP value)
+static uint32_t PopCount(const regMaskTP& value)
 {
     return BitOperations::PopCount(value.getLow());
 }
 
-static uint32_t BitScanForward(regMaskTP mask)
+static uint32_t BitScanForward(const regMaskTP& mask)
 {
     return BitOperations::BitScanForward(mask.getLow());
 }
@@ -507,9 +520,6 @@ inline bool isByteReg(regNumber reg)
     return true;
 }
 #endif
-
-inline SingleTypeRegSet genRegMask(regNumber reg);
-inline SingleTypeRegSet genRegMaskFloat(regNumber reg ARM_ARG(var_types type = TYP_DOUBLE));
 
 /*****************************************************************************
  * Return true if the register number is valid

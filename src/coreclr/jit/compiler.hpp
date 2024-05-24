@@ -933,7 +933,7 @@ inline unsigned Compiler::funGetFuncIdx(BasicBlock* block)
 // Assumptions:
 //    The mask contains one and only one register.
 
-inline regNumber genRegNumFromMask(regMaskTP mask)
+inline regNumber genRegNumFromMask(const regMaskTP& mask)
 {
     assert(mask.IsNonEmpty()); // Must have one bit set, so can't have a mask of zero
 
@@ -943,6 +943,27 @@ inline regNumber genRegNumFromMask(regMaskTP mask)
 
     /* Make sure we got it right */
     assert(genRegMask(regNum) == mask.getLow());
+
+    return regNum;
+}
+
+//------------------------------------------------------------------------------
+// genFirstRegNumFromMask : Maps first bit set in the register mask to a register number.
+//
+// Arguments:
+//    mask               - the register mask
+//
+// Return Value:
+//    The number of the first register contained in the mask.
+//
+
+inline regNumber genFirstRegNumFromMask(const regMaskTP& mask)
+{
+    assert(mask.IsNonEmpty()); // Must have one bit set, so can't have a mask of zero
+
+    /* Convert the mask to a register number */
+
+    regNumber regNum = (regNumber)BitScanForward(mask);
 
     return regNum;
 }
@@ -964,30 +985,33 @@ inline regNumber genFirstRegNumFromMaskAndToggle(regMaskTP& mask)
 
     /* Convert the mask to a register number */
 
-    regNumber regNum = (regNumber)BitScanForward(mask);
+    regNumber regNum = (regNumber)genFirstRegNumFromMask(mask);
 
-    mask ^= genRegMask(regNum);
+    mask ^= regNum;
 
     return regNum;
 }
 
 //------------------------------------------------------------------------------
-// genFirstRegNumFromMask : Maps first bit set in the register mask to a register number.
-//
+// genFirstRegNumFromMaskAndToggle : Maps first bit set in the register mask to a
+//          register number and also toggle the bit in the `mask`.
 // Arguments:
 //    mask               - the register mask
 //
 // Return Value:
-//    The number of the first register contained in the mask.
+//    The number of the first register contained in the mask and updates the `mask` to toggle
+//    the bit.
 //
 
-inline regNumber genFirstRegNumFromMask(regMaskTP mask)
+inline regNumber genFirstRegNumFromMaskAndToggle(SingleTypeRegSet& mask)
 {
-    assert(mask.IsNonEmpty()); // Must have one bit set, so can't have a mask of zero
+    assert(mask != RBM_NONE); // Must have one bit set, so can't have a mask of zero
 
     /* Convert the mask to a register number */
 
-    regNumber regNum = (regNumber)BitScanForward(mask);
+    regNumber regNum = (regNumber)BitOperations::BitScanForward(mask);
+
+    mask ^= genRegMask(regNum);
 
     return regNum;
 }

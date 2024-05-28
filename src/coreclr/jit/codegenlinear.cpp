@@ -202,9 +202,9 @@ void CodeGen::genCodeForBBlist()
         // change? We cleared them out above. Maybe we should just not clear them out, but update the ones that change
         // here. That would require handling the changes in recordVarLocationsAtStartOfBB().
 
-        regMaskTP newLiveRegSet  = RBM_NONE;
-        regMaskTP newRegGCrefSet = RBM_NONE;
-        regMaskTP newRegByrefSet = RBM_NONE;
+        SingleTypeRegSet newLiveRegSet  = RBM_NONE;
+        SingleTypeRegSet newRegGCrefSet = RBM_NONE;
+        SingleTypeRegSet newRegByrefSet = RBM_NONE;
 #ifdef DEBUG
         VARSET_TP removedGCVars(VarSetOps::MakeEmpty(compiler));
         VARSET_TP addedGCVars(VarSetOps::MakeEmpty(compiler));
@@ -1545,7 +1545,7 @@ regNumber CodeGen::genConsumeReg(GenTree* tree)
     }
     else
     {
-        gcInfo.gcMarkRegSetNpt(tree->gtGetRegMask());
+        gcInfo.gcMarkRegSetNpt(tree->gtGetRegMask().GetRegSetForType(TYP_INT));
     }
 
     genCheckConsumeNode(tree);
@@ -1826,7 +1826,7 @@ void CodeGen::genConsumeArgSplitStruct(GenTreePutArgSplit* putArgNode)
 
     genUnspillRegIfNeeded(putArgNode);
 
-    gcInfo.gcMarkRegSetNpt(putArgNode->gtGetRegMask());
+    gcInfo.gcMarkRegSetNpt(putArgNode->gtGetRegMask().GetRegSetForType(TYP_INT));
 
     genCheckConsumeNode(putArgNode);
 }
@@ -2225,8 +2225,8 @@ void CodeGen::genProduceReg(GenTree* tree)
 // transfer gc/byref status of src reg to dst reg
 void CodeGen::genTransferRegGCState(regNumber dst, regNumber src)
 {
-    regMaskTP srcMask = genRegMask(src);
-    regMaskTP dstMask = genRegMask(dst);
+    SingleTypeRegSet srcMask = genRegMask(src);
+    SingleTypeRegSet dstMask = genRegMask(dst);
 
     if (gcInfo.gcRegGCrefSetCur & srcMask)
     {

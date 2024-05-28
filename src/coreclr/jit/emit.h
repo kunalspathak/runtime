@@ -250,11 +250,11 @@ struct insPlaceholderGroupData
     insGroup*               igPhNext;
     BasicBlock*             igPhBB;
     VARSET_TP               igPhInitGCrefVars;
-    regMaskTP               igPhInitGCrefRegs;
-    regMaskTP               igPhInitByrefRegs;
+    SingleTypeRegSet               igPhInitGCrefRegs;
+    SingleTypeRegSet        igPhInitByrefRegs;
     VARSET_TP               igPhPrevGCrefVars;
-    regMaskTP               igPhPrevGCrefRegs;
-    regMaskTP               igPhPrevByrefRegs;
+    SingleTypeRegSet               igPhPrevGCrefRegs;
+    SingleTypeRegSet               igPhPrevByrefRegs;
     insGroupPlaceholderType igPhType;
 }; // end of struct insPlaceholderGroupData
 
@@ -324,7 +324,7 @@ struct insGroup
     // Try to do better packing based on how large regMaskSmall is (8, 16, or 64 bits).
 
 #if !(REGMASK_BITS <= 32)
-    regMaskSmall igGCregs; // set of registers with live GC refs
+    SingleTypeRegSet igGCregs; // set of registers with live GC refs
 #endif                     // !(REGMASK_BITS <= 32)
 
     union
@@ -2166,8 +2166,8 @@ protected:
 
         VARSET_TP idcGCvars;    // ... updated GC vars or
         ssize_t   idcDisp;      // ... big addrmode disp
-        regMaskTP idcGcrefRegs; // ... gcref registers
-        regMaskTP idcByrefRegs; // ... byref registers
+        SingleTypeRegSet idcGcrefRegs; // ... gcref registers
+        SingleTypeRegSet idcByrefRegs; // ... byref registers
         unsigned  idcArgCnt;    // ... lots of args or (<0 ==> caller pops args)
 
 #if MULTIREG_HAS_SECOND_GC_RET
@@ -2281,8 +2281,8 @@ protected:
     VARSET_TP  debugPrevGCrefVars;
     VARSET_TP  debugThisGCrefVars;
     regPtrDsc* debugPrevRegPtrDsc;
-    regMaskTP  debugPrevGCrefRegs;
-    regMaskTP  debugPrevByrefRegs;
+    SingleTypeRegSet debugPrevGCrefRegs;
+    SingleTypeRegSet debugPrevByrefRegs;
     void       emitDispInsIndent();
     void       emitDispGCDeltaTitle(const char* title);
     void       emitDispGCRegDelta(const char* title, regMaskTP prevRegs, regMaskTP curRegs);
@@ -2500,18 +2500,18 @@ public:
 
 private:
 #if defined(TARGET_AMD64)
-    regMaskTP rbmFltCalleeTrash;
+    SingleTypeRegSet rbmFltCalleeTrash;
 
-    FORCEINLINE regMaskTP get_RBM_FLT_CALLEE_TRASH() const
+    FORCEINLINE SingleTypeRegSet get_RBM_FLT_CALLEE_TRASH() const
     {
         return this->rbmFltCalleeTrash;
     }
 #endif // TARGET_AMD64
 
 #if defined(TARGET_XARCH)
-    regMaskTP rbmMskCalleeTrash;
+    SingleTypeRegSet rbmMskCalleeTrash;
 
-    FORCEINLINE regMaskTP get_RBM_MSK_CALLEE_TRASH() const
+    FORCEINLINE SingleTypeRegSet get_RBM_MSK_CALLEE_TRASH() const
     {
         return this->rbmMskCalleeTrash;
     }
@@ -2675,12 +2675,12 @@ private:
     // out, and GCrefRegs is always saved.
 
     VARSET_TP emitPrevGCrefVars;
-    regMaskTP emitPrevGCrefRegs;
-    regMaskTP emitPrevByrefRegs;
+    SingleTypeRegSet emitPrevGCrefRegs;
+    SingleTypeRegSet emitPrevByrefRegs;
 
     VARSET_TP emitInitGCrefVars;
-    regMaskTP emitInitGCrefRegs;
-    regMaskTP emitInitByrefRegs;
+    SingleTypeRegSet emitInitGCrefRegs;
+    SingleTypeRegSet emitInitByrefRegs;
 
     // If this is set, we ignore comparing emitPrev* and emitInit* to determine
     // whether to save GC state (to save space in the IG), and always save it.
@@ -2698,8 +2698,8 @@ private:
     // used due to bugs.
 
     VARSET_TP emitThisGCrefVars;
-    regMaskTP emitThisGCrefRegs; // Current set of registers holding GC references
-    regMaskTP emitThisByrefRegs; // Current set of registers holding BYREF references
+    SingleTypeRegSet emitThisGCrefRegs; // Current set of registers holding GC references
+    SingleTypeRegSet emitThisByrefRegs;  // Current set of registers holding BYREF references
 
     bool emitThisGCrefVset; // Is "emitThisGCrefVars" up to date?
 
@@ -2883,8 +2883,8 @@ private:
     // and registers.
     // prevBlock is passed when starting a new block.
     void* emitAddLabel(VARSET_VALARG_TP GCvars,
-                       regMaskTP        gcrefRegs,
-                       regMaskTP        byrefRegs,
+                       SingleTypeRegSet gcrefRegs,
+                       SingleTypeRegSet byrefRegs,
                        BasicBlock*      prevBlock = nullptr);
 
     // Same as above, except the label is added and is conceptually "inline" in
@@ -3227,7 +3227,7 @@ public:
     /* Liveness of stack variables, and registers */
 
     void emitUpdateLiveGCvars(VARSET_VALARG_TP vars, BYTE* addr);
-    void emitUpdateLiveGCregs(GCtype gcType, regMaskTP regs, BYTE* addr);
+    void emitUpdateLiveGCregs(GCtype gcType, SingleTypeRegSet regs, BYTE* addr);
 
 #ifdef DEBUG
     const char* emitGetFrameReg();
@@ -3236,10 +3236,10 @@ public:
 #endif
 
     void emitGCregLiveUpd(GCtype gcType, regNumber reg, BYTE* addr);
-    void emitGCregLiveSet(GCtype gcType, regMaskTP mask, BYTE* addr, bool isThis);
-    void emitGCregDeadUpdMask(regMaskTP, BYTE* addr);
+    void emitGCregLiveSet(GCtype gcType, SingleTypeRegSet mask, BYTE* addr, bool isThis);
+    void emitGCregDeadUpdMask(SingleTypeRegSet, BYTE* addr);
     void emitGCregDeadUpd(regNumber reg, BYTE* addr);
-    void emitGCregDeadSet(GCtype gcType, regMaskTP mask, BYTE* addr);
+    void emitGCregDeadSet(GCtype gcType, SingleTypeRegSet mask, BYTE* addr);
 
     void emitGCvarLiveUpd(int offs, int varNum, GCtype gcType, BYTE* addr DEBUG_ARG(unsigned actualVarNum));
     void emitGCvarLiveSet(int offs, GCtype gcType, BYTE* addr, ssize_t disp = -1);

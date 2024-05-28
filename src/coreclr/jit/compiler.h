@@ -1014,9 +1014,9 @@ public:
         return lvIsRegCandidate() && (GetRegNum() != REG_STK);
     }
 
-    regMaskTP lvRegMask() const
+    SingleTypeRegSet lvRegMask() const
     {
-        regMaskTP regMask = RBM_NONE;
+        SingleTypeRegSet regMask = RBM_NONE;
         if (GetRegNum() != REG_STK)
         {
             if (varTypeUsesFloatReg(this))

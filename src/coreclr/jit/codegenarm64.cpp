@@ -3979,7 +3979,7 @@ void CodeGen::genLockedInstructions(GenTreeOp* treeNode)
 
         instGen_MemoryBarrier();
 
-        gcInfo.gcMarkRegSetNpt(addr->gtGetRegMask());
+        gcInfo.gcMarkRegSetNpt(addr->gtGetRegMask().GetRegSetForType(TYP_INT));
     }
 
     if (targetReg != REG_NA)
@@ -4129,7 +4129,7 @@ void CodeGen::genCodeForCmpXchg(GenTreeCmpXchg* treeNode)
 
         instGen_MemoryBarrier();
 
-        gcInfo.gcMarkRegSetNpt(addr->gtGetRegMask());
+        gcInfo.gcMarkRegSetNpt(addr->gtGetRegMask().GetRegSetForType(TYP_INT));
     }
 
     if (varTypeIsSmall(treeNode->TypeGet()) && varTypeIsSigned(treeNode->TypeGet()))
@@ -4374,9 +4374,9 @@ void CodeGen::genCodeForSwap(GenTreeOp* tree)
     assert(!varTypeIsFloating(type1));
 
     regNumber oldOp1Reg     = lcl1->GetRegNum();
-    regMaskTP oldOp1RegMask = genRegMask(oldOp1Reg);
+    SingleTypeRegSet oldOp1RegMask = genRegMask(oldOp1Reg);
     regNumber oldOp2Reg     = lcl2->GetRegNum();
-    regMaskTP oldOp2RegMask = genRegMask(oldOp2Reg);
+    SingleTypeRegSet oldOp2RegMask = genRegMask(oldOp2Reg);
 
     // We don't call genUpdateVarReg because we don't have a tree node with the new register.
     varDsc1->SetRegNum(oldOp2Reg);

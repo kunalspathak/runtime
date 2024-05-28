@@ -8990,8 +8990,8 @@ void emitter::emitIns_Call(EmitCallType          callType,
                            emitAttr         retSize,
                            emitAttr         secondRetSize,
                            VARSET_VALARG_TP ptrVars,
-                           regMaskTP        gcrefRegs,
-                           regMaskTP        byrefRegs,
+                           SingleTypeRegSet        gcrefRegs,
+                           SingleTypeRegSet byrefRegs,
                            const DebugInfo& di /* = DebugInfo() */,
                            regNumber        ireg /* = REG_NA */,
                            regNumber        xreg /* = REG_NA */,
@@ -9014,7 +9014,7 @@ void emitter::emitIns_Call(EmitCallType          callType,
     assert((unsigned)std::abs(argSize) <= codeGen->genStackLevel);
 
     // Trim out any callee-trashed registers from the live set.
-    regMaskTP savedSet = emitGetGCRegsSavedOrModified(methHnd);
+    SingleTypeRegSet savedSet = emitGetGCRegsSavedOrModified(methHnd).GetRegSetForType(TYP_INT);
     gcrefRegs &= savedSet;
     byrefRegs &= savedSet;
 
@@ -10719,8 +10719,8 @@ BYTE* emitter::emitOutputVectorConstant(
 unsigned emitter::emitOutputCall(insGroup* ig, BYTE* dst, instrDesc* id, code_t code)
 {
     const unsigned char callInstrSize = sizeof(code_t); // 4 bytes
-    regMaskTP           gcrefRegs;
-    regMaskTP           byrefRegs;
+    SingleTypeRegSet    gcrefRegs;
+    SingleTypeRegSet    byrefRegs;
 
     VARSET_TP GCvars(VarSetOps::UninitVal());
 

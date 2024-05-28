@@ -4465,11 +4465,13 @@ void GenTree::VisitBinOpOperands(TVisitor visitor)
 
 inline void* operator new(size_t sz, Compiler* compiler, CompMemKind cmk)
 {
+    //printf("new: type= %d, sz= %d\n", cmk, sz);
     return compiler->getAllocator(cmk).allocate<char>(sz);
 }
 
 inline void* operator new[](size_t sz, Compiler* compiler, CompMemKind cmk)
 {
+    //printf("new[]: type= %d, sz= %d\n", cmk, sz);
     return compiler->getAllocator(cmk).allocate<char>(sz);
 }
 

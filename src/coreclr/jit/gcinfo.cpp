@@ -84,7 +84,7 @@ void GCInfo::gcResetForBB()
  *  Print the changes in the gcRegGCrefSetCur sets.
  */
 
-void GCInfo::gcDspGCrefSetChanges(regMaskTP gcRegGCrefSetNew DEBUGARG(bool forceOutput))
+void GCInfo::gcDspGCrefSetChanges(SingleTypeRegSet gcRegGCrefSetNew DEBUGARG(bool forceOutput))
 {
     if (compiler->verbose)
     {
@@ -113,7 +113,7 @@ void GCInfo::gcDspGCrefSetChanges(regMaskTP gcRegGCrefSetNew DEBUGARG(bool force
  *  Print the changes in the gcRegByrefSetCur sets.
  */
 
-void GCInfo::gcDspByrefSetChanges(regMaskTP gcRegByrefSetNew DEBUGARG(bool forceOutput))
+void GCInfo::gcDspByrefSetChanges(SingleTypeRegSet gcRegByrefSetNew DEBUGARG(bool forceOutput))
 {
     if (compiler->verbose)
     {
@@ -145,14 +145,15 @@ void GCInfo::gcDspByrefSetChanges(regMaskTP gcRegByrefSetNew DEBUGARG(bool force
  *  GCref pointer values.
  */
 
-void GCInfo::gcMarkRegSetGCref(regMaskTP regMask DEBUGARG(bool forceOutput))
+void GCInfo::gcMarkRegSetGCref(SingleTypeRegSet regMask DEBUGARG(bool forceOutput))
 {
+//TODO: Add assert that regMask is gpr
     // This set of registers are going to hold REFs.
     // Make sure they were not holding BYREFs.
     assert((gcRegByrefSetCur & regMask) == 0);
 
-    regMaskTP gcRegByrefSetNew = gcRegByrefSetCur & ~regMask; // Clear it if set in Byref mask
-    regMaskTP gcRegGCrefSetNew = gcRegGCrefSetCur | regMask;  // Set it in GCref mask
+    SingleTypeRegSet gcRegByrefSetNew = gcRegByrefSetCur & ~regMask; // Clear it if set in Byref mask
+    SingleTypeRegSet gcRegGCrefSetNew = gcRegGCrefSetCur | regMask;  // Set it in GCref mask
 
     INDEBUG(gcDspGCrefSetChanges(gcRegGCrefSetNew, forceOutput));
     INDEBUG(gcDspByrefSetChanges(gcRegByrefSetNew));
@@ -167,10 +168,11 @@ void GCInfo::gcMarkRegSetGCref(regMaskTP regMask DEBUGARG(bool forceOutput))
  *  Byref pointer values.
  */
 
-void GCInfo::gcMarkRegSetByref(regMaskTP regMask DEBUGARG(bool forceOutput))
+void GCInfo::gcMarkRegSetByref(SingleTypeRegSet regMask DEBUGARG(bool forceOutput))
 {
-    regMaskTP gcRegByrefSetNew = gcRegByrefSetCur | regMask;  // Set it in Byref mask
-    regMaskTP gcRegGCrefSetNew = gcRegGCrefSetCur & ~regMask; // Clear it if set in GCref mask
+    // TODO: Add assert that regMask is gpr
+    SingleTypeRegSet gcRegByrefSetNew = gcRegByrefSetCur | regMask;  // Set it in Byref mask
+    SingleTypeRegSet gcRegGCrefSetNew = gcRegGCrefSetCur & ~regMask; // Clear it if set in GCref mask
 
     INDEBUG(gcDspGCrefSetChanges(gcRegGCrefSetNew));
     INDEBUG(gcDspByrefSetChanges(gcRegByrefSetNew, forceOutput));
@@ -185,12 +187,14 @@ void GCInfo::gcMarkRegSetByref(regMaskTP regMask DEBUGARG(bool forceOutput))
  *  non-pointer values.
  */
 
-void GCInfo::gcMarkRegSetNpt(regMaskTP regMask DEBUGARG(bool forceOutput))
+void GCInfo::gcMarkRegSetNpt(SingleTypeRegSet regMask DEBUGARG(bool forceOutput))
 {
+    // TODO: Add assert that regMask is gpr
     /* NOTE: don't unmark any live register variables */
 
-    regMaskTP gcRegByrefSetNew = gcRegByrefSetCur & ~(regMask & ~regSet->GetMaskVars());
-    regMaskTP gcRegGCrefSetNew = gcRegGCrefSetCur & ~(regMask & ~regSet->GetMaskVars());
+    SingleTypeRegSet gcRegByrefSetNew =
+        gcRegByrefSetCur & ~(regMask & ~regSet->GetMaskVars().GetRegSetForType(TYP_INT));
+    SingleTypeRegSet gcRegGCrefSetNew = gcRegGCrefSetCur & ~(regMask & ~regSet->GetMaskVars().GetRegSetForType(TYP_INT));
 
     INDEBUG(gcDspGCrefSetChanges(gcRegGCrefSetNew, forceOutput));
     INDEBUG(gcDspByrefSetChanges(gcRegByrefSetNew, forceOutput));
@@ -206,7 +210,7 @@ void GCInfo::gcMarkRegSetNpt(regMaskTP regMask DEBUGARG(bool forceOutput))
 
 void GCInfo::gcMarkRegPtrVal(regNumber reg, var_types type)
 {
-    regMaskTP regMask = genRegMask(reg);
+    SingleTypeRegSet regMask = genRegMask(reg);
 
     switch (type)
     {
@@ -700,7 +704,8 @@ void GCInfo::gcRegPtrSetInit()
 
 #endif // JIT32_GCENCODER
 
-//------------------------------------------------------------------------
+#if 0
+    //------------------------------------------------------------------------
 // gcUpdateForRegVarMove: Update the masks when a variable is moved
 //
 // Arguments:
@@ -767,5 +772,6 @@ void GCInfo::gcUpdateForRegVarMove(regMaskTP srcMask, regMaskTP dstMask, LclVarD
     }
 }
 
+#endif
 /*****************************************************************************/
 /*****************************************************************************/

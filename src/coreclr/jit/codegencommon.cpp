@@ -805,7 +805,7 @@ void Compiler::compChangeLife(VARSET_VALARG_TP newLife)
         {
             // TODO-Cleanup: Move the code from compUpdateLifeVar to genUpdateRegLife that updates the
             // gc sets
-            regMaskTP regMask = varDsc->lvRegMask();
+            SingleTypeRegSet regMask = varDsc->lvRegMask();
             if (isGCRef)
             {
                 codeGen->gcInfo.gcRegGCrefSetCur &= ~regMask;
@@ -850,7 +850,7 @@ void Compiler::compChangeLife(VARSET_VALARG_TP newLife)
                 VarSetOps::RemoveElemD(this, codeGen->gcInfo.gcVarPtrSetCur, bornVarIndex);
             }
             codeGen->genUpdateRegLife(varDsc, true /*isBorn*/, false /*isDying*/ DEBUGARG(nullptr));
-            regMaskTP regMask = varDsc->lvRegMask();
+            SingleTypeRegSet regMask = varDsc->lvRegMask();
             if (isGCRef)
             {
                 codeGen->gcInfo.gcRegGCrefSetCur |= regMask;
@@ -4655,8 +4655,8 @@ void CodeGen::genReserveProlog(BasicBlock* block)
 
 void CodeGen::genReserveEpilog(BasicBlock* block)
 {
-    regMaskTP gcrefRegsArg = gcInfo.gcRegGCrefSetCur;
-    regMaskTP byrefRegsArg = gcInfo.gcRegByrefSetCur;
+    SingleTypeRegSet gcrefRegsArg = gcInfo.gcRegGCrefSetCur;
+    SingleTypeRegSet byrefRegsArg = gcInfo.gcRegByrefSetCur;
 
     /* The return value is special-cased: make sure it goes live for the epilog */
 
@@ -6282,7 +6282,7 @@ regMaskTP CodeGen::genPushRegs(regMaskTP regs, regMaskTP* byrefRegs, regMaskTP* 
         inst_RV(INS_push, reg, type);
 
         genSinglePush();
-        gcInfo.gcMarkRegSetNpt(regMask);
+        gcInfo.gcMarkRegSetNpt(regMask.GetRegSetForType(TYP_INT));
     }
 
     return pushedRegs;
@@ -7437,7 +7437,7 @@ void CodeGen::genJmpPlaceArgs(GenTree* jmp)
         // Update lvRegNum life and GC info to indicate lvRegNum is dead and varDsc stack slot is going live.
         // Note that we cannot modify varDsc->GetRegNum() here because another basic block may not be expecting it.
         // Therefore manually update life of varDsc->GetRegNum().
-        regMaskTP tempMask = varDsc->lvRegMask();
+        SingleTypeRegSet tempMask = varDsc->lvRegMask();
         regSet.RemoveMaskVars(tempMask);
         gcInfo.gcMarkRegSetNpt(tempMask);
         if (compiler->lvaIsGCTracked(varDsc))

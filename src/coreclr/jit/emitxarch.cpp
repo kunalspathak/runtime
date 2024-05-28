@@ -9659,8 +9659,8 @@ void emitter::emitIns_Call(EmitCallType          callType,
                            emitAttr              retSize
                            MULTIREG_HAS_SECOND_GC_RET_ONLY_ARG(emitAttr secondRetSize),
                            VARSET_VALARG_TP      ptrVars,
-                           regMaskTP             gcrefRegs,
-                           regMaskTP             byrefRegs,
+                           SingleTypeRegSet             gcrefRegs,
+                           SingleTypeRegSet             byrefRegs,
                            const DebugInfo&      di,
                            regNumber             ireg,
                            regNumber             xreg,
@@ -9686,7 +9686,7 @@ void emitter::emitIns_Call(EmitCallType          callType,
     assert((unsigned)abs((signed)argSize) <= codeGen->genStackLevel);
 
     // Trim out any callee-trashed registers from the live set.
-    regMaskTP savedSet = emitGetGCRegsSavedOrModified(methHnd);
+    SingleTypeRegSet savedSet = emitGetGCRegsSavedOrModified(methHnd).GetRegSetForType(TYP_INT);
     gcrefRegs &= savedSet;
     byrefRegs &= savedSet;
 
@@ -16610,8 +16610,8 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
     assert(instrIs3opImul(id->idIns()) == 0 || size >= EA_4BYTE); // Has no 'w' bit
 
     VARSET_TP GCvars(VarSetOps::UninitVal());
-    regMaskTP gcrefRegs;
-    regMaskTP byrefRegs;
+    SingleTypeRegSet gcrefRegs;
+    SingleTypeRegSet byrefRegs;
 
     // What instruction format have we got?
     switch (insFmt)

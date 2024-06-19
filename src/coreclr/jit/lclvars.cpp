@@ -162,7 +162,10 @@ void Compiler::lvaInitTypeRef()
         info.compRetNativeType = hasRetBuffArg ? TYP_STRUCT : TYP_VOID;
     }
 #ifdef TARGET_ARM64
-    codeGen->GetEmitter()->SetHasSveParameterOrReturn(varTypeIsSIMD(genActualType(info.compRetType)));
+    if (!compIsForInlining())
+    {
+        codeGen->GetEmitter()->SetHasSveParameterOrReturn(varTypeIsSIMD(genActualType(info.compRetType)));
+    }
 #endif
 
     // Do we have a RetBuffArg?
@@ -1350,8 +1353,13 @@ void Compiler::lvaInitUserArgs(InitVarDscInfo* varDscInfo, unsigned skipArgs, un
     }
 
 #ifdef TARGET_ARM64
-    // Check if any argument is SVE
-    codeGen->GetEmitter()->SetHasSveParameterOrReturn(hasSveParameters && codeGen->GetEmitter()->HasSveParameterOrReturn());
+    if (!compIsForInlining())
+    {
+        // Check if any argument is SVE
+        hasSveParameters |=
+            codeGen->GetEmitter()->HasSveParameterOrReturn();
+        codeGen->GetEmitter()->SetHasSveParameterOrReturn(hasSveParameters);
+    }
 #endif
 
     compArgSize = GetOutgoingArgByteSize(compArgSize);

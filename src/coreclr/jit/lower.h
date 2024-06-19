@@ -26,6 +26,7 @@ public:
         : Phase(compiler, PHASE_LOWERING)
         , vtableCallTemp(BAD_VAR_NUM)
 #ifdef TARGET_ARM64
+        , m_containsCallWithSveArgumentsOrReturn(false)
         , m_blockIndirs(compiler->getAllocator(CMK_ArrayStack))
 #endif
     {
@@ -608,6 +609,9 @@ private:
     unsigned              vtableCallTemp;       // local variable we use as a temp for vtable calls
     mutable SideEffectSet m_scratchSideEffects; // SideEffectSet used for IsSafeToContainMem and isRMWIndirCandidate
     BasicBlock*           m_block;
+#ifdef TARGET_ARM64
+    bool m_containsCallWithSveArgumentsOrReturn;
+#endif
 
 #ifdef FEATURE_FIXED_OUT_ARGS
     unsigned m_outgoingArgSpaceSize = 0;

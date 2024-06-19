@@ -1745,6 +1745,10 @@ void Lowering::LowerArg(GenTreeCall* call, CallArg* callArg, bool late)
 
     var_types type = genActualType(arg);
 
+#ifdef TARGET_ARM64
+    m_containsCallWithSveArgumentsOrReturn |= varTypeIsSIMD(type);
+#endif
+
 #if defined(FEATURE_SIMD)
 #if defined(TARGET_X86)
     // Non-param TYP_SIMD12 local var nodes are massaged in Lower to TYP_SIMD16 to match their
@@ -2638,6 +2642,9 @@ GenTree* Lowering::LowerCall(GenTree* node)
     {
         assert(call->gtInitClsHnd == nullptr);
     }
+#ifdef TARGET_ARM64
+    m_containsCallWithSveArgumentsOrReturn |= varTypeIsSIMD(genActualType(call));
+#endif
 
 #if defined(TARGET_AMD64) || defined(TARGET_ARM64)
     GenTree* nextNode = nullptr;
@@ -7688,6 +7695,10 @@ PhaseStatus Lowering::DoPhase()
     {
         comp->fgDispBasicBlocks(true);
     }
+#endif
+
+#ifdef TARGET_ARM64
+    comp->codeGen->GetEmitter()->SetContainsCallWithSveArgumentsOrReturn(m_containsCallWithSveArgumentsOrReturn);
 #endif
 
     FinalizeOutgoingArgSpace();

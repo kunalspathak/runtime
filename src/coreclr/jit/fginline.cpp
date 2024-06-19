@@ -1358,12 +1358,6 @@ void Compiler::fgInvokeInlineeCompiler(GenTreeCall* call, InlineResult* inlineRe
         {
             inlineResult->NoteFatal(InlineObservation::CALLSITE_COMPILATION_ERROR);
         }
-#ifdef TARGET_ARM64
-        // If the inline failed, this is a call. Record if this needs sve parameters/return
-        bool containsCallWithSveArgsOrReturn = codeGen->GetEmitter()->ContainsCallWithSveArgumentsOrReturn();
-        codeGen->GetEmitter()->SetContainsCallWithSveArgumentsOrReturn(containsCallWithSveArgsOrReturn && param.hasSveParameterOrRet);
-#endif
-
     }
 
     *createdContext = inlineInfo.inlineContext;

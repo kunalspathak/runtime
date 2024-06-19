@@ -2149,6 +2149,11 @@ private:
         assert((unsigned)rt < ArrLen(varTypeCalleeTrashRegs));
         return varTypeCalleeTrashRegs[rt].GetRegSetForType(rt);
     }
+
+#ifdef TARGET_ARM64
+    bool hasSveIsa;
+#endif
+
 };
 
 /*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

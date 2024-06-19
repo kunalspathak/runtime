@@ -924,6 +924,10 @@ LinearScan::LinearScan(Compiler* theCompiler)
 
     pendingDelayFree = false;
     tgtPrefUse       = nullptr;
+
+#ifdef TARGET_ARM64
+    hasSveIsa = compiler->compHWIntrinsicDependsOn(InstructionSet_Sve);
+#endif
 }
 
 //------------------------------------------------------------------------

@@ -821,6 +821,21 @@ regMaskTP LinearScan::getKillSetForModDiv(GenTreeOp* node)
 regMaskTP LinearScan::getKillSetForCall(GenTreeCall* call)
 {
     regMaskTP killMask = RBM_CALLEE_TRASH;
+#if defined(TARGET_ARM64)
+    if (hasSveIsa)
+    {
+        if (call->IsCallContainsSveArgsOrResult())
+        {
+            // For sve callee, caller needs to preserve v0-v7, v24-v31, p0-p3
+            killMask = RBM_INT_CALLEE_TRASH | RBM_SVE_CALLEE_TRASH | RBM_MSK_CALLEE_TRASH;
+        }
+        else
+        {
+            // For regular callee, caller needs to preserve v0-v7, v16-v31, p0-p15
+            killMask = RBM_INT_CALLEE_TRASH | RBM_FLT_CALLEE_TRASH | RBM_ALLMASK;
+        }
+    }
+#endif
 #ifdef TARGET_X86
     if (compiler->compFloatingPointUsed)
     {
@@ -852,11 +867,14 @@ regMaskTP LinearScan::getKillSetForCall(GenTreeCall* call)
         killMask.RemoveRegsetForType(RBM_FLT_CALLEE_TRASH.GetFloatRegSet(), FloatRegisterType);
         killMask &= ~RBM_MSK_CALLEE_TRASH;
 #endif // TARGET_AMD64
-
 #else
         killMask.RemoveRegsetForType(RBM_FLT_CALLEE_TRASH.GetFloatRegSet(), FloatRegisterType);
+#ifdef TARGET_ARM64
+        killMask.RemoveRegsetForType(RBM_MSK_CALLEE_TRASH.GetPredicateRegSet(), MaskRegisterType);
+#endif
 #endif // TARGET_XARCH
     }
+
 #ifdef TARGET_ARM
     if (call->IsVirtualStub())
     {

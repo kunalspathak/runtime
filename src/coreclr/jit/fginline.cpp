@@ -1247,6 +1247,9 @@ void Compiler::fgInvokeInlineeCompiler(GenTreeCall* call, InlineResult* inlineRe
         CORINFO_METHOD_HANDLE fncHandle;
         InlineCandidateInfo*  inlineCandidateInfo;
         InlineInfo*           inlineInfo;
+#ifdef TARGET_ARM64
+        bool hasSveParameterOrRet;
+#endif
     } param;
     memset(&param, 0, sizeof(param));
 
@@ -1255,6 +1258,9 @@ void Compiler::fgInvokeInlineeCompiler(GenTreeCall* call, InlineResult* inlineRe
     param.fncHandle           = fncHandle;
     param.inlineCandidateInfo = inlineCandidateInfo;
     param.inlineInfo          = &inlineInfo;
+#ifdef TARGET_ARM64
+    param.hasSveParameterOrRet = false;
+#endif
     bool success              = eeRunWithErrorTrap<Param>(
         [](Param* pParam) {
         // Init the local var info of the inlinee
@@ -1328,6 +1334,10 @@ void Compiler::fgInvokeInlineeCompiler(GenTreeCall* call, InlineResult* inlineRe
                 {
                     innerInlineResult->NoteFatal(InlineObservation::CALLSITE_COMPILATION_FAILURE);
                 }
+
+#ifdef TARGET_ARM64
+                pParam->hasSveParameterOrRet = pParam->inlineInfo->InlinerCompiler->codeGen->GetEmitter()->HasSveParameterOrReturn();
+#endif
             }
         }
     },
@@ -1348,6 +1358,12 @@ void Compiler::fgInvokeInlineeCompiler(GenTreeCall* call, InlineResult* inlineRe
         {
             inlineResult->NoteFatal(InlineObservation::CALLSITE_COMPILATION_ERROR);
         }
+#ifdef TARGET_ARM64
+        // If the inline failed, this is a call. Record if this needs sve parameters/return
+        bool containsCallWithSveArgsOrReturn = codeGen->GetEmitter()->ContainsCallWithSveArgumentsOrReturn();
+        codeGen->GetEmitter()->SetContainsCallWithSveArgumentsOrReturn(containsCallWithSveArgsOrReturn && param.hasSveParameterOrRet);
+#endif
+
     }
 
     *createdContext = inlineInfo.inlineContext;

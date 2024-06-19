@@ -33,6 +33,22 @@ const char* emitSveRegName(regNumber reg) const;
 const char* emitVectorRegName(regNumber reg);
 const char* emitPredicateRegName(regNumber reg, PredicateType ptype);
 
+bool containsCallWithSveArgumentsOrReturn = false;
+bool ContainsCallWithSveArgumentsOrReturn() const {
+    return containsCallWithSveArgumentsOrReturn;
+}
+void SetContainsCallWithSveArgumentsOrReturn(bool value) {
+    containsCallWithSveArgumentsOrReturn = value;
+}
+
+bool hasSveParameterOrReturn = false;
+bool HasSveParameterOrReturn() const {
+    return hasSveParameterOrReturn;
+}
+void SetHasSveParameterOrReturn(bool value) {
+    hasSveParameterOrReturn = value;
+}
+
 #ifdef DEBUG
 void emitInsSveSanityCheck(instrDesc* id);
 #endif // DEBUG

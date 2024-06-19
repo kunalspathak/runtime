@@ -161,6 +161,9 @@ void Compiler::lvaInitTypeRef()
         hasRetBuffArg          = info.compRetType != TYP_VOID;
         info.compRetNativeType = hasRetBuffArg ? TYP_STRUCT : TYP_VOID;
     }
+#ifdef TARGET_ARM64
+    codeGen->GetEmitter()->SetHasSveParameterOrReturn(varTypeIsSIMD(genActualType(info.compRetType)));
+#endif
 
     // Do we have a RetBuffArg?
     if (hasRetBuffArg)
@@ -641,6 +644,7 @@ void Compiler::lvaInitUserArgs(InitVarDscInfo* varDscInfo, unsigned skipArgs, un
         ;
     }
 
+    bool hasSveParameters = false;
     // Process each user arg.
     for (unsigned i = 0; i < numUserArgs; i++, varDscInfo->nextParam(), argLst = info.compCompHnd->getArgNext(argLst))
     {
@@ -660,6 +664,7 @@ void Compiler::lvaInitUserArgs(InitVarDscInfo* varDscInfo, unsigned skipArgs, un
 
         // The final home for this incoming parameter might be our local stack frame.
         varDsc->lvOnFrame = true;
+        hasSveParameters = varTypeIsSIMD(varDsc);
 
 #ifdef SWIFT_SUPPORT
         if (info.compCallConv == CorInfoCallConvExtension::Swift)
@@ -1343,6 +1348,11 @@ void Compiler::lvaInitUserArgs(InitVarDscInfo* varDscInfo, unsigned skipArgs, un
 #endif // !TARGET_X86
         }
     }
+
+#ifdef TARGET_ARM64
+    // Check if any argument is SVE
+    codeGen->GetEmitter()->SetHasSveParameterOrReturn(hasSveParameters && codeGen->GetEmitter()->HasSveParameterOrReturn());
+#endif
 
     compArgSize = GetOutgoingArgByteSize(compArgSize);
 

@@ -1746,7 +1746,11 @@ void Lowering::LowerArg(GenTreeCall* call, CallArg* callArg, bool late)
     var_types type = genActualType(arg);
 
 #ifdef TARGET_ARM64
-    m_containsCallWithSveArgumentsOrReturn |= varTypeIsSIMD(type);
+    if (varTypeIsSIMD(type))
+    {
+        m_containsCallWithSveArgumentsOrReturn |= true;
+        call->gtCallMoreFlags |= GTF_CALL_M_HAS_SVE_ARGS_OR_RESULT;
+    }
 #endif
 
 #if defined(FEATURE_SIMD)
@@ -2643,7 +2647,11 @@ GenTree* Lowering::LowerCall(GenTree* node)
         assert(call->gtInitClsHnd == nullptr);
     }
 #ifdef TARGET_ARM64
-    m_containsCallWithSveArgumentsOrReturn |= varTypeIsSIMD(genActualType(call));
+    if (varTypeIsSIMD(genActualType(call)))
+    {
+        call->gtCallMoreFlags |= GTF_CALL_M_HAS_SVE_ARGS_OR_RESULT;
+        m_containsCallWithSveArgumentsOrReturn |= true;
+    }    
 #endif
 
 #if defined(TARGET_AMD64) || defined(TARGET_ARM64)

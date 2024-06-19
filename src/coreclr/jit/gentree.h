@@ -4171,6 +4171,9 @@ enum GenTreeCallFlags : unsigned int
     GTF_CALL_M_CAST_CAN_BE_EXPANDED    = 0x04000000, // this cast (helper call) can be expanded if it's profitable. To be removed.
     GTF_CALL_M_CAST_OBJ_NONNULL        = 0x08000000, // if we expand this specific cast we don't need to check the input object for null
                                                      // NOTE: if needed, this flag can be removed, and we can introduce new _NONNUL cast helpers
+#ifdef TARGET_ARM64
+    GTF_CALL_M_HAS_SVE_ARGS_OR_RESULT  = 0x10000000, // sve args or result
+#endif
 };
 
 inline constexpr GenTreeCallFlags operator ~(GenTreeCallFlags a)
@@ -5546,6 +5549,13 @@ struct GenTreeCall final : public GenTree
     {
         return (gtCallMoreFlags & GTF_CALL_M_RETBUFFARG_LCLOPT) != 0;
     }
+
+#ifdef TARGET_ARM64
+    bool IsCallContainsSveArgsOrResult() const
+    {
+        return (gtCallMoreFlags & GTF_CALL_M_HAS_SVE_ARGS_OR_RESULT) != 0;
+    }
+#endif
 
     InlineCandidateInfo* GetSingleInlineCandidateInfo()
     {

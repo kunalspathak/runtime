@@ -799,6 +799,13 @@ LinearScan::LinearScan(Compiler* theCompiler)
         availableRegCount -= (CNT_HIGHFLOAT + CNT_MASK_REGS);
     }
 #endif // TARGET_XARCH
+#if defined (TARGET_ARM64)
+    if (!hasSveIsa)
+    {
+        // zero out RBM_ALL_MSK, callee-save, callee-trash
+        // zero out sve_all_mask, etc.
+    }
+#endif
 
     firstColdLoc = MaxLocation;
 

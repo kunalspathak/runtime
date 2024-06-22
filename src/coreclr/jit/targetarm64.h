@@ -145,9 +145,6 @@
   #define REG_OPT_RSVD             REG_IP1
   #define RBM_OPT_RSVD             RBM_IP1
 
-  #define REG_OPT_RSVD_SCALABLE    REG_OPT_RSVD
-  #define RBM_OPT_RSVD_SCALABLE    RBM_OPT_RSVD
-
   // Where is the exception object on entry to the handler block?
   #define REG_EXCEPTION_OBJECT     REG_R0
   #define RBM_EXCEPTION_OBJECT     RBM_R0

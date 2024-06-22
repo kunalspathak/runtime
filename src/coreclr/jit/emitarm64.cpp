@@ -7886,10 +7886,15 @@ void emitter::emitIns_R_S(instruction ins, emitAttr attr, regNumber reg1, int va
             attr     = size;
             if (isPredicateRegister(reg1))
             {
+                assert(offs == 0);
+                assert(varx == -1);
+
                 // For predicate, generate based of RsvdRegForPredicate()
-                regNumber rsvdReg = codeGen->rsGetRsvdRegForPredicate();
-                emitIns_R_R_I(INS_sub, EA_8BYTE, rsvdReg, REG_SP, codeGen->predicateOffset);
-                emitIns_R_R_I(ins, attr, reg1, rsvdReg, 0);
+                regNumber rsvdReg = codeGen->rsGetRsvdReg();
+                // add rsvd, fp, #predicateOffset
+                emitIns_R_R_I(INS_add, EA_8BYTE, rsvdReg, reg2, codeGen->predicateOffset);
+                // ldr reg1, [rsvd #imm mul vl]
+                emitIns_R_R_I(ins, attr, reg1, rsvdReg, imm);
                 return;
             }
             else
@@ -8149,10 +8154,16 @@ void emitter::emitIns_S_R(instruction ins, emitAttr attr, regNumber reg1, int va
             attr     = size;
             if (isPredicateRegister(reg1))
             {
+                assert(offs == 0);
+                assert(varx == -1);
+
                 // For predicate, generate based of RsvdRegForPredicate()
-                regNumber rsvdReg = codeGen->rsGetRsvdRegForPredicate();
-                emitIns_R_R_I(INS_sub, EA_8BYTE, rsvdReg, REG_SP, codeGen->predicateOffset);
-                emitIns_R_R_I(ins, attr, reg1, codeGen->rsGetRsvdRegForPredicate(), 0);
+                regNumber rsvdReg = codeGen->rsGetRsvdReg();
+                // add rsvd, fp, #predicateOffset
+                emitIns_R_R_I(INS_add, EA_8BYTE, rsvdReg, reg2, codeGen->predicateOffset);
+                // ldr reg1, [rsvd #imm mul vl]
+                emitIns_R_R_I(ins, attr, reg1, rsvdReg, imm);
+               
                 return;
             }
             else

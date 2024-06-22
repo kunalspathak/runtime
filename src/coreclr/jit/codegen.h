@@ -123,13 +123,6 @@ private:
     }
 #endif // REG_OPT_RSVD
 
-#ifdef TARGET_ARM64
-    regNumber rsGetRsvdRegForPredicate()
-    {
-        return REG_OPT_RSVD_SCALABLE;
-    }
-#endif // TARGET_ARM64
-
     //-------------------------------------------------------------------------
 
     bool     genUseBlockInit;  // true if we plan to block-initialize the local stack frame

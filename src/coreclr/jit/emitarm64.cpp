@@ -7887,37 +7887,63 @@ void emitter::emitIns_R_S(instruction ins, emitAttr attr, regNumber reg1, int va
             if (isPredicateRegister(reg1))
             {
                 assert(offs == 0);
-                assert(varx == -1);
-
-                // For predicate, generate based of RsvdRegForPredicate()
+                // For predicate, generate based of rsGetRsvdReg()
                 regNumber rsvdReg = codeGen->rsGetRsvdReg();
-                // add rsvd, fp, #predicateOffset
-                emitIns_R_R_I(INS_add, EA_8BYTE, rsvdReg, reg2, codeGen->predicateOffset);
-                // ldr reg1, [rsvd #imm mul vl]
-                emitIns_R_R_I(ins, attr, reg1, rsvdReg, imm);
+
+                if (varx >= 0)
+                {
+                    // local
+                    // add rsvd, fp, #imm
+                    emitIns_R_R_I(INS_add, EA_8BYTE, rsvdReg, reg2, imm);
+                    // str p0, [rsvd, #0, mul vl]
+                    emitIns_R_R_I(ins, attr, reg1, rsvdReg, 0);
+                }
+                else
+                {
+                    // `base` contains seqNum and offs = 0, so imm contains seqNum
+                    //
+                    // temp
+                    // add rsvd, fp #predicateStartOffset
+                    emitIns_R_R_I(INS_add, EA_8BYTE, rsvdReg, reg2, codeGen->predicateOffset);
+                    // str p0, [rsvd, #imm, mul vl]
+                    emitIns_R_R_I(ins, attr, reg1, rsvdReg, imm);
+                }
                 return;
+                /*
+                *
+                    id->idAddr()->iiaLclVar.initLclVarAddr(varx, offs);
+                    id->idSetIsLclVar();
+                    #ifdef DEBUG
+                        id->idDebugOnlyInfo()->idVarRefOffs = emitVarRefOffs;
+                    #endif
+                *
+                */
+                // assert(varx == -1);
+
             }
             else
             {
                 assert(isVectorRegister(reg1));
                 fmt = IF_SVE_IE_2A;
+
+                // TODO-SVE: Don't assume 128bit vectors
+                // Predicate size is vector length / 8
+                scale        = NaturalScale_helper(isVectorRegister(reg1) ? EA_16BYTE : EA_2BYTE);
+                ssize_t mask = (1 << scale) - 1; // the mask of low bits that must be zero to encode the immediate
+
+                if (((imm & mask) == 0) && (isValidSimm<9>(imm >> scale)))
+                {
+                    imm >>= scale; // The immediate is scaled by the size of the ld/st
+                }
+                else
+                {
+                    useRegForImm      = true;
+                    regNumber rsvdReg = codeGen->rsGetRsvdReg();
+                    codeGen->instGen_Set_Reg_To_Imm(EA_PTRSIZE, rsvdReg, imm);
+                }
             }
 
-            // TODO-SVE: Don't assume 128bit vectors
-            // Predicate size is vector length / 8
-            scale        = NaturalScale_helper(isVectorRegister(reg1) ? EA_16BYTE : EA_2BYTE);
-            ssize_t mask = (1 << scale) - 1; // the mask of low bits that must be zero to encode the immediate
 
-            if (((imm & mask) == 0) && (isValidSimm<9>(imm >> scale)))
-            {
-                imm >>= scale; // The immediate is scaled by the size of the ld/st
-            }
-            else
-            {
-                useRegForImm      = true;
-                regNumber rsvdReg = codeGen->rsGetRsvdReg();
-                codeGen->instGen_Set_Reg_To_Imm(EA_PTRSIZE, rsvdReg, imm);
-            }
             break;
         }
 
@@ -8155,14 +8181,40 @@ void emitter::emitIns_S_R(instruction ins, emitAttr attr, regNumber reg1, int va
             if (isPredicateRegister(reg1))
             {
                 assert(offs == 0);
-                assert(varx == -1);
-
-                // For predicate, generate based of RsvdRegForPredicate()
+                // For predicate, generate based of rsGetRsvdReg()
                 regNumber rsvdReg = codeGen->rsGetRsvdReg();
-                // add rsvd, fp, #predicateOffset
-                emitIns_R_R_I(INS_add, EA_8BYTE, rsvdReg, reg2, codeGen->predicateOffset);
-                // ldr reg1, [rsvd #imm mul vl]
-                emitIns_R_R_I(ins, attr, reg1, rsvdReg, imm);
+
+                if (varx >= 0)
+                {
+                    // local
+                    // add rsvd, fp, #imm
+                    emitIns_R_R_I(INS_add, EA_8BYTE, rsvdReg, reg2, imm);
+                    // str p0, [rsvd, #0, mul vl]
+                    emitIns_R_R_I(ins, attr, reg1, rsvdReg, 0);
+                }
+                else
+                {
+                    // `base` contains seqNum and offs = 0, so imm contains seqNum
+                    //
+                    // temp
+                    // add rsvd, fp #predicateStartOffset
+                    emitIns_R_R_I(INS_add, EA_8BYTE, rsvdReg, reg2, codeGen->predicateOffset);
+                    // str p0, [rsvd, #imm, mul vl]
+                    emitIns_R_R_I(ins, attr, reg1, rsvdReg, imm);
+                }
+
+                /*
+                *
+                    id->idAddr()->iiaLclVar.initLclVarAddr(varx, offs);
+                    id->idSetIsLclVar();
+                    #ifdef DEBUG
+                        id->idDebugOnlyInfo()->idVarRefOffs = emitVarRefOffs;
+                    #endif
+                * 
+                */
+                //assert(varx == -1);
+
+
                
                 return;
             }

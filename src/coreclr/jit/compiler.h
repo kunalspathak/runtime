@@ -9477,7 +9477,11 @@ private:
     {
 #if defined(FEATURE_SIMD) && ALIGN_SIMD_TYPES
         LclVarDsc* lcl = lvaGetDesc(varNum);
-        if (varTypeIsSIMD(lcl))
+        if (varTypeIsSIMD(lcl)
+#ifdef TARGET_ARM64
+            || varTypeIsMask(lcl)
+#endif
+            )
         {
             // TODO-Cleanup: Can't this use the lvExactSize on the varDsc?
             int alignment = getSIMDTypeAlignment(lcl->TypeGet());

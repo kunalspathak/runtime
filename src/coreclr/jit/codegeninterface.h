@@ -141,7 +141,7 @@ public:
     RegState              intRegState;
     RegState              floatRegState;
     NodeInternalRegisters internalRegisters;
-
+    int                   predicateOffset;
 protected:
     Compiler* compiler;
     bool      m_genAlignLoops;

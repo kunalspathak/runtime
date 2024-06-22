@@ -215,6 +215,7 @@ CodeGen::CodeGen(Compiler* theCompiler)
 #endif // DEBUG
 
     regSet.tmpInit();
+    predicateOffset = 0;
 
 #ifdef LATE_DISASM
     getDisAssembler().disInit(compiler);

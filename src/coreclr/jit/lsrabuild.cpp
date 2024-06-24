@@ -1167,7 +1167,9 @@ bool LinearScan::buildKillPositionsForNode(GenTree* tree, LsraLocation currentLo
                         continue;
                     }
                 Interval*        interval     = getIntervalForLocalVar(varIndex);
-                const bool       isCallKill   = ((killMask == RBM_INT_CALLEE_TRASH) || (killMask == RBM_CALLEE_TRASH));
+                const bool isCallKill =
+                    ((killMask.getLow() == RBM_INT_CALLEE_TRASH) ||
+                     (killMask.getLow() == RBM_CALLEE_TRASH.getLow())); // fix this so it can read updated msk_call information
                 SingleTypeRegSet regsKillMask = killMask.GetRegSetForType(interval->registerType);
 
                 if (isCallKill)

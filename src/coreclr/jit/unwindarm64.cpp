@@ -404,18 +404,30 @@ void Compiler::unwindSaveRegPair(regNumber reg1, regNumber reg2, int offset)
 
         pu->AddCode(0xC8 | (BYTE)(x >> 2), (BYTE)(x << 6) | (BYTE)z);
     }
-    else
+    else if (emitter::isFloatReg(reg1))
     {
         // save_fregp: 1101100x | xxzzzzzz : save pair d(8 + #X) at [sp + #Z * 8], offset <= 504
 
         assert(REG_NEXT(reg1) == reg2);
+
+        // TODO: "reg1 <= REG_V22" is temporary until we add scalable register store/load
+        // Once that is done, change back to "reg1 <= REG_V14"
         assert(REG_V8 <= reg1 && // first legal pair: V8, V9
-               reg1 <= REG_V22); // last legal pair: V14, V15 // TODO: fix this properly
+               reg1 <= REG_V22); // last legal pair: V22, V23
 
         BYTE x = (BYTE)(reg1 - REG_V8);
-        //assert(0 <= x && x <= 0x7);
-
-        pu->AddCode(0xD8 | (BYTE)(x >> 2), (BYTE)(x << 6) | (BYTE)z);
+        if (0 <= x && x <= 0x7)
+        {
+            // TODO: This is temporary until we store/load scalable vector registers,
+            // in which case, we will use single register store/load because there is
+            // no instruction to store/load pair scalable register.
+            pu->AddCode(0xD8 | (BYTE)(x >> 2), (BYTE)(x << 6) | (BYTE)z);
+        }
+    }
+    else
+    {
+        // TODO: Add unwinder opcodes once they become available on windows
+        assert(emitter::isPredicateRegister(reg1));
     }
 }
 
@@ -492,7 +504,7 @@ void Compiler::unwindSaveRegPairPreindexed(regNumber reg1, regNumber reg2, int o
 
         pu->AddCode(0xCC | (BYTE)(x >> 2), (BYTE)(x << 6) | (BYTE)z);
     }
-    else
+    else if (emitter::isFloatReg(reg1))
     {
         // save_fregp_x: 1101101x | xxzzzzzz : save pair d(8 + #X), at [sp - (#Z + 1) * 8]!, pre-indexed offset >= -512
 
@@ -501,13 +513,25 @@ void Compiler::unwindSaveRegPairPreindexed(regNumber reg1, regNumber reg2, int o
         assert(0 <= z && z <= 0x3F);
 
         assert(REG_NEXT(reg1) == reg2);
+
+        // TODO: "reg1 <= REG_V22" is temporary until we add scalable register store/load
+        // Once that is done, change back to "reg1 <= REG_V14"
         assert(REG_V8 <= reg1 && // first legal pair: V8, V9
-               reg1 <= REG_V22); // last legal pair: V14, V15
+               reg1 <= REG_V22); // last legal pair: V22, V23
 
         BYTE x = (BYTE)(reg1 - REG_V8);
-        //assert(0 <= x && x <= 0x7);
-
-        pu->AddCode(0xDA | (BYTE)(x >> 2), (BYTE)(x << 6) | (BYTE)z);
+        if (0 <= x && x <= 0x7)
+        {
+            // TODO: This is temporary until we store/load scalable vector registers,
+            // in which case, we will use single register store/load because there is
+            // no instruction to store/load pair scalable register.
+            pu->AddCode(0xDA | (BYTE)(x >> 2), (BYTE)(x << 6) | (BYTE)z);
+        }
+    }
+    else
+    {
+        // TODO: Add unwinder opcodes once they become available on windows
+        assert(emitter::isPredicateRegister(reg1));
     }
 }
 
@@ -551,17 +575,28 @@ void Compiler::unwindSaveReg(regNumber reg, int offset)
 
         pu->AddCode(0xD0 | (BYTE)(x >> 2), (BYTE)(x << 6) | (BYTE)z);
     }
-    else
+    else if (emitter::isFloatReg(reg))
     {
         // save_freg: 1101110x | xxzzzzzz : save reg d(8 + #X) at [sp + #Z * 8], offset <= 504
 
+        // TODO: "reg1 <= REG_V23" is temporary until we add scalable register store/load
+        // Once that is done, change back to "reg1 <= REG_V15"
         assert(REG_V8 <= reg && // first legal register: V8
-               reg <= REG_V23); // last legal register: V15
+               reg <= REG_V23); // last legal register: V23
 
         BYTE x = (BYTE)(reg - REG_V8);
-        //assert(0 <= x && x <= 0x7);
-
-        pu->AddCode(0xDC | (BYTE)(x >> 2), (BYTE)(x << 6) | (BYTE)z);
+        if (0 <= x && x <= 0x7)
+        {
+            // TODO: This is temporary until we store/load scalable vector registers
+            // and the OS has support for unwinder opcodes
+            // save_zreg: 11100111 ' 0ooRrrrr ' 11oooooo
+            pu->AddCode(0xDC | (BYTE)(x >> 2), (BYTE)(x << 6) | (BYTE)z);
+        }
+    }
+    else
+    {
+        // TODO: Add unwinder opcodes once they become available on windows
+        assert(emitter::isPredicateRegister(reg));
     }
 }
 
@@ -606,17 +641,29 @@ void Compiler::unwindSaveRegPreindexed(regNumber reg, int offset)
 
         pu->AddCode(0xD4 | (BYTE)(x >> 3), (BYTE)(x << 5) | (BYTE)z);
     }
-    else
+    else if (emitter::isFloatReg(reg))
     {
         // save_freg_x: 11011110 | xxxzzzzz : save reg d(8 + #X) at [sp - (#Z + 1) * 8]!, pre - indexed offset >= -256
 
+        // TODO: "reg1 <= REG_V23" is temporary until we add scalable register store/load
+        // Once that is done, change back to "reg1 <= REG_V15"
         assert(REG_V8 <= reg && // first legal register: V8
-               reg <= REG_V23); // last legal register: V15
+               reg <= REG_V23); // last legal register: V23
 
         BYTE x = (BYTE)(reg - REG_V8);
-        //assert(0 <= x && x <= 0x7);
+        if (0 <= x && x <= 0x7)
+        {
+            // TODO: This is temporary until we store/load scalable vector registers
+            // and the OS has support for unwinder opcodes
+            // save_zreg: 11100111 ' 0ooRrrrr ' 11oooooo
+            pu->AddCode(0xDE, (BYTE)(x << 5) | (BYTE)z);
+        }
 
-        pu->AddCode(0xDE, (BYTE)(x << 5) | (BYTE)z);
+    }
+    else
+    {
+        // TODO: Add unwinder opcodes once they become available on windows
+        assert(emitter::isPredicateRegister(reg));
     }
 }
 

@@ -743,6 +743,8 @@ regMaskTP Compiler::compHelperCallKillSet(CorInfoHelpFunc helper)
             {
                 return RBM_INT_CALLEE_TRASH | RBM_FLT_CALLEE_TRASH | RBM_ALLMASK;
             }
+#else
+            return RBM_CALLEE_TRASH;
 #endif
             //TODO: Might need special handling here as well or at least add
             // a note why it is not needed

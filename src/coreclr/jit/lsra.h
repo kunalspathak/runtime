@@ -2144,6 +2144,9 @@ private:
     // NOTE: we currently don't need a LinearScan `this` pointer for this definition, and some callers
     // don't have one available, so make is static.
     //
+#ifndef TARGET_ARM64
+    static
+#endif
     FORCEINLINE SingleTypeRegSet calleeSaveRegs(RegisterType rt)
     {
 #if !defined(TARGET_ARM64)
@@ -2457,7 +2460,11 @@ public:
 
         if (preferCalleeSave)
         {
+#ifdef TARGET_ARM64
             SingleTypeRegSet calleeSaveMask = linearScan->calleeSaveRegs(this->registerType) & newPreferences;
+#else
+            SingleTypeRegSet calleeSaveMask = LinearScan::calleeSaveRegs(this->registerType) & newPreferences;
+#endif
 
             if (calleeSaveMask != RBM_NONE)
             {

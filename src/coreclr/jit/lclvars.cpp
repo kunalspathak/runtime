@@ -301,11 +301,12 @@ void Compiler::lvaInitTypeRef()
         cntCalleeSavedFloat = CNT_FLT_CALLEE_SAVED_INIT;
         cntCalleeSavedMask  = 0;
     }
-#endif
     // copy register mask to codegen and emitter
-    codeGen->CopyRegisterInfo();
     GetEmitter()->CopyRegisterInfo();
+    codeGen->CopyRegisterInfo();
     codeGen->regSet.rsSetCalleeSaveMask(RBM_CALLEE_SAVED);
+
+#endif
 
     //-------------------------------------------------------------------------
     // Finally the local variables

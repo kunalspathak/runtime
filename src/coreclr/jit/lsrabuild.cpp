@@ -1496,10 +1496,15 @@ void LinearScan::buildUpperVectorSaveRefPositions(GenTree*                tree,
 
     if (enregisterLocalVars && !VarSetOps::IsEmpty(compiler, largeVectorVars))
     {
+#ifdef TARGET_ARM64
+        regMaskTP fltCalleeSaved = RBM_FLT_CALLEE_SAVED_INIT;
+#else
+        regMaskTP fltCalleeSaved = RBM_FLT_CALLEE_SAVED;
+#endif
         // We assume that the kill set includes at least some callee-trash registers, but
         // that it doesn't include any callee-save registers.
         assert((fpCalleeKillSet & RBM_FLT_CALLEE_TRASH) != RBM_NONE);
-        assert((fpCalleeKillSet & RBM_FLT_CALLEE_SAVED_INIT) == RBM_NONE);
+        assert((fpCalleeKillSet & fltCalleeSaved) == RBM_NONE);
 
         // We should only save the upper half of any large vector vars that are currently live.
         // However, the liveness information may not be accurate, specially around the place where
@@ -1532,7 +1537,7 @@ void LinearScan::buildUpperVectorSaveRefPositions(GenTree*                tree,
                 //TODO: Check what need to be changed here. 
                 Interval*    upperVectorInterval = getUpperVectorInterval(varIndex);
                 RefPosition* pos = newRefPosition(upperVectorInterval, currentLoc, RefTypeUpperVectorSave, tree,
-                                                  RBM_FLT_CALLEE_SAVED_INIT.GetFloatRegSet());
+                                                  fltCalleeSaved.GetFloatRegSet());
                 varInterval->isPartiallySpilled = true;
                 pos->skipSaveRestore            = blockAlwaysReturn;
                 pos->liveVarUpperSave           = VarSetOps::IsMember(compiler, liveLargeVectors, varIndex);

@@ -191,6 +191,16 @@ void CodeGenInterface::CopyRegisterInfo()
 }
 #endif // TARGET_XARCH
 
+#if defined(TARGET_ARM64)
+void CodeGenInterface::CopyRegisterInfo()
+{
+    rbmFltCalleeSaved = compiler->rbmFltCalleeSaved;
+    rbmMskCalleeSaved = compiler->rbmMskCalleeSaved;
+    cntCalleeSavedFloat = compiler->cntCalleeSavedFloat;
+    cntCalleeSavedMask  = compiler->cntCalleeSavedMask;
+}
+#endif // TARGET_ARM64
+
 /*****************************************************************************/
 
 CodeGen::CodeGen(Compiler* theCompiler)
@@ -728,9 +738,15 @@ regMaskTP Compiler::compHelperCallKillSet(CorInfoHelpFunc helper)
             return RBM_VALIDATE_INDIRECT_CALL_TRASH;
 
         default:
+#if defined(TARGET_ARM64)
+            //if (hasSveIsa)
+            {
+                return RBM_INT_CALLEE_TRASH | RBM_FLT_CALLEE_TRASH | RBM_ALLMASK;
+            }
+#endif
             //TODO: Might need special handling here as well or at least add
             // a note why it is not needed
-            return RBM_CALLEE_TRASH;
+            //return RBM_CALLEE_TRASH;
     }
 }
 
@@ -1993,6 +2009,10 @@ void CodeGen::genGenerateMachineCode()
     // required during code generation. So, there is nothing left to estimate: we can be precise in the frame
     // layout. This helps us generate smaller code, and allocate, after code generation, a smaller amount of
     // memory from the VM.
+    if (compiler->getNeedsGSSecurityCookie())
+    {
+        regSet.verifyRegistersUsed(compiler->compHelperCallKillSet((CorInfoHelpFunc)CORINFO_HELP_FAIL_FAST));
+    }
 
     genFinalizeFrame();
 

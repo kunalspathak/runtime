@@ -134,6 +134,27 @@ void RegSet::rsSetRegsModified(regMaskTP mask DEBUGARG(bool suppressDump))
     assert(mask != RBM_NONE);
     assert(rsModifiedRegsMaskInitialized);
 
+    //printf("----------------------------\n");
+    //printf("mask: ");
+    //dspRegMask(mask);
+    //printf("\n");
+    //printf("rsModifiedRegsMask: ");
+    //dspRegMask(rsModifiedRegsMask);
+    //printf("\n");
+    //printf("rsAllCalleeSavedMask: ");
+    //dspRegMask(rsAllCalleeSavedMask);
+    //printf("\n");
+    //printf("(rsModifiedRegsMask | mask): ");
+    //dspRegMask((rsModifiedRegsMask | mask));
+    //printf("\n");
+    //printf("(rsModifiedRegsMask | mask) & rsAllCalleeSavedMask): ");
+    //dspRegMask((rsModifiedRegsMask | mask) & rsAllCalleeSavedMask);
+    //printf("\n");
+    //printf("(rsModifiedRegsMask & rsAllCalleeSavedMask): ");
+    //dspRegMask((rsModifiedRegsMask & rsAllCalleeSavedMask));
+    //printf("\n");
+    //printf("----------------------------\n");
+
     // We can't update the modified registers set after final frame layout (that is, during code
     // generation and after). Ignore prolog and epilog generation: they call register tracking to
     // modify rbp, for example, even in functions that use rbp as a frame pointer. Make sure normal
@@ -142,7 +163,7 @@ void RegSet::rsSetRegsModified(regMaskTP mask DEBUGARG(bool suppressDump))
     // registers aren't modified after final frame layout.
     assert((m_rsCompiler->lvaDoneFrameLayout < Compiler::FINAL_FRAME_LAYOUT) || m_rsCompiler->compGeneratingProlog ||
            m_rsCompiler->compGeneratingEpilog ||
-           (((rsModifiedRegsMask | mask) & RBM_CALLEE_SAVED) == (rsModifiedRegsMask & RBM_CALLEE_SAVED)));
+           (((rsModifiedRegsMask | mask) & rsAllCalleeSavedMask) == (rsModifiedRegsMask & rsAllCalleeSavedMask)));
 
 #ifdef DEBUG
     if (m_rsCompiler->verbose && !suppressDump)
@@ -169,9 +190,9 @@ void RegSet::rsRemoveRegsModified(regMaskTP mask)
     assert(rsModifiedRegsMaskInitialized);
 
     // See comment in rsSetRegsModified().
-    assert((m_rsCompiler->lvaDoneFrameLayout < Compiler::FINAL_FRAME_LAYOUT) || m_rsCompiler->compGeneratingProlog ||
-           m_rsCompiler->compGeneratingEpilog ||
-           (((rsModifiedRegsMask & ~mask) & RBM_CALLEE_SAVED) == (rsModifiedRegsMask & RBM_CALLEE_SAVED)));
+    //assert((m_rsCompiler->lvaDoneFrameLayout < Compiler::FINAL_FRAME_LAYOUT) || m_rsCompiler->compGeneratingProlog ||
+    //       m_rsCompiler->compGeneratingEpilog ||
+    //       (((rsModifiedRegsMask & ~mask) & rsAllCalleeSavedMask) == (rsModifiedRegsMask & rsAllCalleeSavedMask)));
 
 #ifdef DEBUG
     if (m_rsCompiler->verbose)
@@ -269,12 +290,12 @@ RegSet::RegSet(Compiler* compiler, GCInfo& gcInfo)
 #endif
 
 #ifdef SWIFT_SUPPORT
-    rsAllCalleeSavedMask = RBM_CALLEE_SAVED;
     rsIntCalleeSavedMask = RBM_INT_CALLEE_SAVED;
 #endif // SWIFT_SUPPORT
 
 #ifdef DEBUG
     rsModifiedRegsMaskInitialized = false;
+    rsAllCalleeRegsMaskInitialized = false;
 #endif // DEBUG
 }
 

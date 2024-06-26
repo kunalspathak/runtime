@@ -735,6 +735,16 @@ unsigned emitLclVarAddr::lvaOffset() const // returns the offset into the variab
     }
 }
 
+#if defined(TARGET_ARM64)
+void emitter::CopyRegisterInfo()
+{
+    rbmFltCalleeSaved = emitComp->rbmFltCalleeSaved;
+    rbmMskCalleeSaved = emitComp->rbmMskCalleeSaved;
+    cntCalleeSavedFloat = emitComp->cntCalleeSavedFloat;
+    cntCalleeSavedMask = emitComp->cntCalleeSavedMask;
+}
+
+#endif // TARGET_ARM64
 /*****************************************************************************
  *
  *  Record some info about the method about to be emitted.
@@ -757,6 +767,11 @@ void emitter::emitBegCG(Compiler* comp, COMP_HANDLE cmpHandle)
 #if defined(TARGET_XARCH)
     rbmMskCalleeTrash = emitComp->rbmMskCalleeTrash;
 #endif // TARGET_XARCH
+
+#if defined(TARGET_ARM64)
+    rbmFltCalleeSaved = emitComp->rbmFltCalleeSaved;
+    rbmMskCalleeSaved = emitComp->rbmMskCalleeSaved;
+#endif // TARGET_ARM64
 }
 
 void emitter::emitEndCG()

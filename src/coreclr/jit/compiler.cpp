@@ -3502,6 +3502,22 @@ void Compiler::compInitOptions(JitFlags* jitFlags)
 
     codeGen->CopyRegisterInfo();
 #endif // TARGET_XARCH
+
+#ifdef TARGET_ARM64
+
+    const regMaskTP vtCalleeSaveRegs[] = {
+#define DEF_TP(tn, nm, jitType, sz, sze, asze, st, al, regTyp, regFld, csr, ctr, tf) csr,
+#include "typelist.h"
+#undef DEF_TP
+    };
+
+    memcpy(varTypeCalleeSaveRegs, vtCalleeSaveRegs, sizeof(regMaskTP) * TYP_COUNT);
+
+    rbmFltCalleeSaved = RBM_FLT_CALLEE_SAVED_INIT;
+    rbmMskCalleeSaved = RBM_MSK_CALLEE_SAVED_INIT;
+    cntCalleeSavedFloat = CNT_FLT_CALLEE_SAVED_INIT;
+    cntCalleeSavedMask  = CNT_MSK_CALLEE_SAVED_INIT;
+#endif // TARGET_ARM64
 }
 
 #ifdef DEBUG

@@ -285,6 +285,27 @@ void Compiler::lvaInitTypeRef()
 #endif
 
     lvaInitArgs(&varDscInfo);
+#ifdef TARGET_ARM64
+    if (GetEmitter()->HasSveParameterOrReturn())
+    {
+        //TODO: Fix it properly so we update the global RBM_CALLEE_SAVED
+        rbmFltCalleeSaved = RBM_SVE_CALLEE_SAVED;
+        rbmMskCalleeSaved = RBM_MSK_CALLEE_SAVED;
+        cntCalleeSavedFloat = CNT_SVE_CALLEE_SAVED;
+        cntCalleeSavedMask  = CNT_MSK_CALLEE_SAVED_INIT;
+    }
+    else
+    {
+        rbmFltCalleeSaved = RBM_FLT_CALLEE_SAVED_INIT;
+        rbmMskCalleeSaved = RBM_MSK_CALLEE_SAVED_INIT;
+        cntCalleeSavedFloat = CNT_FLT_CALLEE_SAVED_INIT;
+        cntCalleeSavedMask  = 0;
+    }
+#endif
+    // copy register mask to codegen and emitter
+    codeGen->CopyRegisterInfo();
+    GetEmitter()->CopyRegisterInfo();
+    codeGen->regSet.rsSetCalleeSaveMask(RBM_CALLEE_SAVED);
 
     //-------------------------------------------------------------------------
     // Finally the local variables
@@ -667,7 +688,7 @@ void Compiler::lvaInitUserArgs(InitVarDscInfo* varDscInfo, unsigned skipArgs, un
 
         // The final home for this incoming parameter might be our local stack frame.
         varDsc->lvOnFrame = true;
-        hasSveParameters = varTypeIsSIMD(varDsc);
+        hasSveParameters |= varTypeIsSIMD(varDsc);
 
 #ifdef SWIFT_SUPPORT
         if (info.compCallConv == CorInfoCallConvExtension::Swift)

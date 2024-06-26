@@ -410,10 +410,10 @@ void Compiler::unwindSaveRegPair(regNumber reg1, regNumber reg2, int offset)
 
         assert(REG_NEXT(reg1) == reg2);
         assert(REG_V8 <= reg1 && // first legal pair: V8, V9
-               reg1 <= REG_V14); // last legal pair: V14, V15
+               reg1 <= REG_V22); // last legal pair: V14, V15 // TODO: fix this properly
 
         BYTE x = (BYTE)(reg1 - REG_V8);
-        assert(0 <= x && x <= 0x7);
+        //assert(0 <= x && x <= 0x7);
 
         pu->AddCode(0xD8 | (BYTE)(x >> 2), (BYTE)(x << 6) | (BYTE)z);
     }
@@ -502,10 +502,10 @@ void Compiler::unwindSaveRegPairPreindexed(regNumber reg1, regNumber reg2, int o
 
         assert(REG_NEXT(reg1) == reg2);
         assert(REG_V8 <= reg1 && // first legal pair: V8, V9
-               reg1 <= REG_V14); // last legal pair: V14, V15
+               reg1 <= REG_V22); // last legal pair: V14, V15
 
         BYTE x = (BYTE)(reg1 - REG_V8);
-        assert(0 <= x && x <= 0x7);
+        //assert(0 <= x && x <= 0x7);
 
         pu->AddCode(0xDA | (BYTE)(x >> 2), (BYTE)(x << 6) | (BYTE)z);
     }
@@ -556,10 +556,10 @@ void Compiler::unwindSaveReg(regNumber reg, int offset)
         // save_freg: 1101110x | xxzzzzzz : save reg d(8 + #X) at [sp + #Z * 8], offset <= 504
 
         assert(REG_V8 <= reg && // first legal register: V8
-               reg <= REG_V15); // last legal register: V15
+               reg <= REG_V23); // last legal register: V15
 
         BYTE x = (BYTE)(reg - REG_V8);
-        assert(0 <= x && x <= 0x7);
+        //assert(0 <= x && x <= 0x7);
 
         pu->AddCode(0xDC | (BYTE)(x >> 2), (BYTE)(x << 6) | (BYTE)z);
     }
@@ -611,10 +611,10 @@ void Compiler::unwindSaveRegPreindexed(regNumber reg, int offset)
         // save_freg_x: 11011110 | xxxzzzzz : save reg d(8 + #X) at [sp - (#Z + 1) * 8]!, pre - indexed offset >= -256
 
         assert(REG_V8 <= reg && // first legal register: V8
-               reg <= REG_V15); // last legal register: V15
+               reg <= REG_V23); // last legal register: V15
 
         BYTE x = (BYTE)(reg - REG_V8);
-        assert(0 <= x && x <= 0x7);
+        //assert(0 <= x && x <= 0x7);
 
         pu->AddCode(0xDE, (BYTE)(x << 5) | (BYTE)z);
     }

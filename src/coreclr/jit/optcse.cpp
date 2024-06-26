@@ -4616,7 +4616,12 @@ bool CSE_Heuristic::PromotionCheck(CSE_Candidate* candidate)
         // are no callee-saved FP registers available, the RA will have to spill at
         // the def site and reload at the (first) use site, if the variable is a register
         // candidate. Account for that.
-        if (varTypeIsFloating(candidate->Expr()) && (CNT_CALLEE_SAVED_FLOAT == 0) && !candidate->IsConservative())
+#ifdef TARGET_ARM64
+        int calleeSavedFloat = m_pCompiler->get_CNT_CALLEE_SAVED_FLOAT();
+#else
+        int calleeSavedFloat = CNT_CALLEE_SAVED_FLOAT;
+#endif // TARGET_ARM64
+        if (varTypeIsFloating(candidate->Expr()) && (calleeSavedFloat == 0) && !candidate->IsConservative())
         {
             cse_def_cost += 1;
             cse_use_cost += 1;

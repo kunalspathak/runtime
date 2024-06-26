@@ -508,15 +508,14 @@ public:
         {
             registerType = FloatRegisterType;
         }
-#if defined(TARGET_XARCH) && defined(FEATURE_SIMD)
+#if defined(FEATURE_MASKED_HW_INTRINSICS)
         else
         {
             assert(emitter::isMaskReg(reg));
             registerType = MaskRegisterType;
         }
-#endif
+#endif // FEATURE_MASKED_HW_INTRINSICS
         regNum       = reg;
-        isCalleeSave = ((RBM_CALLEE_SAVED & genRegMask(reg)) != 0);
     }
 
 #ifdef DEBUG
@@ -2101,6 +2100,30 @@ private:
     }
 #endif // TARGET_XARCH
 
+#if defined(TARGET_ARM64)
+    regMaskTP rbmFltCalleeSaved;
+    regMaskTP rbmMskCalleeSaved;
+    unsigned  cntCalleeSavedFloat;
+    unsigned  cntCalleeSavedMask;
+
+    FORCEINLINE regMaskTP get_RBM_FLT_CALLEE_SAVED() const
+    {
+        return this->rbmFltCalleeSaved;
+    }
+    FORCEINLINE regMaskTP get_RBM_MSK_CALLEE_SAVED() const
+    {
+        return this->rbmMskCalleeSaved;
+    }
+    FORCEINLINE unsigned get_CNT_CALLEE_SAVED_FLOAT() const
+    {
+        return this->cntCalleeSavedFloat;
+    }
+    FORCEINLINE unsigned get_CNT_CALLEE_SAVED_MASK() const
+    {
+        return this->cntCalleeSavedMask;
+    }
+#endif // TARGET_ARM64
+
     unsigned availableRegCount;
 
     FORCEINLINE unsigned get_AVAILABLE_REG_COUNT() const
@@ -2108,19 +2131,28 @@ private:
         return this->availableRegCount;
     }
 
+#if defined(TARGET_ARM64)
+    // Not all of the callee saved values are constant, so don't declare this as a method local static
+    // doing so results in significantly more complex codegen and we'd rather just initialize this once
+    // as part of initializing LSRA instead
+    regMaskTP varTypeCalleeSaveRegs[TYP_COUNT];
+#endif
+
     //------------------------------------------------------------------------
     // calleeSaveRegs: Get the set of callee-save registers of the given RegisterType
     //
     // NOTE: we currently don't need a LinearScan `this` pointer for this definition, and some callers
     // don't have one available, so make is static.
     //
-    static FORCEINLINE SingleTypeRegSet calleeSaveRegs(RegisterType rt)
+    FORCEINLINE SingleTypeRegSet calleeSaveRegs(RegisterType rt)
     {
+#if !defined(TARGET_ARM64)
         static const regMaskTP varTypeCalleeSaveRegs[] = {
 #define DEF_TP(tn, nm, jitType, sz, sze, asze, st, al, regTyp, regFld, csr, ctr, tf) csr,
 #include "typelist.h"
 #undef DEF_TP
         };
+#endif // !TARGET_ARM64
 
         assert((unsigned)rt < ArrLen(varTypeCalleeSaveRegs));
         return varTypeCalleeSaveRegs[rt].GetRegSetForType(rt);
@@ -2371,7 +2403,7 @@ public:
         return (assignedReg == nullptr) ? registerPreferences : genSingleTypeRegMask(assignedReg->regNum);
     }
 
-    void mergeRegisterPreferences(SingleTypeRegSet preferences)
+    void mergeRegisterPreferences(SingleTypeRegSet preferences ARM64_ARG(LinearScan* linearScan))
     {
         // We require registerPreferences to have been initialized.
         assert(registerPreferences != RBM_NONE);
@@ -2425,7 +2457,7 @@ public:
 
         if (preferCalleeSave)
         {
-            SingleTypeRegSet calleeSaveMask = LinearScan::calleeSaveRegs(this->registerType) & newPreferences;
+            SingleTypeRegSet calleeSaveMask = linearScan->calleeSaveRegs(this->registerType) & newPreferences;
 
             if (calleeSaveMask != RBM_NONE)
             {
@@ -2441,17 +2473,17 @@ public:
     // An exception is made in the case where one of the existing or new
     // preferences are all callee-save, in which case we "prefer" the callee-save
 
-    void updateRegisterPreferences(SingleTypeRegSet preferences)
+    void updateRegisterPreferences(SingleTypeRegSet preferences ARM64_ARG(LinearScan* linearScan))
     {
         // If this interval is preferenced, that interval may have already been assigned a
         // register, and we want to include that in the preferences.
         if ((relatedInterval != nullptr) && !relatedInterval->isActive)
         {
-            mergeRegisterPreferences(relatedInterval->getCurrentPreferences());
+            mergeRegisterPreferences(relatedInterval->getCurrentPreferences() ARM64_ARG(linearScan));
         }
 
         // Now merge the new preferences.
-        mergeRegisterPreferences(preferences);
+        mergeRegisterPreferences(preferences ARM64_ARG(linearScan));
     }
 };
 

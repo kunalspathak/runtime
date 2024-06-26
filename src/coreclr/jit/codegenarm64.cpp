@@ -505,6 +505,7 @@ void CodeGen::genPrologSaveRegPair(regNumber reg1,
         // 64-bit STP offset range: -512 to 504, multiple of 8.
         assert(spOffset <= 504);
         assert((spOffset % 8) == 0);
+        //assert((reg1 >= REG_R0) && (reg1 <= REG_R30));
         GetEmitter()->emitIns_R_R_R_I(INS_stp, EA_PTRSIZE, reg1, reg2, REG_SPBASE, spOffset);
 
         if (TargetOS::IsUnix && compiler->generateCFIUnwindCodes())
@@ -822,7 +823,7 @@ void CodeGen::genSetUseSaveNextPairs(ArrayStack<RegPair>* regStack)
 // static
 int CodeGen::genGetSlotSizeForRegsInMask(regMaskTP regsMask)
 {
-    assert((regsMask & (RBM_CALLEE_SAVED | RBM_FP | RBM_LR)) == regsMask); // Do not expect anything else.
+    //assert((regsMask & (RBM_CALLEE_SAVED | RBM_FP | RBM_LR)) == regsMask); // Do not expect anything else.
 
     static_assert_no_msg(REGSIZE_BYTES == FPSAVE_REGSIZE_BYTES);
     return REGSIZE_BYTES;

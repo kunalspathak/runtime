@@ -72,9 +72,10 @@ private:
 
 #ifdef DEBUG
     bool rsModifiedRegsMaskInitialized; // Has rsModifiedRegsMask been initialized? Guards against illegal use.
+    bool rsAllCalleeRegsMaskInitialized; // Has rsAllCalleeSavedMask been initialized? Guards against illegal use.
 #endif                                  // DEBUG
 
-    regMaskTP rsAllCalleeSavedMask = RBM_CALLEE_SAVED;
+    regMaskTP rsAllCalleeSavedMask;
     regMaskTP rsIntCalleeSavedMask = RBM_INT_CALLEE_SAVED;
 
 public:
@@ -84,9 +85,15 @@ public:
         return rsModifiedRegsMask;
     }
 
-    regMaskTP rsGetModifiedCalleeSavedRegsMask() const
+    void rsSetCalleeSaveMask(regMaskTP newMask)
     {
-        assert(rsModifiedRegsMaskInitialized);
+        rsAllCalleeSavedMask = newMask;
+        rsAllCalleeRegsMaskInitialized = true;
+    }
+
+    regMaskTP rsGetModifiedCalleeSavedRegsMask()
+    {
+        assert(rsModifiedRegsMaskInitialized && rsAllCalleeRegsMaskInitialized);
         return (rsModifiedRegsMask & rsAllCalleeSavedMask);
     }
 
@@ -104,11 +111,13 @@ public:
     }
 #endif // TARGET_AMD64
 
+#ifdef TARGET_ARM
     regMaskTP rsGetModifiedFltCalleeSavedRegsMask() const
     {
         assert(rsModifiedRegsMaskInitialized);
         return (rsModifiedRegsMask & RBM_FLT_CALLEE_SAVED);
     }
+#endif // TARGET_ARM
 
     void rsClearRegsModified();
 

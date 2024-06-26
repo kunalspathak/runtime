@@ -2518,6 +2518,32 @@ private:
     }
 #endif // TARGET_AMD64
 
+#if defined(TARGET_ARM64)
+    regMaskTP rbmFltCalleeSaved;
+    regMaskTP rbmMskCalleeSaved;
+    unsigned  cntCalleeSavedFloat;
+    unsigned  cntCalleeSavedMask;
+
+    FORCEINLINE regMaskTP get_RBM_FLT_CALLEE_SAVED() const
+    {
+        return this->rbmFltCalleeSaved;
+    }
+    FORCEINLINE regMaskTP get_RBM_MSK_CALLEE_SAVED() const
+    {
+        return this->rbmMskCalleeSaved;
+    }
+    FORCEINLINE unsigned get_CNT_CALLEE_SAVED_FLOAT() const
+    {
+        return this->cntCalleeSavedFloat;
+    }
+    FORCEINLINE unsigned get_CNT_CALLEE_SAVED_MASK() const
+    {
+        return this->cntCalleeSavedMask;
+    }
+    // Call this function after the equivalent fields in Compiler have been initialized.
+    void CopyRegisterInfo();
+#endif // TARGET_ARM64
+
     CORINFO_FIELD_HANDLE emitFltOrDblConst(double constValue, emitAttr attr);
 #if defined(FEATURE_SIMD)
     CORINFO_FIELD_HANDLE emitSimd8Const(simd8_t constValue);

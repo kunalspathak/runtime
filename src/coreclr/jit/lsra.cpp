@@ -804,7 +804,14 @@ LinearScan::LinearScan(Compiler* theCompiler)
     {
         // zero out RBM_ALL_MSK, callee-save, callee-trash
         // zero out sve_all_mask, etc.
+        rbmMskCalleeSaved = RBM_NONE;
     }
+    else
+    {
+        rbmFltCalleeSaved = compiler->rbmFltCalleeSaved;
+        rbmMskCalleeSaved = compiler->rbmMskCalleeSaved;
+    }
+    memcpy(varTypeCalleeSaveRegs, compiler->varTypeCalleeSaveRegs, sizeof(regMaskTP) * TYP_COUNT);
 #endif
 
     firstColdLoc = MaxLocation;
@@ -3538,7 +3545,7 @@ void LinearScan::checkAndAssignInterval(RegRecord* regRec, Interval* interval)
 // Assign the given physical register interval to the given interval
 void LinearScan::assignPhysReg(RegRecord* regRec, Interval* interval)
 {
-    compiler->codeGen->regSet.rsSetRegsModified(genRegMask(regRec->regNum) DEBUGARG(true));
+    compiler->codeGen->regSet.rsSetRegsModified(genRegMask(regRec->regNum) DEBUGARG(false));
 
     interval->assignedReg = regRec;
     checkAndAssignInterval(regRec, interval);
@@ -3548,7 +3555,7 @@ void LinearScan::assignPhysReg(RegRecord* regRec, Interval* interval)
     if (interval->isLocalVar)
     {
         // Prefer this register for future references
-        interval->updateRegisterPreferences(genSingleTypeRegMask(regRec->regNum));
+        interval->updateRegisterPreferences(genSingleTypeRegMask(regRec->regNum) ARM64_ARG(this));
     }
 }
 
@@ -5531,7 +5538,7 @@ void LinearScan::allocateRegistersMinimal()
                 // don't know yet whether the register will be retained.
                 if (currentInterval->relatedInterval != nullptr)
                 {
-                    currentInterval->relatedInterval->updateRegisterPreferences(assignedRegBit);
+                    currentInterval->relatedInterval->updateRegisterPreferences(assignedRegBit ARM64_ARG(this));
                 }
             }
 
@@ -6771,7 +6778,7 @@ void LinearScan::allocateRegisters()
                     // don't know yet whether the register will be retained.
                     if (currentInterval->relatedInterval != nullptr)
                     {
-                        currentInterval->relatedInterval->updateRegisterPreferences(assignedRegBit);
+                        currentInterval->relatedInterval->updateRegisterPreferences(assignedRegBit ARM64_ARG(this));
                     }
                 }
 
@@ -10023,7 +10030,7 @@ void LinearScan::resolveEdge(BasicBlock*      fromBlock,
                 }
                 else
                 {
-                    compiler->codeGen->regSet.rsSetRegsModified(genRegMask(tempReg) DEBUGARG(true));
+                    compiler->codeGen->regSet.rsSetRegsModified(genRegMask(tempReg) DEBUGARG(false));
 #ifdef TARGET_ARM
                     if (sourceIntervals[fromReg]->registerType == TYP_DOUBLE)
                     {

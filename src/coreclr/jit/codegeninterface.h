@@ -105,6 +105,35 @@ public:
     }
 #endif // TARGET_XARCH
 
+#if defined(TARGET_ARM64)
+private:
+    regMaskTP rbmFltCalleeSaved;
+    regMaskTP rbmMskCalleeSaved;
+    unsigned  cntCalleeSavedFloat;
+    unsigned  cntCalleeSavedMask;
+
+public:
+    FORCEINLINE regMaskTP get_RBM_FLT_CALLEE_SAVED() const
+    {
+        return this->rbmFltCalleeSaved;
+    }
+    FORCEINLINE regMaskTP get_RBM_MSK_CALLEE_SAVED() const
+    {
+        return this->rbmMskCalleeSaved;
+    }
+    FORCEINLINE unsigned get_CNT_CALLEE_SAVED_FLOAT() const
+    {
+        return this->cntCalleeSavedFloat;
+    }
+    FORCEINLINE unsigned get_CNT_CALLEE_SAVED_MASK() const
+    {
+        return this->cntCalleeSavedMask;
+    }
+
+    // Call this function after the equivalent fields in Compiler have been initialized.
+    void CopyRegisterInfo();
+#endif // TARGET_ARM64
+
     // genSpillVar is called by compUpdateLifeVar.
     // TODO-Cleanup: We should handle the spill directly in CodeGen, rather than
     // calling it from compUpdateLifeVar.  Then this can be non-virtual.

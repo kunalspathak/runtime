@@ -11426,8 +11426,34 @@ public:
     {
         return this->cntCalleeTrashFloat;
     }
-
 #endif // TARGET_AMD64
+
+#if defined(TARGET_ARM64)
+private:
+    regMaskTP rbmFltCalleeSaved;
+    regMaskTP rbmMskCalleeSaved;    
+    unsigned cntCalleeSavedFloat;
+    unsigned cntCalleeSavedMask;
+    regMaskTP varTypeCalleeSaveRegs[TYP_COUNT];
+
+public:
+    FORCEINLINE regMaskTP get_RBM_FLT_CALLEE_SAVED() const
+    {
+        return this->rbmFltCalleeSaved;
+    }
+    FORCEINLINE regMaskTP get_RBM_MSK_CALLEE_SAVED() const
+    {
+        return this->rbmMskCalleeSaved;
+    }
+    FORCEINLINE unsigned get_CNT_CALLEE_SAVED_FLOAT() const
+    {
+        return this->cntCalleeSavedFloat;
+    }
+    FORCEINLINE unsigned get_CNT_CALLEE_SAVED_MASK() const
+    {
+        return this->cntCalleeSavedMask;
+    }
+#endif // TARGET_ARM64
 
 #if defined(TARGET_XARCH)
 private:

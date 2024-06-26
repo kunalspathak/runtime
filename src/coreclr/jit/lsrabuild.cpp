@@ -387,7 +387,7 @@ void LinearScan::applyCalleeSaveHeuristics(RefPosition* rp)
 #endif // DEBUG
     {
         // Set preferences so that this register set will be preferred for earlier refs
-        theInterval->mergeRegisterPreferences(rp->registerAssignment);
+        theInterval->mergeRegisterPreferences(rp->registerAssignment ARM64_ARG(this));
     }
 }
 
@@ -697,7 +697,7 @@ void LinearScan::addKillForRegs(regMaskTP mask, LsraLocation currentLoc)
     // CORINFO_HELP_ASSIGN_BYREF helper, which kills callee-saved RSI and
     // RDI, if LSRA doesn't assign RSI/RDI, they wouldn't get marked as
     // modified until codegen, which is too late.
-    compiler->codeGen->regSet.rsSetRegsModified(mask DEBUGARG(true));
+    compiler->codeGen->regSet.rsSetRegsModified(mask DEBUGARG(false));
 
     RefPosition* pos = newRefPosition((Interval*)nullptr, currentLoc, RefTypeKill, nullptr, mask.getLow());
 
@@ -827,7 +827,7 @@ regMaskTP LinearScan::getKillSetForCall(GenTreeCall* call)
         if (call->IsCallContainsSveArgsOrResult())
         {
             // For sve callee, caller needs to preserve v0-v7, v24-v31, p0-p3
-            killMask = RBM_INT_CALLEE_TRASH | RBM_SVE_CALLEE_TRASH | RBM_MSK_CALLEE_TRASH;
+            killMask = RBM_INT_CALLEE_TRASH | RBM_FLT_CALLEE_TRASH | RBM_MSK_CALLEE_TRASH;
         }
         else
         {
@@ -1193,7 +1193,7 @@ bool LinearScan::buildKillPositionsForNode(GenTree* tree, LsraLocation currentLo
                             // reason mentioned above.
                             interval->registerAversion |= regsKillMask;
                         }
-                        interval->updateRegisterPreferences(newPreferences);
+                        interval->updateRegisterPreferences(newPreferences ARM64_ARG(this));
                     }
                     else
                     {
@@ -1499,7 +1499,7 @@ void LinearScan::buildUpperVectorSaveRefPositions(GenTree*                tree,
         // We assume that the kill set includes at least some callee-trash registers, but
         // that it doesn't include any callee-save registers.
         assert((fpCalleeKillSet & RBM_FLT_CALLEE_TRASH) != RBM_NONE);
-        assert((fpCalleeKillSet & RBM_FLT_CALLEE_SAVED) == RBM_NONE);
+        assert((fpCalleeKillSet & RBM_FLT_CALLEE_SAVED_INIT) == RBM_NONE);
 
         // We should only save the upper half of any large vector vars that are currently live.
         // However, the liveness information may not be accurate, specially around the place where
@@ -1529,9 +1529,10 @@ void LinearScan::buildUpperVectorSaveRefPositions(GenTree*                tree,
             Interval* varInterval = getIntervalForLocalVar(varIndex);
             if (!varInterval->isPartiallySpilled)
             {
+                //TODO: Check what need to be changed here. 
                 Interval*    upperVectorInterval = getUpperVectorInterval(varIndex);
                 RefPosition* pos = newRefPosition(upperVectorInterval, currentLoc, RefTypeUpperVectorSave, tree,
-                                                  RBM_FLT_CALLEE_SAVED.GetFloatRegSet());
+                                                  RBM_FLT_CALLEE_SAVED_INIT.GetFloatRegSet());
                 varInterval->isPartiallySpilled = true;
                 pos->skipSaveRestore            = blockAlwaysReturn;
                 pos->liveVarUpperSave           = VarSetOps::IsMember(compiler, liveLargeVectors, varIndex);
@@ -1951,6 +1952,7 @@ void LinearScan::buildPhysRegRecords()
     {
         RegRecord* curr = &physRegs[reg];
         curr->init(reg);
+        curr->isCalleeSave = ((RBM_CALLEE_SAVED & genRegMask(reg)) != 0);
     }
     for (unsigned int i = 0; i < lsraRegOrderSize; i++)
     {
@@ -2967,7 +2969,7 @@ void LinearScan::stressSetRandomParameterPreferences()
         }
 
         *regs &= ~genRegMask(prefReg);
-        interval->mergeRegisterPreferences(genSingleTypeRegMask(prefReg));
+        interval->mergeRegisterPreferences(genSingleTypeRegMask(prefReg) ARM64_ARG(this));
     }
 }
 
@@ -3268,7 +3270,7 @@ void LinearScan::BuildKills(GenTree* tree, regMaskTP killMask)
         // RefPositions in that case.
         // This must be done after the kills, so that we know which large vectors are still live.
         //
-        if ((killMask & RBM_FLT_CALLEE_TRASH) != RBM_NONE)
+        if ((killMask & RBM_FLT_CALLEE_TRASH) != RBM_NONE) // check properly for SVE
         {
             buildUpperVectorSaveRefPositions(tree, currentLoc + 1 DEBUG_ARG(killMask & RBM_FLT_CALLEE_TRASH));
         }
@@ -3430,7 +3432,7 @@ void LinearScan::UpdatePreferencesOfDyingLocal(Interval* interval)
         SingleTypeRegSet unprefSet = unpref.GetRegSetForType(interval->registerType);
         interval->registerAversion |= unprefSet;
         SingleTypeRegSet newPreferences = allRegs(interval->registerType) & ~unprefSet;
-        interval->updateRegisterPreferences(newPreferences);
+        interval->updateRegisterPreferences(newPreferences ARM64_ARG(this));
     }
 }
 

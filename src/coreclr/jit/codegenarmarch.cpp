@@ -4599,7 +4599,7 @@ void CodeGen::genPushCalleeSavedRegisters()
     rsPushRegs |= RBM_LR; // We must save the return address (in the LR register)
 
     regSet.rsMaskCalleeSaved = rsPushRegs;
-
+    //compiler->compCalleeRegsPushed = genCountBits(rsPushRegs);
 #ifdef DEBUG
     if (compiler->compCalleeRegsPushed != genCountBits(rsPushRegs))
     {
@@ -4719,7 +4719,9 @@ void CodeGen::genPushCalleeSavedRegisters()
 
     int offset; // This will be the starting place for saving the callee-saved registers, in increasing order.
 
-    regMaskTP maskSaveRegsFloat = rsPushRegs & RBM_ALLFLOAT;
+    regMaskTP allFloat = RBM_ALLFLOAT;
+    regMaskTP savedFloat        = RBM_FLT_CALLEE_SAVED;
+    regMaskTP maskSaveRegsFloat = rsPushRegs & allFloat;
     regMaskTP maskSaveRegsInt   = rsPushRegs & ~maskSaveRegsFloat;
 
 #ifdef DEBUG

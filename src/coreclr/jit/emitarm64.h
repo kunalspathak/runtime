@@ -38,7 +38,7 @@ bool ContainsCallWithSveArgumentsOrReturn() const {
     return containsCallWithSveArgumentsOrReturn;
 }
 void SetContainsCallWithSveArgumentsOrReturn(bool value) {
-    containsCallWithSveArgumentsOrReturn = false; //value;
+    containsCallWithSveArgumentsOrReturn = value;
 }
 
 bool hasSveParameterOrReturn = false;
@@ -46,7 +46,7 @@ bool HasSveParameterOrReturn() const {
     return hasSveParameterOrReturn;
 }
 void SetHasSveParameterOrReturn(bool value) {
-    hasSveParameterOrReturn = false;
+    hasSveParameterOrReturn = value;
      //value;
 }
 

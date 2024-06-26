@@ -508,6 +508,11 @@ void CodeGen::genPrologSaveRegPair(regNumber reg1,
         //assert((reg1 >= REG_R0) && (reg1 <= REG_R30));
         GetEmitter()->emitIns_R_R_R_I(INS_stp, EA_PTRSIZE, reg1, reg2, REG_SPBASE, spOffset);
 
+        if (emitter::isFloatReg(reg1) && (reg1 >= REG_V16))
+        {
+            useSaveNextPair = false;
+        }
+
         if (TargetOS::IsUnix && compiler->generateCFIUnwindCodes())
         {
             useSaveNextPair = false;
@@ -640,6 +645,11 @@ void CodeGen::genEpilogRestoreRegPair(regNumber reg1,
     else
     {
         GetEmitter()->emitIns_R_R_R_I(INS_ldp, EA_PTRSIZE, reg1, reg2, REG_SPBASE, spOffset);
+
+        if (emitter::isFloatReg(reg1) && (reg1 >= REG_V16))
+        {
+            useSaveNextPair = false;
+        }
 
         if (TargetOS::IsUnix && compiler->generateCFIUnwindCodes())
         {

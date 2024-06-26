@@ -528,9 +528,9 @@ struct Agnostic_GetThreadLocalStaticBlocksInfo
     DWORDLONG                     tlsIndexObject;
     DWORDLONG                     threadVarsSection;
     DWORD                         offsetOfThreadLocalStoragePointer;
-    DWORD                         offsetOfMaxThreadStaticBlocks;
-    DWORD                         offsetOfThreadStaticBlocks;
-    DWORD                         offsetOfGCDataPointer;
+    DWORDLONG                     offsetOfMaxThreadStaticBlocks;
+    DWORDLONG                     offsetOfThreadStaticBlocks;
+    DWORDLONG                     offsetOfGCDataPointer;
 };
 
 struct Agnostic_GetThreadLocalFieldInfo

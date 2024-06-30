@@ -11224,9 +11224,14 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
                 JITDUMP("---> Recording for IN%04x :\n", idNum);
                 if (id->idIsDspReloc())
                 {
-                    emitRecordRelocation(odst, id->idAddr()->iiaAddr,
-                                         id->idIsTlsGD() ? IMAGE_REL_AARCH64_TLSDESC_ADR_PAGE21
-                                                         : IMAGE_REL_ARM64_PAGEBASE_REL21);
+                    if (id->idIsTlsGD())
+                    {
+                        emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_AARCH64_TLSDESC_ADD_LO12);
+                    }
+                    else
+                    {
+                        emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_PAGEOFFSET_12A);
+                    }
                 }
                 else
                 {
@@ -11275,7 +11280,6 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
 
             unsigned idNum = id->idDebugOnlyInfo()->idNum;
             JITDUMP("---> Recording for IN%04x :\n", idNum);
-            uint16_t relocType = id->idIsTlsGD() ? IMAGE_REL_AARCH64_TLSDESC_ADD_LO12 : IMAGE_REL_ARM64_PAGEOFFSET_12A;
             if (id->idIsReloc())
             {
                 assert(sz == sizeof(instrDesc));
@@ -11283,13 +11287,18 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
 
                 if (id->idIsDspReloc())
                 {
-                    emitRecordRelocation(odst, id->idAddr()->iiaAddr,
-                                         id->idIsTlsGD() ? IMAGE_REL_AARCH64_TLSDESC_ADD_LO12
-                                                         : IMAGE_REL_ARM64_PAGEOFFSET_12A);
+                    if (id->idIsTlsGD())
+                    {
+                        emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_AARCH64_TLSDESC_ADD_LO12);
+                    }
+                    else
+                    {
+                        emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_PAGEOFFSET_12A);
+                    }
                 }
                 else
                 {
-                    assert(relocType == IMAGE_REL_ARM64_PAGEOFFSET_12A);
+                    assert(!id->idIsTlsGD());
                     assert(id->idAddr()->iiaAddr != nullptr);
                     emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_PAGEOFFSET_12A);
                 }

@@ -15617,6 +15617,8 @@ BYTE* emitter::emitOutputRI(BYTE* dst, instrDesc* id)
         }
 #endif
 
+        unsigned idNum = id->idDebugOnlyInfo()->idNum;
+        JITDUMP("---> Recording for IN%04x :\n", idNum);
         if (id->idIsCnsReloc())
         {
             if (emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI) && id->idAddr()->iiaSecRel)
@@ -15629,6 +15631,10 @@ BYTE* emitter::emitOutputRI(BYTE* dst, instrDesc* id)
                 emitRecordRelocation((void*)(dst - (unsigned)EA_SIZE(size)), (void*)(size_t)val,
                                      IMAGE_REL_BASED_MOFFSET);
             }
+        }
+        else
+        {
+            JITDUMP("skipped\n");
         }
 
         goto DONE;

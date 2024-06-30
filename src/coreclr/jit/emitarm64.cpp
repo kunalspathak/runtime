@@ -8590,7 +8590,15 @@ void emitter::emitIns_R_AI(instruction  ins,
     id->idOpSize(size);
     id->idAddr()->iiaAddr = (BYTE*)addr;
     id->idReg1(ireg);
-    id->idSetIsDspReloc();
+    if (EA_IS_CNS_SEC_RELOC(attr))
+    {
+        id->idSetIsCnsReloc();
+    }
+    else
+    {
+        id->idSetIsDspReloc();
+    }
+    
 #ifdef DEBUG
     id->idDebugOnlyInfo()->idMemCookie = targetHandle;
     id->idDebugOnlyInfo()->idFlags     = gtFlags;
@@ -11205,15 +11213,26 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
 
         case IF_DI_1E: // DI_1E   .ii.....iiiiiiii iiiiiiiiiiiddddd      Rd       simm21
         case IF_LARGEADR:
+        {
             assert(insOptsNone(id->idInsOpt()));
             if (id->idIsReloc())
             {
                 code = emitInsCode(ins, fmt);
                 code |= insEncodeReg_Rd(id->idReg1()); // ddddd
                 dst += emitOutput_Instr(dst, code);
-                emitRecordRelocation(odst, id->idAddr()->iiaAddr,
-                                     id->idIsTlsGD() ? IMAGE_REL_AARCH64_TLSDESC_ADR_PAGE21
-                                                     : IMAGE_REL_ARM64_PAGEBASE_REL21);
+                unsigned idNum = id->idDebugOnlyInfo()->idNum;
+                JITDUMP("---> Recording for IN%04x :\n", idNum);
+                if (id->idIsDspReloc())
+                {
+                    emitRecordRelocation(odst, id->idAddr()->iiaAddr,
+                                         id->idIsTlsGD() ? IMAGE_REL_AARCH64_TLSDESC_ADR_PAGE21
+                                                         : IMAGE_REL_ARM64_PAGEBASE_REL21);
+                }
+                else
+                {
+                    assert(id->idIsCnsReloc());
+                    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_PAGEBASE_REL21);
+                }
             }
             else
             {
@@ -11223,6 +11242,7 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
             }
             sz = sizeof(instrDescJmp);
             break;
+        }
 
         case IF_DI_1F: // DI_1F   X..........iiiii cccc..nnnnn.nzcv      Rn imm5  nzcv cond
             imm = emitGetInsSC(id);
@@ -11241,6 +11261,7 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
             break;
 
         case IF_DI_2A: // DI_2A   X.......shiiiiii iiiiiinnnnnddddd      Rd Rn    imm(i12,sh)
+        {
             assert(insOptsNone(id->idInsOpt()) || insOptsLSL12(id->idInsOpt()));
             imm = emitGetInsSC(id);
             assert(isValidUimm<12>(imm));
@@ -11252,15 +11273,29 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
             code |= insEncodeReg_Rn(id->idReg2());       // nnnnn
             dst += emitOutput_Instr(dst, code);
 
+            unsigned idNum = id->idDebugOnlyInfo()->idNum;
+            JITDUMP("---> Recording for IN%04x :\n", idNum);
+            uint16_t relocType = id->idIsTlsGD() ? IMAGE_REL_AARCH64_TLSDESC_ADD_LO12 : IMAGE_REL_ARM64_PAGEOFFSET_12A;
             if (id->idIsReloc())
             {
                 assert(sz == sizeof(instrDesc));
                 assert(id->idAddr()->iiaAddr != nullptr);
-                emitRecordRelocation(odst, id->idAddr()->iiaAddr,
-                                     id->idIsTlsGD() ? IMAGE_REL_AARCH64_TLSDESC_ADD_LO12
-                                                     : IMAGE_REL_ARM64_PAGEOFFSET_12A);
+
+                if (id->idIsDspReloc())
+                {
+                    emitRecordRelocation(odst, id->idAddr()->iiaAddr,
+                                         id->idIsTlsGD() ? IMAGE_REL_AARCH64_TLSDESC_ADD_LO12
+                                                         : IMAGE_REL_ARM64_PAGEOFFSET_12A);
+                }
+                else
+                {
+                    assert(relocType == IMAGE_REL_ARM64_PAGEOFFSET_12A);
+                    assert(id->idAddr()->iiaAddr != nullptr);
+                    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_PAGEOFFSET_12A);
+                }
             }
             break;
+        }
 
         case IF_DI_2B: // DI_2B   X.........Xnnnnn ssssssnnnnnddddd      Rd Rn    imm(0-63)
             code = emitInsCode(ins, fmt);

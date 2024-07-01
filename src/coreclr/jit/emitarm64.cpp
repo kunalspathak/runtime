@@ -3996,7 +3996,23 @@ void emitter::emitIns_R_I(instruction ins,
     assert(canEncode);
     assert(fmt != IF_NONE);
 
-    instrDesc* id = emitNewInstrSC(attr, imm);
+    instrDesc* id; 
+    if (emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI))
+    {
+        if (EA_IS_CNS_SEC_RELOC(attr))
+        {
+            id                      = emitNewInstrCns(attr, imm);
+            id->idAddr()->iiaSecRel = true;
+        }
+        else
+        {
+            id = emitNewInstrSC(attr, imm);
+        }
+    }
+    else
+    {
+        id = emitNewInstrSC(attr, imm);
+    }
 
     id->idIns(ins);
     id->idInsFmt(fmt);
@@ -11226,17 +11242,17 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
                 {
                     if (id->idIsTlsGD())
                     {
-                        emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_AARCH64_TLSDESC_ADD_LO12);
+                        emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_AARCH64_TLSDESC_ADR_PAGE21);
                     }
                     else
                     {
-                        emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_PAGEOFFSET_12A);
+                        emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_PAGEBASE_REL21);
                     }
                 }
                 else
                 {
                     assert(id->idIsCnsReloc());
-                    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_PAGEBASE_REL21);
+                    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_SECREL);
                 }
             }
             else
@@ -11300,7 +11316,7 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
                 {
                     assert(!id->idIsTlsGD());
                     assert(id->idAddr()->iiaAddr != nullptr);
-                    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_PAGEOFFSET_12A);
+                    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_SECREL);
                 }
             }
             break;

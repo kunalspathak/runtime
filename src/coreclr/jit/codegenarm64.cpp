@@ -2235,15 +2235,27 @@ void CodeGen::instGen_Set_Reg_To_Imm(emitAttr       size,
 {
     // reg cannot be a FP register
     assert(!genIsValidFloatReg(reg));
+
+    emitAttr origAttr = size;
     if (!compiler->opts.compReloc)
     {
         size = EA_SIZE(size); // Strip any Reloc flags from size if we aren't doing relocs
     }
 
-    if (EA_IS_RELOC(size))
+    if (EA_IS_RELOC(size) )
     {
-        // This emits a pair of adrp/add (two instructions) with fix-ups.
-        GetEmitter()->emitIns_R_AI(INS_adrp, size, reg, imm DEBUGARG(targetHandle) DEBUGARG(gtFlags));
+        
+        //{
+        //    
+        //    GetEmitter()->emitIns_R_I(INS_mov, size, reg, imm, INS_OPTS_NONE, INS_SCALABLE_OPTS_NONE DEBUGARG(targetHandle) DEBUGARG(gtFlags));
+        //}
+        //if (!)
+        {
+            // This emits a pair of adrp/add (two instructions) with fix-ups.
+            GetEmitter()->emitIns_R_AI(INS_adrp, size, reg, imm DEBUGARG(targetHandle) DEBUGARG(gtFlags));
+
+            // For section constant, the immediate will be relocatable below
+        }
     }
     else if (imm == 0)
     {
@@ -2357,9 +2369,12 @@ void CodeGen::genSetRegToConst(regNumber targetReg, var_types targetType, GenTre
                 attr = EA_SET_FLG(attr, EA_BYREF_FLG);
             }
 
-            if (con->IsIconHandle(GTF_ICON_SECREL_OFFSET))
+            if (compiler->IsTargetAbi(CORINFO_NATIVEAOT_ABI))
             {
-                attr = EA_SET_FLG(attr, EA_CNS_SEC_RELOC);
+                if (con->IsIconHandle(GTF_ICON_SECREL_OFFSET))
+                {
+                    attr = EA_SET_FLG(attr, EA_CNS_SEC_RELOC);
+                }
             }
 
             instGen_Set_Reg_To_Imm(attr, targetReg, cnsVal,

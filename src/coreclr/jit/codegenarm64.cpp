@@ -2244,17 +2244,22 @@ void CodeGen::instGen_Set_Reg_To_Imm(emitAttr       size,
 
     if (EA_IS_RELOC(size) )
     {
+
+        // 1. Here, we should probably, call emitIns_R_I() and inside it, just special case that if it is TLS related
+        // then also store the `idAddr()` that contains the `target` and have the mov value to be 0.
+        // Then during output, just emit mov rdx, #0, but then, during recording, get the value from idAddr()
+        // and record it against SECREL.
         
-        //{
-        //    
-        //    GetEmitter()->emitIns_R_I(INS_mov, size, reg, imm, INS_OPTS_NONE, INS_SCALABLE_OPTS_NONE DEBUGARG(targetHandle) DEBUGARG(gtFlags));
-        //}
-        //if (!)
+        if (!EA_IS_CNS_SEC_RELOC(origAttr))
         {
             // This emits a pair of adrp/add (two instructions) with fix-ups.
             GetEmitter()->emitIns_R_AI(INS_adrp, size, reg, imm DEBUGARG(targetHandle) DEBUGARG(gtFlags));
 
             // For section constant, the immediate will be relocatable below
+        }
+        else
+        {
+            GetEmitter()->emitIns_Mov_Tls_Reloc(size, reg, imm DEBUGARG(gtFlags));
         }
     }
     else if (imm == 0)
@@ -2373,7 +2378,7 @@ void CodeGen::genSetRegToConst(regNumber targetReg, var_types targetType, GenTre
             {
                 if (con->IsIconHandle(GTF_ICON_SECREL_OFFSET))
                 {
-                    attr = EA_SET_FLG(attr, EA_CNS_TLSGD_RELOC);
+                    attr = EA_SET_FLG(attr, EA_CNS_SEC_RELOC);
                 }
             }
 

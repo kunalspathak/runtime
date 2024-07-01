@@ -365,7 +365,7 @@ void emitter::emitInsSanityCheck(instrDesc* id)
         case IF_DI_1B: // DI_1B   X........hwiiiii iiiiiiiiiiiddddd      Rd       imm(i16,hw)
             assert(isValidGeneralDatasize(id->idOpSize()));
             assert(isGeneralRegister(id->idReg1()));
-            assert(isValidImmHWVal(emitGetInsSC(id), id->idOpSize()));
+            assert(isValidImmHWVal(emitGetInsSC(id), id->idOpSize()) || id->idIsCnsReloc());
             break;
 
         case IF_DI_1C: // DI_1C   X........Nrrrrrr ssssssnnnnn.....         Rn    imm(N,r,s)
@@ -3743,6 +3743,34 @@ void emitter::emitIns_R(instruction ins, emitAttr attr, regNumber reg, insOpts o
     appendToCurIG(id);
 }
 
+void emitter::emitIns_Mov_Tls_Reloc(emitAttr    attr,
+                                    regNumber   reg,
+                                    ssize_t imm DEBUGARG(GenTreeFlags gtFlags /* = GTF_EMPTY */))
+{
+    emitAttr size = EA_SIZE(attr);
+
+    assert(emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI));    
+    assert(isValidGeneralDatasize(size));
+    assert(EA_IS_CNS_SEC_RELOC(attr));
+    instrDesc* id                      = emitNewInstrCns(attr, 0);
+    id->idAddr()->iiaAddr = (byte*)imm;
+    id->idSetIsCnsReloc();
+
+    id->idIns(INS_mov);
+    id->idInsFmt(IF_DI_1B);
+    id->idInsOpt(INS_OPTS_NONE);
+
+    id->idReg1(reg);
+
+#ifdef DEBUG
+    id->idDebugOnlyInfo()->idMemCookie = imm;
+    id->idDebugOnlyInfo()->idFlags     = gtFlags;
+#endif
+
+    dispIns(id);
+    appendToCurIG(id);
+}
+
 /*****************************************************************************
  *
  *  Add an instruction referencing a register and a constant.
@@ -3800,6 +3828,9 @@ void emitter::emitIns_R_I(instruction ins,
             break;
 
         case INS_mov:
+
+            //TODO: Somewhere need to check for cnsReloc
+
             assert(isValidGeneralDatasize(size));
             assert(insOptsNone(opt)); // No explicit LSL here
             // We will automatically determine the shift based upon the imm
@@ -11198,14 +11229,28 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
             break;
 
         case IF_DI_1B: // DI_1B   X........hwiiiii iiiiiiiiiiiddddd      Rd       imm(i16,hw)
+        {
+            byte* relocTarget = nullptr;
             imm = emitGetInsSC(id);
+
+            //if (emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI) && id->idIsCnsReloc())
+            //{
+            //    relocTarget = (byte*)imm;
+            //    imm = 0;
+            //}
+
             assert(isValidImmHWVal(imm, id->idOpSize()));
             code = emitInsCode(ins, fmt);
             code |= insEncodeDatasize(id->idOpSize()); // X
             code |= ((code_t)imm << 5);                // hwiiiii iiiiiiiiiii
             code |= insEncodeReg_Rd(id->idReg1());     // ddddd
             dst += emitOutput_Instr(dst, code);
+            if (emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI) && id->idIsCnsReloc())
+            {
+                emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_SECREL);
+            }
             break;
+        }
 
         case IF_DI_1C: // DI_1C   X........Nrrrrrr ssssssnnnnn.....         Rn    imm(N,r,s)
             imm = emitGetInsSC(id);

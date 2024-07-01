@@ -356,6 +356,7 @@ namespace ILCompiler.ObjectWriter
                                     IMAGE_REL_BASED_ARM64_PAGEOFFSET_12A => IMAGE_REL_ARM64_PAGEOFFSET_12A,
                                     IMAGE_REL_SECREL => IMAGE_REL_ARM64_SECREL,
                                     IMAGE_REL_SECTION => IMAGE_REL_ARM64_SECTION,
+                                    IMAGE_REL_ARM64_TLS_SECREL => IMAGE_REL_ARM64_SECREL,
                                     _ => throw new NotSupportedException($"Unsupported relocation: {relocation.Type}")
                                 },
                             });

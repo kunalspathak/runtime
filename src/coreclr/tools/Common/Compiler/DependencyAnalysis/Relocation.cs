@@ -43,7 +43,8 @@ namespace ILCompiler.DependencyAnalysis
         // LE model
         IMAGE_REL_TPOFF                      = 0x106,
 
-
+        // Windows arm64
+        IMAGE_REL_ARM64_TLS_SECREL = 0x8,
 
         // Linux arm64
         //    TLSDESC  (dynamic)
@@ -488,6 +489,7 @@ namespace ILCompiler.DependencyAnalysis
                 case RelocType.IMAGE_REL_AARCH64_TLSDESC_CALL:
                     *(int*)location = (int)value;
                     break;
+                case RelocType.IMAGE_REL_ARM64_TLS_SECREL:
                 case RelocType.IMAGE_REL_AARCH64_TLSDESC_LD64_LO12:
                     break;
                 case RelocType.IMAGE_REL_BASED_DIR64:

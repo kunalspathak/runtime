@@ -11247,7 +11247,7 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
             dst += emitOutput_Instr(dst, code);
             if (emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI) && id->idIsCnsReloc())
             {
-                emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_SECREL);
+                emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_SECREL);
             }
             break;
         }

@@ -8606,11 +8606,11 @@ void emitter::emitIns_R_AI(instruction  ins,
     id->idOpSize(size);
     id->idAddr()->iiaAddr = (BYTE*)addr;
     id->idReg1(ireg);
-    if (EA_IS_CNS_SEC_RELOC(attr))
+    if (EA_IS_CNS_TLSGD_RELOC(attr))
     {
-        id->idSetIsCnsReloc();
+        id->idSetTlsGD();
     }
-    else
+    //else
     {
         id->idSetIsDspReloc();
     }
@@ -11242,17 +11242,30 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
                 {
                     if (id->idIsTlsGD())
                     {
-                        emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_AARCH64_TLSDESC_ADR_PAGE21);
+                        if (emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI))
+                        {
+                            emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_SECREL);
+                        }
+                        else
+                        {
+                            emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_AARCH64_TLSDESC_ADR_PAGE21);
+                        }
                     }
                     else
                     {
                         emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_PAGEBASE_REL21);
                     }
                 }
+                //else if (id->idIsTlsGD())
+                //{
+                //    //assert(!id->idIsTlsGD());
+                //    assert(id->idAddr()->iiaAddr != nullptr);
+                //    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_SECREL);
+                //}
                 else
                 {
                     assert(id->idIsCnsReloc());
-                    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_SECREL);
+                    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_PAGEBASE_REL21);
                 }
             }
             else
@@ -11305,18 +11318,31 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
                 {
                     if (id->idIsTlsGD())
                     {
-                        emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_AARCH64_TLSDESC_ADD_LO12);
+                        if (emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI))
+                        {
+                            emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_AARCH64_TLSDESC_ADD_LO12);
+                        }
+                        else
+                        {
+                            emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_SECREL);
+                        }
                     }
                     else
                     {
                         emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_PAGEOFFSET_12A);
                     }
                 }
+                //else if (id->idIsTlsGD())
+                //{
+                //    //assert(!id->idIsTlsGD());
+                //    assert(id->idAddr()->iiaAddr != nullptr);
+                //    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_SECREL);
+                //}
                 else
                 {
                     assert(!id->idIsTlsGD());
                     assert(id->idAddr()->iiaAddr != nullptr);
-                    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_SECREL);
+                    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_PAGEOFFSET_12A);
                 }
             }
             break;

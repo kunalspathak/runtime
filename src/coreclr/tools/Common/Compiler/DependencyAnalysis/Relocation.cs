@@ -42,7 +42,7 @@ namespace ILCompiler.DependencyAnalysis
         // Hence, IMAGE_REL_BASED_ARM64_SECREL_HIGH12A is assigned a different value.
         // IMAGE_REL_BASED_ARM64_SECREL_LOW12L is assigned 0x1B, just for consistency.
         IMAGE_REL_BASED_ARM64_SECREL_HIGH12A        = 0x1A,  // ADD high 12-bit offset for tls
-        IMAGE_REL_BASED_ARM64_SECREL_LOW12L        = 0x1B,  // ADD low 12-bit offset for tls
+        IMAGE_REL_BASED_ARM64_SECREL_LOW12L         = 0x1B,  // ADD low 12-bit offset for tls
 
         // Linux x64
         // GD model
@@ -297,6 +297,8 @@ namespace ILCompiler.DependencyAnalysis
 
         //*****************************************************************************
         //  Deposit the PC-Relative offset 'imm12' into an add instruction
+        //  Same as PutArm64Rel12(), except the assert here checks if "LSL #3" is encoded
+        //  in the instruction.
         //*****************************************************************************
         private static unsafe void PutArm64TlsRel12(uint* pCode, int imm12)
         {

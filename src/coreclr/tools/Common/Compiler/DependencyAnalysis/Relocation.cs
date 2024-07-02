@@ -37,9 +37,12 @@ namespace ILCompiler.DependencyAnalysis
         // Windows x64
         IMAGE_REL_SECREL                     = 0x104,
 
-        // Windows arm64
-        IMAGE_REL_BASED_ARM64_SECREL_HIGH12A       = 0x1A,
-        IMAGE_REL_BASED_ARM64_SECREL_LOW12L        = 0x1B,
+        // Windows arm64 TLS access
+        // The value of IMAGE_REL_BASED_ARM64_SECREL_HIGH12A and IMAGE_REL_BASED_DIR64 are same.
+        // Hence, IMAGE_REL_BASED_ARM64_SECREL_HIGH12A is assigned a different value.
+        // IMAGE_REL_BASED_ARM64_SECREL_LOW12L is assigned 0x1B, just for consistency.
+        IMAGE_REL_BASED_ARM64_SECREL_HIGH12A        = 0x1A,  // ADD high 12-bit offset for tls
+        IMAGE_REL_BASED_ARM64_SECREL_LOW12L        = 0x1B,  // ADD low 12-bit offset for tls
 
         // Linux x64
         // GD model
@@ -282,7 +285,27 @@ namespace ILCompiler.DependencyAnalysis
 
             uint addInstr = *pCode;
             // Check add opcode 1001 0001 00...
-            //Debug.Assert((addInstr & 0xFFC00000) == 0x91000000);
+            Debug.Assert((addInstr & 0xFFC00000) == 0x91000000);
+
+            addInstr &= 0xFFC003FF;          // keep bits 31-22, 9-0
+            addInstr |= (uint)(imm12 << 10); // Occupy 21-10.
+
+            *pCode = addInstr;               // write the assembled instruction
+
+            Debug.Assert(GetArm64Rel12(pCode) == imm12);
+        }
+
+        //*****************************************************************************
+        //  Deposit the PC-Relative offset 'imm12' into an add instruction
+        //*****************************************************************************
+        private static unsafe void PutArm64TlsRel12(uint* pCode, int imm12)
+        {
+            // Verify that we got a valid offset
+            Debug.Assert(FitsInRel12(imm12));
+
+            uint addInstr = *pCode;
+            // Check add opcode 1001 0001 00...
+            Debug.Assert((addInstr & 0xFFC00000) == 0x91400000);
 
             addInstr &= 0xFFC003FF;          // keep bits 31-22, 9-0
             addInstr |= (uint)(imm12 << 10); // Occupy 21-10.
@@ -509,9 +532,11 @@ namespace ILCompiler.DependencyAnalysis
                 case RelocType.IMAGE_REL_AARCH64_TLSDESC_ADR_PAGE21:
                     PutArm64Rel21((uint*)location, (int)value);
                     break;
+                case RelocType.IMAGE_REL_BASED_ARM64_SECREL_HIGH12A:
+                    PutArm64TlsRel12((uint*)location, (int)value);
+                    break;
                 case RelocType.IMAGE_REL_BASED_ARM64_PAGEOFFSET_12A:
                 case RelocType.IMAGE_REL_AARCH64_TLSDESC_ADD_LO12:
-                case RelocType.IMAGE_REL_BASED_ARM64_SECREL_HIGH12A:
                 case RelocType.IMAGE_REL_BASED_ARM64_SECREL_LOW12L:
                     PutArm64Rel12((uint*)location, (int)value);
                     break;

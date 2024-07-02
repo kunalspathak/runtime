@@ -493,7 +493,8 @@ namespace ILCompiler.DependencyAnalysis
                 case RelocType.IMAGE_REL_AARCH64_TLSDESC_LD64_LO12:
                     break;
                 case RelocType.IMAGE_REL_BASED_DIR64:
-                    *(long*)location = value;
+                    //*(long*)location = value;
+                    PutArm64Rel12((uint*)location, (int)value);
                     break;
                 case RelocType.IMAGE_REL_BASED_THUMB_MOV32:
                 case RelocType.IMAGE_REL_BASED_THUMB_MOV32_PCREL:
@@ -511,7 +512,7 @@ namespace ILCompiler.DependencyAnalysis
                     break;
                 case RelocType.IMAGE_REL_BASED_ARM64_PAGEOFFSET_12A:
                 case RelocType.IMAGE_REL_AARCH64_TLSDESC_ADD_LO12:
-                case RelocType.IMAGE_REL_BASED_ARM64_SECREL_HIGH12A:
+                //case RelocType.IMAGE_REL_BASED_ARM64_SECREL_HIGH12A:
                 case RelocType.IMAGE_REL_BASED_ARM64_SECREL_LOW12L:
                     PutArm64Rel12((uint*)location, (int)value);
                     break;
@@ -557,7 +558,8 @@ namespace ILCompiler.DependencyAnalysis
                 case RelocType.IMAGE_REL_SYMBOL_SIZE:
                     return *(int*)location;
                 case RelocType.IMAGE_REL_BASED_DIR64:
-                    return *(long*)location;
+                    //return *(long*)location;
+                    return GetArm64Rel12((uint*)location);
                 case RelocType.IMAGE_REL_BASED_THUMB_MOV32:
                 case RelocType.IMAGE_REL_BASED_THUMB_MOV32_PCREL:
                     return (long)GetThumb2Mov32((ushort*)location);
@@ -568,7 +570,7 @@ namespace ILCompiler.DependencyAnalysis
                 case RelocType.IMAGE_REL_BASED_ARM64_PAGEBASE_REL21:
                     return GetArm64Rel21((uint*)location);
                 case RelocType.IMAGE_REL_BASED_ARM64_PAGEOFFSET_12A:
-                case RelocType.IMAGE_REL_BASED_ARM64_SECREL_HIGH12A:
+                //case RelocType.IMAGE_REL_BASED_ARM64_SECREL_HIGH12A:
                 case RelocType.IMAGE_REL_BASED_ARM64_SECREL_LOW12L:
                     return GetArm64Rel12((uint*)location);
                 case RelocType.IMAGE_REL_AARCH64_TLSDESC_LD64_LO12:

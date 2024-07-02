@@ -3743,7 +3743,7 @@ void emitter::emitIns_R(instruction ins, emitAttr attr, regNumber reg, insOpts o
     appendToCurIG(id);
 }
 
-void emitter::emitIns_Mov_Tls_Reloc(emitAttr    attr,
+void emitter::emitIns_Add_Add_Tls_Reloc(emitAttr    attr,
                                     regNumber   reg,
                                     ssize_t imm DEBUGARG(GenTreeFlags gtFlags /* = GTF_EMPTY */))
 {
@@ -8662,16 +8662,6 @@ void emitter::emitIns_R_AI(instruction  ins,
     id->idOpSize(size);
     id->idAddr()->iiaAddr = (BYTE*)addr;
     id->idReg1(ireg);
-    //id->idSetIsDspReloc();
-    if (EA_IS_CNS_SEC_RELOC(attr))
-    {
-        id->idSetTlsGD();
-        id->idOpSize(EA_8BYTE); // since this is relocation
-    }
-    //else
-    //{
-    //    
-    //}
     id->idSetIsDspReloc();
 #ifdef DEBUG
     id->idDebugOnlyInfo()->idMemCookie = targetHandle;
@@ -8692,14 +8682,10 @@ void emitter::emitIns_R_AI(instruction  ins,
         id->idIns(ins);
         id->idInsFmt(fmt);
         id->idInsOpt(INS_OPTS_NONE);
+        id->idOpSize(size);
         id->idAddr()->iiaAddr = (BYTE*)addr;
         id->idReg1(ireg);
         id->idReg2(ireg);
-        if (EA_IS_CNS_SEC_RELOC(attr))
-        {
-            id->idOpSize(EA_8BYTE); // since this is relocation
-            id->idSetTlsGD();            
-        }
 
         dispIns(id);
         appendToCurIG(id);
@@ -11291,47 +11277,16 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
 
         case IF_DI_1E: // DI_1E   .ii.....iiiiiiii iiiiiiiiiiiddddd      Rd       simm21
         case IF_LARGEADR:
-            //TODO-tls
             assert(insOptsNone(id->idInsOpt()));
             if (id->idIsReloc())
             {
                 code = emitInsCode(ins, fmt);
                 code |= insEncodeReg_Rd(id->idReg1()); // ddddd
                 dst += emitOutput_Instr(dst, code);
-
-                uint16_t relocType;
-                if (id->idIsTlsGD())
-                {
-                    assert(emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI));
-
-                    if (TargetOS::IsWindows)
-                    {
-                        relocType = IMAGE_REL_ARM64_SECREL_HIGH12A;
-                    }
-                    else
-                    {
-                        relocType = IMAGE_REL_AARCH64_TLSDESC_ADR_PAGE21;
-                    }
-                }
-                else
-                {
-                    relocType = IMAGE_REL_ARM64_PAGEBASE_REL21;
-                }
-
-                //if (emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI) && id->idIsCnsReloc())
-                //{
-                //    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_SECREL_HIGH12A);
-                //}
-                //else
-                {
-                    emitRecordRelocation(odst, id->idAddr()->iiaAddr, relocType);
-                }
-
+                emitRecordRelocation(odst, id->idAddr()->iiaAddr,
+                                     id->idIsTlsGD() ? IMAGE_REL_AARCH64_TLSDESC_ADR_PAGE21
+                                                     : IMAGE_REL_ARM64_PAGEBASE_REL21);
             }
-            //else if (emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI) && id->idIsTlsGD())
-            //{
-            //    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_SECREL_HIGH12A);
-            //}
             else
             {
                 // Local jmp/load case which does not need a relocation.
@@ -11642,7 +11597,6 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
             code |= insEncodeReg_Rn(id->idReg2());     // nnnnn
             code |= insEncodeReg_Rm(id->idReg3());     // mmmmm
             dst += emitOutput_Instr(dst, code);
-
             break;
 
         case IF_DR_3D: // DR_3D   X..........mmmmm cccc..nnnnnddddd      Rd Rn Rm cond

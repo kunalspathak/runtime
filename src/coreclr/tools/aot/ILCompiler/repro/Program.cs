@@ -2,11 +2,21 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Runtime.CompilerServices;
 
 class Program
 {
+    [ThreadStatic]
+    static int x = 5;
+
     static void Main()
     {
-        Console.WriteLine("Hello world");
+        Test();
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    static int Test()
+    {
+        return x;
     }
 }

@@ -3764,7 +3764,7 @@ void emitter::emitIns_Mov_Tls_Reloc(emitAttr    attr,
 
     id->idIns(INS_add);
     id->idInsFmt(fmt);
-    //id->idInsOpt(INS_OPTS_LSL12);
+    id->idInsOpt(INS_OPTS_LSL12);
     id->idAddr()->iiaAddr = (BYTE*)imm;
 
     id->idReg1(reg);
@@ -3783,7 +3783,7 @@ void emitter::emitIns_Mov_Tls_Reloc(emitAttr    attr,
 
     id->idIns(INS_add);
     id->idInsFmt(fmt);
-    //id->idInsOpt(INS_OPTS_LSL12);
+    //id->idInsOpt(INS_OPTS_LSL);
     id->idAddr()->iiaAddr = (BYTE*)imm;
 
     id->idReg1(reg);

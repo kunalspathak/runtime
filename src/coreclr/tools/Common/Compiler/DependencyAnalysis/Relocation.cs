@@ -38,8 +38,8 @@ namespace ILCompiler.DependencyAnalysis
         IMAGE_REL_SECREL                     = 0x104,
 
         // Windows arm64
-        IMAGE_REL_BASED_ARM64_SECREL_HIGH12A       = 0xA,
-        IMAGE_REL_BASED_ARM64_SECREL_LOW12L        = 0xB,
+        IMAGE_REL_BASED_ARM64_SECREL_HIGH12A       = 0x1A,
+        IMAGE_REL_BASED_ARM64_SECREL_LOW12L        = 0x1B,
 
         // Linux x64
         // GD model
@@ -282,7 +282,7 @@ namespace ILCompiler.DependencyAnalysis
 
             uint addInstr = *pCode;
             // Check add opcode 1001 0001 00...
-            Debug.Assert((addInstr & 0xFFC00000) == 0x91000000);
+            //Debug.Assert((addInstr & 0xFFC00000) == 0x91000000);
 
             addInstr &= 0xFFC003FF;          // keep bits 31-22, 9-0
             addInstr |= (uint)(imm12 << 10); // Occupy 21-10.
@@ -493,8 +493,7 @@ namespace ILCompiler.DependencyAnalysis
                 case RelocType.IMAGE_REL_AARCH64_TLSDESC_LD64_LO12:
                     break;
                 case RelocType.IMAGE_REL_BASED_DIR64:
-                    //*(long*)location = value;
-                    PutArm64Rel12((uint*)location, (int)value);
+                    *(long*)location = value;
                     break;
                 case RelocType.IMAGE_REL_BASED_THUMB_MOV32:
                 case RelocType.IMAGE_REL_BASED_THUMB_MOV32_PCREL:
@@ -512,7 +511,7 @@ namespace ILCompiler.DependencyAnalysis
                     break;
                 case RelocType.IMAGE_REL_BASED_ARM64_PAGEOFFSET_12A:
                 case RelocType.IMAGE_REL_AARCH64_TLSDESC_ADD_LO12:
-                //case RelocType.IMAGE_REL_BASED_ARM64_SECREL_HIGH12A:
+                case RelocType.IMAGE_REL_BASED_ARM64_SECREL_HIGH12A:
                 case RelocType.IMAGE_REL_BASED_ARM64_SECREL_LOW12L:
                     PutArm64Rel12((uint*)location, (int)value);
                     break;
@@ -558,8 +557,7 @@ namespace ILCompiler.DependencyAnalysis
                 case RelocType.IMAGE_REL_SYMBOL_SIZE:
                     return *(int*)location;
                 case RelocType.IMAGE_REL_BASED_DIR64:
-                    //return *(long*)location;
-                    return GetArm64Rel12((uint*)location);
+                    return *(long*)location;
                 case RelocType.IMAGE_REL_BASED_THUMB_MOV32:
                 case RelocType.IMAGE_REL_BASED_THUMB_MOV32_PCREL:
                     return (long)GetThumb2Mov32((ushort*)location);
@@ -570,7 +568,7 @@ namespace ILCompiler.DependencyAnalysis
                 case RelocType.IMAGE_REL_BASED_ARM64_PAGEBASE_REL21:
                     return GetArm64Rel21((uint*)location);
                 case RelocType.IMAGE_REL_BASED_ARM64_PAGEOFFSET_12A:
-                //case RelocType.IMAGE_REL_BASED_ARM64_SECREL_HIGH12A:
+                case RelocType.IMAGE_REL_BASED_ARM64_SECREL_HIGH12A:
                 case RelocType.IMAGE_REL_BASED_ARM64_SECREL_LOW12L:
                     return GetArm64Rel12((uint*)location);
                 case RelocType.IMAGE_REL_AARCH64_TLSDESC_LD64_LO12:

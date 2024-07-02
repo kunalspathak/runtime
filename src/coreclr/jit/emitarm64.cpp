@@ -3743,6 +3743,18 @@ void emitter::emitIns_R(instruction ins, emitAttr attr, regNumber reg, insOpts o
     appendToCurIG(id);
 }
 
+//-----------------------------------------------------------------------------
+//  emitIns_Add_Add_Tls_Reloc: Generates pair of "add" instructions needed for TLS access
+//  on windows for NativeAOT.
+//          add reg, reg, #0, LSL #0xC
+//          add reg, reg, #0
+//
+//  Arguments:
+//      attr - Instruction attributes
+//      reg  - Register
+//      imm  - The handle of TLS variable
+//      gtFlags - DEBUG only gtFlags.
+//
 void emitter::emitIns_Add_Add_Tls_Reloc(emitAttr    attr,
                                     regNumber   reg,
                                     ssize_t imm DEBUGARG(GenTreeFlags gtFlags /* = GTF_EMPTY */))
@@ -3750,18 +3762,16 @@ void emitter::emitIns_Add_Add_Tls_Reloc(emitAttr    attr,
     emitAttr size = EA_SIZE(attr);
 
     assert(emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI));
+    assert(TargetOS::IsWindows);
+
     assert(isValidGeneralDatasize(size));
     assert(EA_IS_CNS_SEC_RELOC(attr));
 
-    //
-
-    //emitIns_R_R_R_I(INS_add, attr, reg, reg, reg, 3, INS_OPTS_UXTB);
-
-     //instrDesc* addId = emitNewInstr(attr);
     insFormat fmt = IF_DI_2A;
 
     instrDesc* id = emitNewInstrCns(attr, 0);
 
+    // add reg, reg, #0, LSL 0xC
     id->idIns(INS_add);
     id->idInsFmt(fmt);
     id->idInsOpt(INS_OPTS_LSL12);
@@ -3769,50 +3779,45 @@ void emitter::emitIns_Add_Add_Tls_Reloc(emitAttr    attr,
 
     id->idReg1(reg);
     id->idReg2(reg);
-    id->idOpSize(EA_8BYTE); // since this is a reloc
 
+    // Since this is relocation, set to 8 byte size.
+    id->idOpSize(EA_8BYTE);
     id->idSetTlsGD();
+
+#ifdef DEBUG
+    id->idDebugOnlyInfo()->idMemCookie = imm;
+    id->idDebugOnlyInfo()->idFlags     = gtFlags;
+#endif
 
     dispIns(id);
     appendToCurIG(id);
 
-    // Another add
-    //----------------------------------
+    // add reg, reg, #0
 
-    id = emitNewInstrCns(size, 0); // to differentiate from 2nd add
+    // To differentiate from first add, instead of passing
+    // `attr`, we pass `size` so this instruction is not
+    // set as having "constant relocation" i.e EA_CNS_RELOC_FLG
+    // is not set.
+    id = emitNewInstrCns(size, 0);
 
     id->idIns(INS_add);
     id->idInsFmt(fmt);
-    //id->idInsOpt(INS_OPTS_LSL);
     id->idAddr()->iiaAddr = (BYTE*)imm;
 
     id->idReg1(reg);
     id->idReg2(reg);
-    id->idOpSize(EA_8BYTE);
-    
+
+    // Since this is relocation, set to 8 byte size.
+    id->idOpSize(EA_8BYTE);    
     id->idSetTlsGD();
+
+#ifdef DEBUG
+    id->idDebugOnlyInfo()->idMemCookie = imm;
+    id->idDebugOnlyInfo()->idFlags     = gtFlags;
+#endif
 
     dispIns(id);
     appendToCurIG(id);
-
-
-//    instrDesc* id         = emitNewInstrCns(attr, 0);
-//    id->idAddr()->iiaAddr = (byte*)imm;
-//    id->idSetIsCnsReloc();
-//
-//    id->idIns(INS_mov);
-//    id->idInsFmt(IF_DI_1B);
-//    id->idInsOpt(INS_OPTS_NONE);
-//
-//    id->idReg1(reg);
-//
-//#ifdef DEBUG
-//    id->idDebugOnlyInfo()->idMemCookie = imm;
-//    id->idDebugOnlyInfo()->idFlags     = gtFlags;
-//#endif
-//
-//    dispIns(id);
-//    appendToCurIG(id);
 }
 
 /*****************************************************************************

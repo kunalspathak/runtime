@@ -2244,15 +2244,15 @@ void CodeGen::instGen_Set_Reg_To_Imm(emitAttr       size,
 
     if (EA_IS_RELOC(size))
     {
-        //if (!EA_IS_CNS_SEC_RELOC(origAttr))
+        if (!EA_IS_CNS_SEC_RELOC(origAttr))
         {
             // This emits a pair of adrp/add (two instructions) with fix-ups.
             GetEmitter()->emitIns_R_AI(INS_adrp, size, reg, imm DEBUGARG(targetHandle) DEBUGARG(gtFlags));
         }
-        //else
-        //{
-        //    GetEmitter()->emitIns_Mov_Tls_Reloc(size, reg, imm DEBUGARG(gtFlags));
-        //}
+        else
+        {
+            GetEmitter()->emitIns_Mov_Tls_Reloc(size, reg, imm DEBUGARG(gtFlags));
+        }
     }
     else if (imm == 0)
     {

@@ -3777,8 +3777,9 @@ void emitter::emitIns_Mov_Tls_Reloc(emitAttr    attr,
     appendToCurIG(id);
 
     // Another add
+    //----------------------------------
 
-    id = emitNewInstrCns(attr, 0);
+    id = emitNewInstrCns(size, 0); // to differentiate from 2nd add
 
     id->idIns(INS_add);
     id->idInsFmt(fmt);
@@ -11381,7 +11382,7 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
 
                     if (TargetOS::IsWindows)
                     {
-                        relocType = IMAGE_REL_ARM64_SECREL_LOW12L;
+                        relocType = IMAGE_REL_ARM64_SECREL_HIGH12A;
                     }
                     else
                     {
@@ -11402,10 +11403,12 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
                     emitRecordRelocation(odst, id->idAddr()->iiaAddr, relocType);
                 }
             }
-            //else if(emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI) && id->idIsCnsReloc())
-            //{
-            //    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_SECREL_LOW12A);
-            //}
+            else if (emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI) && id->idIsTlsGD())
+            {
+                //TODO: combine all of this
+                assert(TargetOS::IsWindows);
+                emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_SECREL_LOW12L);
+            }
             break;
 
         case IF_DI_2B: // DI_2B   X.........Xnnnnn ssssssnnnnnddddd      Rd Rn    imm(0-63)

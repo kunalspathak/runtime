@@ -11324,46 +11324,68 @@ size_t emitter::emitOutputInstr(insGroup* ig, instrDesc* id, BYTE** dp)
             code |= insEncodeReg_Rn(id->idReg2());       // nnnnn
             dst += emitOutput_Instr(dst, code);
 
-            //TODO-tls
-            if (id->idIsReloc())
+            if (!emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI))
             {
-                assert(sz == sizeof(instrDesc));
-                assert(id->idAddr()->iiaAddr != nullptr);
-
-                uint16_t relocType;               
+                if (id->idIsReloc())
+                {
+                    assert(sz == sizeof(instrDesc));
+                    assert(id->idAddr()->iiaAddr != nullptr);
+                    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_PAGEOFFSET_12A);
+                }
+            }
+            else
+            {
                 if (id->idIsTlsGD())
                 {
-                    assert(emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI));
-
                     if (TargetOS::IsWindows)
                     {
-                        relocType = IMAGE_REL_ARM64_SECREL_HIGH12A;
+                        if (id->idIsReloc())
+                        {
+                            // This is first "add" of "add/add" pair
+                            emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_SECREL_HIGH12A);
+                        }
+                        else
+                        {
+                            // This is second "add" of "add/add" pair
+                            emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_SECREL_LOW12L);
+                        }
                     }
                     else
                     {
-                        relocType = IMAGE_REL_AARCH64_TLSDESC_ADD_LO12;
+                        // For unix/arm64 it is the "add" of "adrp/add" pair
+                        emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_AARCH64_TLSDESC_ADD_LO12);
                     }
                 }
-                else
-                {
-                    relocType = IMAGE_REL_ARM64_PAGEOFFSET_12A;
-                }
+            }
 
-                //if (emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI) && id->idIsCnsReloc())
-                //{
-                //    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_SECREL_LOW12A);
-                //}
-                //else
-                {
-                    emitRecordRelocation(odst, id->idAddr()->iiaAddr, relocType);
-                }
-            }
-            else if (emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI) && id->idIsTlsGD())
-            {
-                //TODO: combine all of this
-                assert(TargetOS::IsWindows);
-                emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_SECREL_LOW12L);
-            }
+            //if (id->idIsReloc())
+            //{
+            //    assert(sz == sizeof(instrDesc));
+            //    assert(id->idAddr()->iiaAddr != nullptr);
+
+            //    if (id->idIsTlsGD())
+            //    {
+            //        assert(emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI));
+
+            //        if (TargetOS::IsWindows)
+            //        {
+            //            emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_SECREL_HIGH12A);
+            //        }
+            //        else
+            //        {
+            //            emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_AARCH64_TLSDESC_ADD_LO12);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_PAGEOFFSET_12A);
+            //    }
+            //}
+            //else if (emitComp->IsTargetAbi(CORINFO_NATIVEAOT_ABI) && id->idIsTlsGD())
+            //{
+            //    assert(TargetOS::IsWindows);
+            //    emitRecordRelocation(odst, id->idAddr()->iiaAddr, IMAGE_REL_ARM64_SECREL_LOW12L);
+            //}
             break;
 
         case IF_DI_2B: // DI_2B   X.........Xnnnnn ssssssnnnnnddddd      Rd Rn    imm(0-63)

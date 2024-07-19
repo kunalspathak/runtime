@@ -115,10 +115,11 @@ REGDEF(P12,  12+PBASE, PMASK(12),  "p12",  "na")
 REGDEF(P13,  13+PBASE, PMASK(13),  "p13",  "na")
 REGDEF(P14,  14+PBASE, PMASK(14),  "p14",  "na")
 REGDEF(P15,  15+PBASE, PMASK(15),  "p15",  "na")
+REGDEF(FFR,  16+PBASE, PMASK(16),  "ffr",  "na")
 
 
-// The registers with values 80 (NBASE) and above are not real register numbers
-#define NBASE 80
+// The registers with values 81 (NBASE) and above are not real register numbers
+#define NBASE 81
 
 REGDEF(SP,    0+NBASE, 0x0000,    "sp",  "wsp?")
 // This must be last!

@@ -1212,7 +1212,7 @@ inline static bool isHighPredicateRegister(regNumber reg)
 
 inline static bool isMaskReg(regNumber reg)
 {
-    return isPredicateRegister(reg) || isFfrRegister(reg);
+    return isPredicateRegister(reg)/* || isFfrRegister(reg)*/;
 }
 
 inline static bool isEvenRegister(regNumber reg)

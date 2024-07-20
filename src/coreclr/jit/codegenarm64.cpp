@@ -2953,6 +2953,15 @@ void CodeGen::genCodeForStoreLclVar(GenTreeLclVar* lclNode)
             return;
         }
 #endif // FEATURE_SIMD
+#ifdef FEATURE_MASKED_HW_INTRINSICS
+        if ((targetType == TYP_MASK) && (varDsc->lvImplicitlyReferenced == 1))
+        {
+            regNumber op1Reg = data->GetRegNum();
+            assert(op1Reg != REG_NA);
+            GetEmitter()->emitIns_R(INS_sve_rdffr, EA_SCALABLE, op1Reg);
+            //return;
+        }
+#endif
 
         genConsumeRegs(data);
 

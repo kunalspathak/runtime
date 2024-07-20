@@ -1981,8 +1981,46 @@ GenTree* Compiler::impHWIntrinsic(NamedIntrinsic        intrinsic,
 
         if (!varTypeIsMask(op1))
         {
-            // Op1 input is a vector. HWInstrinsic requires a mask.
-            retNode->AsHWIntrinsic()->Op(1) = gtNewSimdCvtVectorToMaskNode(TYP_MASK, op1, simdBaseJitType, simdSize);
+            if (intrinsic == NI_Sve_SetFfr)
+            {
+                lvaFfrRegister       = lvaGrabTempWithImplicitUse(false DEBUGARG("Save the FFR value."));
+                LclVarDsc* ffrLclVar = lvaGetDesc(lvaFfrRegister);
+                ffrLclVar->lvType    = TYP_MASK;
+                ffrLclVar->SetRegNum(REG_FFR);
+
+                GenTree* cvtVectorToMaskNode = gtNewSimdCvtVectorToMaskNode(TYP_MASK, op1, simdBaseJitType, simdSize);
+                retNode->AsHWIntrinsic()->Op(1) = cvtVectorToMaskNode;
+
+                //// 4.
+                // append(RetNode)
+                // return stNode;
+                impAppendTree(retNode, CHECK_SPILL_ALL, impCurStmtDI, false);
+                retNode = gtNewStoreLclVarNode(lvaFfrRegister, gtCloneExpr(cvtVectorToMaskNode));
+                setLclRelatedToSIMDIntrinsic(retNode);
+
+                //setLclRelatedToSIMDIntrinsic(retNode);
+
+                //// 3. Best so far
+                //GenTree* stNode = gtNewStoreLclVarNode(lvaFfrRegister, gtCloneExpr(cvtVectorToMaskNode));
+                //setLclRelatedToSIMDIntrinsic(stNode);
+                //impAppendTree(stNode, CHECK_SPILL_ALL, impCurStmtDI, false);
+
+                ////2. This one leads to assigning ffr to CreateTrueAll() result
+                //retNode = gtNewStoreLclVarNode(lvaFfrRegister,
+                //                               gtNewSimdCvtVectorToMaskNode(TYP_MASK, op1, simdBaseJitType, simdSize));
+                //setLclRelatedToSIMDIntrinsic(retNode);
+
+                ////1.
+                //GenTree* stNode = gtNewStoreLclVarNode(lvaFfrRegister, gtCloneExpr(cvtVectorToMaskNode));
+                //setLclRelatedToSIMDIntrinsic(stNode);
+                //retNode = gtNewOperNode(GT_COMMA, retType, retNode, stNode);
+            }
+            else
+            {
+                // Op1 input is a vector. HWInstrinsic requires a mask.
+                retNode->AsHWIntrinsic()->Op(1) =
+                    gtNewSimdCvtVectorToMaskNode(TYP_MASK, op1, simdBaseJitType, simdSize);
+            }
         }
 
         if (HWIntrinsicInfo::IsMultiReg(intrinsic))
@@ -2005,7 +2043,29 @@ GenTree* Compiler::impHWIntrinsic(NamedIntrinsic        intrinsic,
         CorInfoType simdBaseJitType = op->GetSimdBaseJitType();
         unsigned    simdSize        = op->GetSimdSize();
 
-        retNode = gtNewSimdCvtMaskToVectorNode(retType, op, simdBaseJitType, simdSize);
+        //if (intrinsic == NI_Sve_GetFfrInt64)
+        //{
+        //    assert(lvaFfrRegister != BAD_VAR_NUM);
+
+        //    retNode = gtNewSimdCvtMaskToVectorNode(retType, op, simdBaseJitType, simdSize);
+
+        //    //2.
+        //    //GenTree* gtFfrNode = gtNewLclvNode(lvaFfrRegister, TYP_MASK);
+        //    //retNode            = gtNewOperNode(GT_COMMA, retType, gtFfrNode, retNode);
+
+        //    //3.
+        //    //impAppendTree(gtFfrNode, CHECK_SPILL_ALL, impCurStmtDI, false);
+
+        //    //1.
+        //    GenTree* gtFfrNode = gtNewLclvNode(lvaFfrRegister, TYP_MASK);
+        //    retNode = gtNewSimdCvtMaskToVectorNode(retType, gtFfrNode, simdBaseJitType, simdSize);
+
+        //}
+        //else
+        {
+            retNode = gtNewSimdCvtMaskToVectorNode(retType, op, simdBaseJitType, simdSize);
+        }
+
     }
 #endif // defined(TARGET_ARM64)
 

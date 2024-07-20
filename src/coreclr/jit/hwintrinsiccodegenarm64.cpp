@@ -297,6 +297,7 @@ void CodeGen::genHWIntrinsic(GenTreeHWIntrinsic* node)
 
     emitAttr emitSize;
     insOpts  opt;
+    bool     spilledFfr = false;
 
     if (HWIntrinsicInfo::SIMDScalar(intrin.id))
     {
@@ -312,6 +313,10 @@ void CodeGen::genHWIntrinsic(GenTreeHWIntrinsic* node)
     {
         emitSize = EA_SCALABLE;
         opt      = emitter::optGetSveInsOpt(emitTypeSize(intrin.baseType));
+        if ((intrin.id == NI_Sve_GetFfrInt64) && (intrin.op1 != nullptr) && ((intrin.op1->gtFlags & GTF_SPILLED) != 0))
+        {
+            spilledFfr = true;
+        }
     }
     else if (intrin.category == HW_Category_Special)
     {
@@ -2294,6 +2299,24 @@ void CodeGen::genHWIntrinsic(GenTreeHWIntrinsic* node)
                 break;
             }
 
+            case NI_Sve_GetFfrByte:
+            case NI_Sve_GetFfrInt16:
+            case NI_Sve_GetFfrInt32:
+            case NI_Sve_GetFfrInt64:
+            case NI_Sve_GetFfrSByte:
+            case NI_Sve_GetFfrUInt16:
+            case NI_Sve_GetFfrUInt32:
+            case NI_Sve_GetFfrUInt64:
+            {
+                if (spilledFfr)
+                {
+                    // We have unspilled the value in op1Reg, just set it back in FFR.
+                    GetEmitter()->emitIns_R(INS_sve_wrffr, emitSize, op1Reg, opt);
+                }
+
+                GetEmitter()->emitIns_R(ins, emitSize, targetReg, INS_OPTS_SCALABLE_B);
+                break;
+            }
             case NI_Sve_SetFfr:
             {
                 assert(targetReg == REG_NA);

@@ -4331,6 +4331,9 @@ public:
 #endif // defined(FEATURE_SIMD)
 
     unsigned lvaGSSecurityCookie; // LclVar number
+#ifdef TARGET_ARM64
+    unsigned lvaFfrRegister; // LclVar number
+#endif
     bool     lvaTempsHaveLargerOffsetThanVars();
 
     // Returns "true" iff local variable "lclNum" is in SSA form.

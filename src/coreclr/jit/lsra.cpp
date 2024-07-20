@@ -2112,6 +2112,13 @@ void LinearScan::identifyCandidates()
         }
     }
 
+//#ifdef TARGET_ARM64
+//    if (compiler->lvaFfrRegister != BAD_VAR_NUM)
+//    {
+//        compiler->lvaTable[compiler->lvaFfrRegister].SetRegNum(REG_FFR);
+//    }
+//#endif
+
 #if FEATURE_PARTIAL_SIMD_CALLEE_SAVE
     // Create Intervals to use for the save & restore of the upper halves of large vector lclVars.
     if (localVarsEnregistered)
@@ -2909,6 +2916,9 @@ RegisterType LinearScan::getRegisterType(Interval* currentInterval, RefPosition*
         assert((candidates & allRegs(TYP_I_IMPL)) != RBM_NONE);
         return TYP_I_IMPL;
     }
+#elif defined(TARGET_ARM64)
+    assert((candidates == SRBM_FFR) || ((candidates & allRegs(regType)) != RBM_NONE));
+    return regType;
 #else
     assert((candidates & allRegs(regType)) != RBM_NONE);
     return regType;

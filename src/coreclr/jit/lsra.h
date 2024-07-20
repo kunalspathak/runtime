@@ -511,7 +511,7 @@ public:
 #if defined(FEATURE_MASKED_HW_INTRINSICS)
         else
         {
-            assert(emitter::isMaskReg(reg));
+            assert(emitter::isMaskReg(reg) || (reg == REG_FFR));
             registerType = MaskRegisterType;
         }
 #endif // FEATURE_MASKED_HW_INTRINSICS
@@ -1135,7 +1135,7 @@ private:
     RefPosition* defineNewInternalTemp(GenTree* tree, RegisterType regType, SingleTypeRegSet candidates);
     RefPosition* buildInternalIntRegisterDefForNode(GenTree* tree, SingleTypeRegSet internalCands = RBM_NONE);
     RefPosition* buildInternalFloatRegisterDefForNode(GenTree* tree, SingleTypeRegSet internalCands = RBM_NONE);
-#if defined(FEATURE_SIMD)
+#if defined(FEATURE_MASKED_HW_INTRINSICS)
     RefPosition* buildInternalMaskRegisterDefForNode(GenTree* tree, SingleTypeRegSet internalCands = RBM_NONE);
 #endif
     void buildInternalRegisterUses();

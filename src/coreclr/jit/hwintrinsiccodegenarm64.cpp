@@ -313,7 +313,13 @@ void CodeGen::genHWIntrinsic(GenTreeHWIntrinsic* node)
     {
         emitSize = EA_SCALABLE;
         opt      = emitter::optGetSveInsOpt(emitTypeSize(intrin.baseType));
-        if ((intrin.id == NI_Sve_GetFfrInt64) && (intrin.op1 != nullptr) && ((intrin.op1->gtFlags & GTF_SPILLED) != 0))
+
+        static_assert_no_msg(AreContiguous(NI_Sve_GetFfrByte, NI_Sve_GetFfrInt16, NI_Sve_GetFfrInt32,
+                                           NI_Sve_GetFfrInt64, NI_Sve_GetFfrSByte, NI_Sve_GetFfrUInt16,
+                                           NI_Sve_GetFfrUInt32, NI_Sve_GetFfrUInt64));
+
+        bool readsFfr = (intrin.id >= NI_Sve_GetFfrByte) && (intrin.id <= NI_Sve_GetFfrUInt64);
+        if (readsFfr && (intrin.op1 != nullptr) && ((intrin.op1->gtFlags & GTF_SPILLED) != 0))
         {
             unspilledFfr = true;
         }

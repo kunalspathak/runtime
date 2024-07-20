@@ -1986,7 +1986,6 @@ GenTree* Compiler::impHWIntrinsic(NamedIntrinsic        intrinsic,
                 lvaFfrRegister       = lvaGrabTempWithImplicitUse(false DEBUGARG("Save the FFR value."));
                 LclVarDsc* ffrLclVar = lvaGetDesc(lvaFfrRegister);
                 ffrLclVar->lvType    = TYP_MASK;
-                ffrLclVar->SetRegNum(REG_FFR);
 
                 GenTree* cvtVectorToMaskNode = gtNewSimdCvtVectorToMaskNode(TYP_MASK, op1, simdBaseJitType, simdSize);
                 retNode->AsHWIntrinsic()->Op(1) = cvtVectorToMaskNode;

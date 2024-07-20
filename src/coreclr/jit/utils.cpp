@@ -287,7 +287,7 @@ const char* dspRegRange(regMaskTP regMask, size_t& minSiz, const char* sep, regN
 #ifdef FEATURE_MASKED_HW_INTRINSICS
     assert(((regFirst == REG_INT_FIRST) && (regLast == REG_INT_LAST)) ||
            ((regFirst == REG_FP_FIRST) && (regLast == REG_FP_LAST)) ||
-           ((regFirst == REG_MASK_FIRST) && (regLast == REG_FFR)));
+           ((regFirst == REG_MASK_FIRST) && (regLast == REG_MASK_LAST)));
 #else
     assert(((regFirst == REG_INT_FIRST) && (regLast == REG_INT_LAST)) ||
            ((regFirst == REG_FP_FIRST) && (regLast == REG_FP_LAST)));
@@ -437,7 +437,7 @@ void dspRegMask(regMaskTP regMask, size_t minSiz)
     sep = dspRegRange(regMask, minSiz, sep, REG_INT_FIRST, REG_INT_LAST);
     sep = dspRegRange(regMask, minSiz, sep, REG_FP_FIRST, REG_FP_LAST);
 #ifdef FEATURE_MASKED_HW_INTRINSICS
-    sep = dspRegRange(regMask, minSiz, sep, REG_MASK_FIRST, REG_FFR);
+    sep = dspRegRange(regMask, minSiz, sep, REG_MASK_FIRST, REG_MASK_LAST);
 #endif // FEATURE_MASKED_HW_INTRINSICS
 
     printf("]");

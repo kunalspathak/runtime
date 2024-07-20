@@ -1529,7 +1529,6 @@ int LinearScan::BuildHWIntrinsic(GenTreeHWIntrinsic* intrinsicTree, int* pDstCou
     bool tgtPrefOp1        = false;
     bool tgtPrefOp2        = false;
     bool delayFreeMultiple = false;
-
     if (intrin.op1 != nullptr)
     {
         bool simdRegToSimdRegMove = false;
@@ -1661,12 +1660,6 @@ int LinearScan::BuildHWIntrinsic(GenTreeHWIntrinsic* intrinsicTree, int* pDstCou
             tgtPrefUse = BuildUse(intrin.op1);
             srcCount++;
         }
-        //else if (intrin.id == NI_Sve_GetFfrInt64)
-        //{
-        //    // TODO: Do it efficiently for others as well.
-        //    BuildUse(intrin.op1, SRBM_FFR);
-        //    srcCount++;
-        //}
         else if ((intrin.id != NI_AdvSimd_VectorTableLookup) && (intrin.id != NI_AdvSimd_Arm64_VectorTableLookup))
         {
             srcCount += BuildOperandUses(intrin.op1);

@@ -602,7 +602,7 @@ RefPosition* LinearScan::newRefPosition(Interval*        theInterval,
         regNumber    physicalReg = genRegNumFromMask(mask, theInterval->registerType);
         RefPosition* pos         = newRefPosition(physicalReg, theLocation, RefTypeFixedReg, nullptr, mask);
         assert(theInterval != nullptr);
-        assert((mask == SRBM_FFR) || ((allRegs(theInterval->registerType) & mask) != 0));
+        assert((allRegs(theInterval->registerType) & mask) != 0);
     }
 
     RefPosition* newRP = newRefPositionRaw(theLocation, theTreeNode, theRefType);
@@ -882,12 +882,6 @@ regMaskTP LinearScan::getKillSetForCall(GenTreeCall* call)
         killMask.AddGprRegs(RBM_SWIFT_ERROR.GetIntRegSet());
     }
 #endif // SWIFT_SUPPORT
-#ifdef TARGET_ARM64
-    if (compiler->lvaFfrRegister != BAD_VAR_NUM)
-    {
-        killMask |= RBM_FFR;
-    }
-#endif
 
     return killMask;
 }
@@ -1371,12 +1365,11 @@ RefPosition* LinearScan::buildInternalFloatRegisterDefForNode(GenTree* tree, Sin
     return defRefPosition;
 }
 
-#if defined(FEATURE_MASKED_HW_INTRINSICS)
+#if defined(FEATURE_SIMD) && defined(TARGET_XARCH)
 RefPosition* LinearScan::buildInternalMaskRegisterDefForNode(GenTree* tree, SingleTypeRegSet internalCands)
 {
     // The candidate set should contain only float registers.
     assert((internalCands & ~availableMaskRegs) == RBM_NONE);
-    //assert(((internalCands & ~availableMaskRegs) == RBM_NONE) /*|| (internalCands == RBM_FFR.GetPredicateRegSet())*/);
 
     return defineNewInternalTemp(tree, MaskRegisterType, internalCands);
 }
@@ -2405,18 +2398,6 @@ void LinearScan::buildIntervals()
         }
     }
 
-//#ifdef TARGET_ARM64
-//     // THIS IS WRONG AND SHOULD NOT BE DONE.
-//    if (compiler->lvaFfrRegister == BAD_VAR_NUM)
-//    {
-//        // do this only if we see "use" before "def", otherwise not needed
-//        compiler->lvaFfrRegister = compiler->lvaGrabTempWithImplicitUse(false DEBUGARG("Save the FFR value."));
-//        LclVarDsc*   ffrDsc   = compiler->lvaGetDesc(compiler->lvaFfrRegister);
-//        Interval*    interval = getIntervalForLocalVar(ffrDsc->lvVarIndex);
-//        RefPosition* pos = newRefPosition(interval, MinLocation, RefTypeDummyDef, nullptr, SRBM_FFR);
-//    }
-//#endif
-
 #ifdef DEBUG
     if (stressInitialParamReg())
     {
@@ -2870,10 +2851,6 @@ void LinearScan::buildIntervals()
     {
         actualRegistersMask = regMaskTP(~RBM_NONE, ~0);
     }
-
-#if TARGET_ARM64
-
-#endif
 
 #ifdef DEBUG
     // Make sure we don't have any blocks that were not visited
@@ -3922,15 +3899,6 @@ void LinearScan::BuildStoreLocDef(GenTreeLclVarCommon* storeLoc,
     if (singleUseRef != nullptr)
     {
         Interval* srcInterval = singleUseRef->getInterval();
-#ifdef TARGET_ARM64
-        if (varDsc->GetRegNum() == REG_FFR)
-        {
-            assert(varTypeIsMask(varDsc));
-            assert(compiler->lvaFfrRegister != BAD_VAR_NUM);
-            // skip assigning related interval
-        }
-        else
-#endif
         if (srcInterval->relatedInterval == nullptr)
         {
             // Preference the source to the dest, unless this is a non-last-use localVar.
@@ -3955,15 +3923,6 @@ void LinearScan::BuildStoreLocDef(GenTreeLclVarCommon* storeLoc,
     if (varTypeIsByte(type))
     {
         defCandidates = allByteRegs();
-    }
-    else
-    {
-        defCandidates = allRegs(type);
-    }
-#elif TARGET_ARM64
-    if (varTypeIsMask(type) && (varDsc->GetRegNum() == REG_FFR))
-    {
-        defCandidates = RBM_FFR.GetPredicateRegSet();
     }
     else
     {

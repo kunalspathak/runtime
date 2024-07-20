@@ -1990,30 +1990,10 @@ GenTree* Compiler::impHWIntrinsic(NamedIntrinsic        intrinsic,
 
                 GenTree* cvtVectorToMaskNode = gtNewSimdCvtVectorToMaskNode(TYP_MASK, op1, simdBaseJitType, simdSize);
                 retNode->AsHWIntrinsic()->Op(1) = cvtVectorToMaskNode;
-
-                //// 4.
-                // append(RetNode)
-                // return stNode;
                 impAppendTree(retNode, CHECK_SPILL_ALL, impCurStmtDI, false);
+
                 retNode = gtNewStoreLclVarNode(lvaFfrRegister, gtCloneExpr(cvtVectorToMaskNode));
                 setLclRelatedToSIMDIntrinsic(retNode);
-
-                //setLclRelatedToSIMDIntrinsic(retNode);
-
-                //// 3. Best so far
-                //GenTree* stNode = gtNewStoreLclVarNode(lvaFfrRegister, gtCloneExpr(cvtVectorToMaskNode));
-                //setLclRelatedToSIMDIntrinsic(stNode);
-                //impAppendTree(stNode, CHECK_SPILL_ALL, impCurStmtDI, false);
-
-                ////2. This one leads to assigning ffr to CreateTrueAll() result
-                //retNode = gtNewStoreLclVarNode(lvaFfrRegister,
-                //                               gtNewSimdCvtVectorToMaskNode(TYP_MASK, op1, simdBaseJitType, simdSize));
-                //setLclRelatedToSIMDIntrinsic(retNode);
-
-                ////1.
-                //GenTree* stNode = gtNewStoreLclVarNode(lvaFfrRegister, gtCloneExpr(cvtVectorToMaskNode));
-                //setLclRelatedToSIMDIntrinsic(stNode);
-                //retNode = gtNewOperNode(GT_COMMA, retType, retNode, stNode);
             }
             else
             {
@@ -2043,29 +2023,7 @@ GenTree* Compiler::impHWIntrinsic(NamedIntrinsic        intrinsic,
         CorInfoType simdBaseJitType = op->GetSimdBaseJitType();
         unsigned    simdSize        = op->GetSimdSize();
 
-        //if (intrinsic == NI_Sve_GetFfrInt64)
-        //{
-        //    assert(lvaFfrRegister != BAD_VAR_NUM);
-
-        //    retNode = gtNewSimdCvtMaskToVectorNode(retType, op, simdBaseJitType, simdSize);
-
-        //    //2.
-        //    //GenTree* gtFfrNode = gtNewLclvNode(lvaFfrRegister, TYP_MASK);
-        //    //retNode            = gtNewOperNode(GT_COMMA, retType, gtFfrNode, retNode);
-
-        //    //3.
-        //    //impAppendTree(gtFfrNode, CHECK_SPILL_ALL, impCurStmtDI, false);
-
-        //    //1.
-        //    GenTree* gtFfrNode = gtNewLclvNode(lvaFfrRegister, TYP_MASK);
-        //    retNode = gtNewSimdCvtMaskToVectorNode(retType, gtFfrNode, simdBaseJitType, simdSize);
-
-        //}
-        //else
-        {
-            retNode = gtNewSimdCvtMaskToVectorNode(retType, op, simdBaseJitType, simdSize);
-        }
-
+        retNode = gtNewSimdCvtMaskToVectorNode(retType, op, simdBaseJitType, simdSize);
     }
 #endif // defined(TARGET_ARM64)
 

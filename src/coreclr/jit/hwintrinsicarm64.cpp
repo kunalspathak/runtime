@@ -3130,7 +3130,10 @@ GenTree* Compiler::impSpecialIntrinsic(NamedIntrinsic        intrinsic,
             unsigned tmpNum = lvaGrabTemp(true DEBUGARG("Return value temp for multireg return"));
             impStoreToTemp(tmpNum, retNode, CHECK_SPILL_ALL);
 
-            GenTree* stNode = gtNewStoreLclVarNode(lvaFfrRegister, gtNewVconNode(TYP_MASK));
+            GenTreeMskCon* pseudoCndNode = gtNewMskConNode(TYP_MASK);
+            pseudoCndNode->gtFlags |= GTF_HW_FFR_REGISTER; // So that we diffentiate
+
+            GenTree* stNode = gtNewStoreLclVarNode(lvaFfrRegister, pseudoCndNode);
             //GenTree* stNode = gtNewStoreLclVarNode(lvaFfrRegister, gtNewIconNode(0xFF, TYP_MASK));
             setLclRelatedToSIMDIntrinsic(stNode);
             impAppendTree(stNode, CHECK_SPILL_ALL, impCurStmtDI, false);

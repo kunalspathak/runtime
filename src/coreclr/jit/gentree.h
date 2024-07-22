@@ -550,6 +550,7 @@ enum GenTreeFlags : unsigned int
 #ifdef FEATURE_HW_INTRINSICS
     GTF_HW_EM_OP                  = 0x10000000, // GT_HWINTRINSIC -- node is used as an operand to an embedded mask
     GTF_HW_USER_CALL              = 0x20000000, // GT_HWINTRINSIC -- node is implemented via a user call
+    GTF_HW_FFR_REGISTER           = 0x40000000, // Used to simulate FFR register value
 #endif // FEATURE_HW_INTRINSICS
 };
 

@@ -2965,6 +2965,76 @@ GenTree* Compiler::impSpecialIntrinsic(NamedIntrinsic        intrinsic,
             break;
         }
 
+        case NI_Sve_LoadVectorFirstFaulting:
+        {
+            assert(sig->numArgs == 2);
+
+            CORINFO_ARG_LIST_HANDLE arg1 = sig->args;
+            CORINFO_ARG_LIST_HANDLE arg2 = info.compCompHnd->getArgNext(arg1);
+            var_types               argType  = TYP_UNKNOWN;
+            CORINFO_CLASS_HANDLE    argClass = NO_CLASS_HANDLE;
+            argType = JITtype2varType(strip(info.compCompHnd->getArgType(sig, arg2, &argClass)));
+            op2     = getArgForHWIntrinsic(argType, argClass);
+            argType = JITtype2varType(strip(info.compCompHnd->getArgType(sig, arg1, &argClass)));
+            op1     = getArgForHWIntrinsic(argType, argClass);
+            op1                              = gtNewSimdCvtVectorToMaskNode(TYP_MASK, op1, simdBaseJitType, simdSize);
+
+            if (lvaFfrRegister != BAD_VAR_NUM)
+            {
+                // Attach a lclVar only if there was a definition of it earlier.
+                // This is done to track the liveness of FFR register.
+                GenTree* gtFfrNode = gtNewLclvNode(lvaFfrRegister, TYP_MASK);
+                retNode = gtNewSimdHWIntrinsicNode(retType, gtFfrNode, op1, op2, intrinsic, simdBaseJitType, simdSize);                
+            }
+            else
+            {
+                retNode = gtNewSimdHWIntrinsicNode(retType, op1, op2, intrinsic, simdBaseJitType, simdSize);
+            }
+
+            // Finally produce the definition of the FFR register.
+            if (lvaFfrRegister == BAD_VAR_NUM)
+            {
+                lvaFfrRegister = lvaGrabTempWithImplicitUse(false DEBUGARG("Save the FFR value."));
+            }
+            LclVarDsc* ffrLclVar = lvaGetDesc(lvaFfrRegister);
+            ffrLclVar->lvType    = TYP_MASK;
+            ffrLclVar->SetAddressExposed(true DEBUGARG(AddressExposedReason::NONE));
+
+            // 1.
+            //impAppendTree(retNode, CHECK_SPILL_ALL, impCurStmtDI, false);
+            //retNode = gtNewStoreLclVarNode(lvaFfrRegister, gtCloneExpr(retNode));
+            //setLclRelatedToSIMDIntrinsic(retNode);
+
+            //// 2.
+            //GenTree* stNode = gtNewStoreLclVarNode(lvaFfrRegister, gtCloneExpr(retNode));
+            //setLclRelatedToSIMDIntrinsic(stNode);
+            //impAppendTree(stNode, CHECK_SPILL_ALL, impCurStmtDI, false);
+
+            //// 3.
+            //retNode =
+            //    impStoreMultiRegValueToVar(retNode, sig->retTypeSigClass DEBUGARG(CorInfoCallConvExtension::Managed));
+
+            //// 4.
+            ////lvaSetStruct(lvaFfrRegister, sig->retTypeSigClass, false);
+            //impStoreToTemp(lvaFfrRegister, retNode, CHECK_SPILL_ALL);
+            ////ffrLclVar->lvIsMultiRegRet = true;
+            //retNode                    = gtNewLclvNode(lvaFfrRegister, ffrLclVar->lvType);
+            //retNode->SetDoNotCSE();
+
+            // 5.
+            unsigned tmpNum = lvaGrabTemp(true DEBUGARG("Return value temp for multireg return"));
+            impStoreToTemp(tmpNum, retNode, CHECK_SPILL_ALL);
+
+            GenTree* stNode = gtNewStoreLclVarNode(lvaFfrRegister, gtNewVconNode(TYP_MASK));
+            //GenTree* stNode = gtNewStoreLclVarNode(lvaFfrRegister, gtNewIconNode(0xFF, TYP_MASK));
+            setLclRelatedToSIMDIntrinsic(stNode);
+            impAppendTree(stNode, CHECK_SPILL_ALL, impCurStmtDI, false);
+
+            retNode = gtNewLclvNode(tmpNum, retType);
+            retNode->SetDoNotCSE();
+
+            break;
+        }
         case NI_Sve_GetFfrByte:
         case NI_Sve_GetFfrInt16:
         case NI_Sve_GetFfrInt32:

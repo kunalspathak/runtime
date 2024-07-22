@@ -318,7 +318,7 @@ void CodeGen::genHWIntrinsic(GenTreeHWIntrinsic* node)
                                            NI_Sve_GetFfrInt64, NI_Sve_GetFfrSByte, NI_Sve_GetFfrUInt16,
                                            NI_Sve_GetFfrUInt32, NI_Sve_GetFfrUInt64));
 
-        bool readsFfr = (intrin.id >= NI_Sve_GetFfrByte) && (intrin.id <= NI_Sve_GetFfrUInt64);
+        bool readsFfr = ((intrin.id >= NI_Sve_GetFfrByte) && (intrin.id <= NI_Sve_GetFfrUInt64)) || (intrin.id == NI_Sve_LoadVectorFirstFaulting);
         if (readsFfr && (intrin.op1 != nullptr) && ((intrin.op1->gtFlags & GTF_SPILLED) != 0))
         {
             unspilledFfr = true;
@@ -2299,8 +2299,15 @@ void CodeGen::genHWIntrinsic(GenTreeHWIntrinsic* node)
 
             case NI_Sve_LoadVectorFirstFaulting:
             {
-                assert(op3Reg == REG_NA);
                 insScalableOpts sopt = (opt == INS_OPTS_SCALABLE_B) ? INS_SCALABLE_OPTS_NONE : INS_SCALABLE_OPTS_LSL_N;
+                if (intrin.numOperands == 3)
+                {
+                    // FFR liveness was tracked and we unspilled the value. Now just generate code
+                    // using LoadVectorFirstFaulting(targetReg, op2Reg, op3Reg);
+                    std::swap(op1Reg, op2Reg);
+                    std::swap(op2Reg, op3Reg);
+                }
+                
                 GetEmitter()->emitIns_R_R_R_R(ins, emitSize, targetReg, op1Reg, op2Reg, REG_ZR, opt, sopt);
                 break;
             }

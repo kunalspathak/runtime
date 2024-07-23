@@ -1535,7 +1535,7 @@ GenTree* Lowering::LowerHWIntrinsic(GenTreeHWIntrinsic* node)
         {
 
             unsigned lclNum = comp->getFFRegisterVarNum();
-            GenTree* ffrReg      = comp->gtNewPhysRegNode(REG_P0, TYP_MASK);
+            GenTree* ffrReg = comp->gtNewPhysRegNode(REG_FFR, TYP_MASK);
             BlockRange().InsertAfter(node, ffrReg);
 
             GenTree* storeLclVar = comp->gtNewStoreLclVarNode(lclNum, ffrReg);
@@ -1596,7 +1596,7 @@ GenTree* Lowering::LowerHWIntrinsic(GenTreeHWIntrinsic* node)
             }
 
             lclNum                  = comp->getFFRegisterVarNum();
-            GenTree* ffrReg         = comp->gtNewPhysRegNode(REG_P0, TYP_MASK);
+            GenTree* ffrReg         = comp->gtNewPhysRegNode(REG_FFR, TYP_MASK);
             GenTree* storeFfrLclVar = comp->gtNewStoreLclVarNode(lclNum, ffrReg);
 
             BlockRange().InsertAfter(node, ffrReg, storeFfrLclVar);

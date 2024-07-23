@@ -7451,7 +7451,7 @@ GenTreeIntCon* Compiler::gtNewFalse()
 // return a new node representing the value in a physical register
 GenTree* Compiler::gtNewPhysRegNode(regNumber reg, var_types type)
 {
-    assert(genIsValidIntReg(reg) || genIsValidMaskReg(reg) || (reg == REG_SPBASE));
+    assert(genIsValidIntReg(reg) || (reg == REG_FFR) || (reg == REG_SPBASE));
     GenTree* result = new (this, GT_PHYSREG) GenTreePhysReg(reg, type);
     return result;
 }

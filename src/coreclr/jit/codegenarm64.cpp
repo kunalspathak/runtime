@@ -2970,7 +2970,7 @@ void CodeGen::genCodeForStoreLclVar(GenTreeLclVar* lclNode)
 #endif // FEATURE_SIMD
 
 #ifdef FEATURE_MASKED_HW_INTRINSICS
-        if ((compiler->lvaFfrRegister == lclNode->GetLclNum())/* && (targetReg == REG_NA)*/)
+        if ((compiler->lvaFfrRegister == lclNode->GetLclNum()) && (targetReg == REG_NA))
         {
             assert(targetType == TYP_MASK);
             // We are about to store the FFR on stack. So first read the FFR register and

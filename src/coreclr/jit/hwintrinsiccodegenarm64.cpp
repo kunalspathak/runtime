@@ -2380,15 +2380,7 @@ void CodeGen::genHWIntrinsic(GenTreeHWIntrinsic* node)
 
             case NI_Sve_LoadVectorFirstFaulting:
             {
-                insScalableOpts sopt = (opt == INS_OPTS_SCALABLE_B) ? INS_SCALABLE_OPTS_NONE : INS_SCALABLE_OPTS_LSL_N;
-                //if (intrin.numOperands == 3)
-                //{
-                //    // FFR liveness was tracked and we unspilled the value. Now just generate code
-                //    // using LoadVectorFirstFaulting(targetReg, op2Reg, op3Reg);
-                //    std::swap(op1Reg, op2Reg);
-                //    std::swap(op2Reg, op3Reg);
-                //}
-                
+                insScalableOpts sopt = (opt == INS_OPTS_SCALABLE_B) ? INS_SCALABLE_OPTS_NONE : INS_SCALABLE_OPTS_LSL_N;               
                 GetEmitter()->emitIns_R_R_R_R(ins, emitSize, targetReg, op1Reg, op2Reg, REG_ZR, opt, sopt);
                 break;
             }
@@ -2413,7 +2405,7 @@ void CodeGen::genHWIntrinsic(GenTreeHWIntrinsic* node)
             }
             case NI_Sve_SetFfr:
             {
-                //assert(targetReg == REG_NA); // artificial node to write ffr
+                assert(targetReg == REG_NA);
                 GetEmitter()->emitIns_R(ins, emitSize, op1Reg, opt);
                 break;
             }

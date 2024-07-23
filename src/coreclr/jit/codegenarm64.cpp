@@ -2481,15 +2481,6 @@ void CodeGen::genSetRegToConst(regNumber targetReg, var_types targetType, GenTre
             break;
         }
 
-        case GT_CNS_MSK:
-        {
-            GenTreeMskCon* con    = tree->AsMskCon();
-            if ((con->gtFlags & GTF_HW_FFR_REGISTER) == GTF_HW_FFR_REGISTER)
-            {
-                return;
-            }
-            FALLTHROUGH;
-        }
         default:
             unreached();
     }

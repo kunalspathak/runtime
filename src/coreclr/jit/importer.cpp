@@ -10947,7 +10947,7 @@ GenTree* Compiler::impStoreMultiRegValueToVar(GenTree*                    op,
     // TODO-1stClassStructs: Handle constant propagation and CSE-ing of multireg returns.
     ret->SetDoNotCSE();
 
-    //assert(IsMultiRegReturnedType(hClass, callConv) || op->IsMultiRegNode());
+    assert(IsMultiRegReturnedType(hClass, callConv) || op->IsMultiRegNode());
 
     return ret;
 }

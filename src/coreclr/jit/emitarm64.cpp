@@ -7970,7 +7970,7 @@ void emitter::emitIns_R_S(instruction ins, emitAttr attr, regNumber reg1, int va
             attr     = size;
             if (isPredicateRegister(reg1))
             {
-                //assert(offs == 0);
+                assert(offs == 0);
                 // For predicate, generate based off rsGetRsvdReg()
                 regNumber rsvdReg = codeGen->rsGetRsvdReg();
 

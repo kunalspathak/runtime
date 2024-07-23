@@ -1745,7 +1745,7 @@ GenTree* Compiler::impHWIntrinsic(NamedIntrinsic        intrinsic,
 
         if (HWIntrinsicInfo::IsMultiReg(intrinsic))
         {
-            //assert(sizeBytes == 0); // TODO: Fix this to ignore for FirstFaulting* APIs
+            assert(sizeBytes == 0);
         }
 
 #ifdef TARGET_ARM64

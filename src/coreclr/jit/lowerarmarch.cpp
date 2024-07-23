@@ -2668,12 +2668,6 @@ void Lowering::ContainCheckStoreLoc(GenTreeLclVarCommon* storeLoc) const
     {
         MakeSrcContained(storeLoc, op1);
     }
-    //if ((varDsc->lvSlotNum == comp->lvaFfrRegister) && op1->IsCnsMsk())
-    //{
-    //    //assert();
-    //    MakeSrcContained(storeLoc, op1);
-    //    return;
-    //}
 #else
     // If the source is a containable immediate, make it contained, unless it is
     // an int-size or larger store of zero to memory, because we can generate smaller code

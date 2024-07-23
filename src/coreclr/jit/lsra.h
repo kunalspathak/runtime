@@ -511,7 +511,7 @@ public:
 #if defined(FEATURE_MASKED_HW_INTRINSICS)
         else
         {
-            assert(emitter::isMaskReg(reg) || (reg == REG_FFR));
+            assert(emitter::isMaskReg(reg));
             registerType = MaskRegisterType;
         }
 #endif // FEATURE_MASKED_HW_INTRINSICS

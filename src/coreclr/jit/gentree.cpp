@@ -7451,7 +7451,7 @@ GenTreeIntCon* Compiler::gtNewFalse()
 // return a new node representing the value in a physical register
 GenTree* Compiler::gtNewPhysRegNode(regNumber reg, var_types type)
 {
-    assert(genIsValidIntReg(reg) || (reg == REG_SPBASE));
+    assert(genIsValidIntReg(reg) || genIsValidMaskReg(reg) || (reg == REG_SPBASE));
     GenTree* result = new (this, GT_PHYSREG) GenTreePhysReg(reg, type);
     return result;
 }
@@ -16453,6 +16453,12 @@ GenTree* Compiler::gtNewTempStore(
             assert(val->IsInitVal());
             ok = true;
         }
+#ifdef TARGET_ARM64
+        else if ((dstTyp == TYP_STRUCT) && (valTyp == TYP_SIMD16))
+        {
+            ok = true;
+        }
+#endif
 
         if (!ok)
         {
@@ -27206,6 +27212,7 @@ ClassLayout* GenTreeHWIntrinsic::GetLayout(Compiler* compiler) const
             return compiler->typGetBlkLayout(64);
 
         case NI_Sve_Load2xVectorAndUnzip:
+        case NI_Sve_LoadVectorFirstFaulting:
             return compiler->typGetBlkLayout(compiler->getVectorTByteLength() * 2);
         case NI_Sve_Load3xVectorAndUnzip:
             return compiler->typGetBlkLayout(compiler->getVectorTByteLength() * 3);

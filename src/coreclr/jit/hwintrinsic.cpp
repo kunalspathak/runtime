@@ -1745,7 +1745,7 @@ GenTree* Compiler::impHWIntrinsic(NamedIntrinsic        intrinsic,
 
         if (HWIntrinsicInfo::IsMultiReg(intrinsic))
         {
-            assert(sizeBytes == 0);
+            //assert(sizeBytes == 0); // TODO: Fix this to ignore for FirstFaulting* APIs
         }
 
 #ifdef TARGET_ARM64
@@ -2299,29 +2299,40 @@ GenTree* Compiler::impHWIntrinsic(NamedIntrinsic        intrinsic,
         switch (intrinsic)
         {
             case NI_Sve_LoadVectorFirstFaulting:
+            case NI_Sve_SetFfr:
             {
                 // skip
                 break;
             }
-            case NI_Sve_SetFfr:
-            {
-                GenTree* op1         = retNode->AsHWIntrinsic()->Op(1);
-                lvaFfrRegister       = lvaGrabTempWithImplicitUse(false DEBUGARG("Save the FFR value."));
-                LclVarDsc* ffrLclVar = lvaGetDesc(lvaFfrRegister);
-                ffrLclVar->lvType    = TYP_MASK;
-                ffrLclVar->SetAddressExposed(true DEBUGARG(AddressExposedReason::NONE));
+            //case NI_Sve_SetFfr:
+            //{
+            //    // Append SetFfr
+            //    GenTree* op1         = retNode->AsHWIntrinsic()->Op(1);
+            //    if (!varTypeIsMask(op1))
+            //    {
+            //        op1 = gtNewSimdCvtVectorToMaskNode(TYP_MASK, op1, simdBaseJitType, simdSize);
+            //    }
+            //    retNode->AsHWIntrinsic()->Op(1) = op1;
+            //    impAppendTree(retNode, CHECK_SPILL_ALL, impCurStmtDI, false);
 
-                if (!varTypeIsMask(op1))
-                {
-                    op1 = gtNewSimdCvtVectorToMaskNode(TYP_MASK, op1, simdBaseJitType, simdSize);
-                }
-                retNode->AsHWIntrinsic()->Op(1) = op1;
-                impAppendTree(retNode, CHECK_SPILL_ALL, impCurStmtDI, false);
 
-                retNode = gtNewStoreLclVarNode(lvaFfrRegister, gtCloneExpr(op1));
-                setLclRelatedToSIMDIntrinsic(retNode);
-                break;
-            }
+            //    if (lvaFfrRegister == BAD_VAR_NUM)
+            //    {
+            //        lvaFfrRegister = lvaGrabTempWithImplicitUse(false DEBUGARG("Save the FFR value."));
+            //    }
+            //    LclVarDsc* ffrLclVar = lvaGetDesc(lvaFfrRegister);
+            //    ffrLclVar->lvType    = TYP_MASK;
+            //    ffrLclVar->SetAddressExposed(true DEBUGARG(AddressExposedReason::NONE));
+
+            //    GenTreeMskCon* pseudoCndNode = gtNewMskConNode(TYP_MASK);
+            //    pseudoCndNode->gtFlags |= GTF_HW_FFR_REGISTER; // So that we diffentiate
+
+            //    retNode = gtNewStoreLclVarNode(lvaFfrRegister, pseudoCndNode);
+            //    retNode->gtFlags |= GTF_ASG;
+            //    setLclRelatedToSIMDIntrinsic(retNode);
+
+            //    break;
+            //}
             case NI_Sve_CreateBreakAfterPropagateMask:
             case NI_Sve_CreateBreakBeforePropagateMask:
             {

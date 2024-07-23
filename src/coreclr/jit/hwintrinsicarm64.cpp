@@ -3070,56 +3070,6 @@ GenTree* Compiler::impSpecialIntrinsic(NamedIntrinsic        intrinsic,
             break;
         }
 
-        case NI_Sve_SetFfr:
-        {
-            assert(sig->numArgs == 1);
-            CORINFO_ARG_LIST_HANDLE arg1 = sig->args;
-            CORINFO_CLASS_HANDLE    argClass = NO_CLASS_HANDLE;
-            var_types            argType  = JITtype2varType(strip(info.compCompHnd->getArgType(sig, arg1, &argClass)));
-            op1               = getArgForHWIntrinsic(argType, argClass);
-            if (!varTypeIsMask(op1))
-            {
-                op1 = gtNewSimdCvtVectorToMaskNode(TYP_MASK, op1, simdBaseJitType, simdSize);
-            }
-            retNode = gtNewSimdHWIntrinsicNode(retType, op1, intrinsic, simdBaseJitType, simdSize); // Make it return TYP_MASK
-            break;
-        }
-        case NI_Sve_LoadVectorFirstFaulting:
-        {
-            assert(sig->numArgs == 2);
-
-            CORINFO_ARG_LIST_HANDLE arg1 = sig->args;
-            CORINFO_ARG_LIST_HANDLE arg2 = info.compCompHnd->getArgNext(arg1);
-            var_types               argType  = TYP_UNKNOWN;
-            CORINFO_CLASS_HANDLE    argClass = NO_CLASS_HANDLE;
-            argType = JITtype2varType(strip(info.compCompHnd->getArgType(sig, arg2, &argClass)));
-            op2     = getArgForHWIntrinsic(argType, argClass);
-            argType = JITtype2varType(strip(info.compCompHnd->getArgType(sig, arg1, &argClass)));
-            op1     = getArgForHWIntrinsic(argType, argClass);
-
-            if (!varTypeIsMask(op1))
-            {
-                op1 = gtNewSimdCvtVectorToMaskNode(TYP_MASK, op1, simdBaseJitType, simdSize);
-            }
-            retNode = gtNewSimdHWIntrinsicNode(retType, op1, op2, intrinsic, simdBaseJitType, simdSize);
-            
-            break;
-        }
-        case NI_Sve_GetFfrByte:
-        case NI_Sve_GetFfrInt16:
-        case NI_Sve_GetFfrInt32:
-        case NI_Sve_GetFfrInt64:
-        case NI_Sve_GetFfrSByte:
-        case NI_Sve_GetFfrUInt16:
-        case NI_Sve_GetFfrUInt32:
-        case NI_Sve_GetFfrUInt64:
-        {
-            assert(sig->numArgs == 0);
-            //TODO: Remove SpecialImport from GetFfr/SetFfr/LoadFirstFAulting
-            retNode = gtNewSimdHWIntrinsicNode(retType, intrinsic, simdBaseJitType, simdSize);
-            break;
-        }
-
         default:
         {
             return nullptr;

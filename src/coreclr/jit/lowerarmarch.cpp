@@ -1533,8 +1533,7 @@ GenTree* Lowering::LowerHWIntrinsic(GenTreeHWIntrinsic* node)
             return LowerHWIntrinsicCndSel(node);
         case NI_Sve_SetFfr:
         {
-            //// Store the FFR register value into a local variable to simulate "def" of FFR.
-            //node->gtType    = TYP_MASK;
+
             unsigned lclNum = comp->getFFRegisterVarNum();
             GenTree* ffrReg      = comp->gtNewPhysRegNode(REG_P0, TYP_MASK);
             BlockRange().InsertAfter(node, ffrReg);
@@ -1567,7 +1566,6 @@ GenTree* Lowering::LowerHWIntrinsic(GenTreeHWIntrinsic* node)
         }
         case NI_Sve_LoadVectorFirstFaulting:
         {
-#if 1
             JITDUMP("lowering Load*FirstFaulting HWIntrinisic (before):\n");
             DISPTREERANGE(BlockRange(), node);
             JITDUMP("\n");
@@ -1595,115 +1593,14 @@ GenTree* Lowering::LowerHWIntrinsic(GenTreeHWIntrinsic* node)
                 tmpVarDsc->lvType    = node->TypeGet();
                 GenTree* storeLclVar;
                 use.ReplaceWithLclVar(comp, tmpNum, &storeLclVar);
-                printf("storeLclVar:\n");
-                comp->gtDispLIRNode(storeLclVar);
             }
 
             lclNum                  = comp->getFFRegisterVarNum();
             GenTree* ffrReg         = comp->gtNewPhysRegNode(REG_P0, TYP_MASK);
-            BlockRange().InsertAfter(node, ffrReg);
-            printf("ffrReg:\n");
-            comp->gtDispLIRNode(ffrReg);
+            GenTree* storeFfrLclVar = comp->gtNewStoreLclVarNode(lclNum, ffrReg);
 
-            GenTree* storeFfrLclVar = comp->gtNewStoreLclVarNode(lclNum, ffrReg); // 25
-            BlockRange().InsertAfter(ffrReg, storeFfrLclVar);
-            printf("storeFfrLclVar:\n");
-            comp->gtDispLIRNode(storeFfrLclVar);
+            BlockRange().InsertAfter(node, ffrReg, storeFfrLclVar);
 
-            //// 2.
-            //lclNum = comp->getFFRegisterVarNum();
-            //LIR::Use use;
-            //bool     foundUse = BlockRange().TryGetUse(node, &use);
-            
-            //// To begin with, we have:
-            //// V05 = Load*FirstFaulting();
-
-            //// V01 = Load*FirstFaulting()
-            //unsigned tmpNum = comp->lvaGrabTemp(true DEBUGARG("Return value result/FFR"));
-            //LclVarDsc* tmpVarDsc = comp->lvaGetDesc(tmpNum);
-            //tmpVarDsc->lvType    = node->TypeGet();
-            //GenTree* storeLclVar = comp->gtNewStoreLclVarNode(tmpNum, node); // 25
-            //BlockRange().InsertAfter(node, storeLclVar);
-
-            //// V02 = V01
-            //// t1 = VectorToMask(V02)
-            //// VFFr = t1
-            //GenTree* lclVarNodeForFfr = comp->gtNewLclvNode(tmpNum, node->TypeGet()); // 26
-            //BlockRange().InsertAfter(storeLclVar, lclVarNodeForFfr);
-
-
-            //GenTree* trueMask = comp->gtNewSimdAllTrueMaskNode(node->GetSimdBaseJitType(), node->GetSimdSize());
-            //trueMask->SetContained();
-            //BlockRange().InsertAfter(lclVarNodeForFfr, trueMask);
-            //GenTree* ffrCvt =
-            //    comp->gtNewSimdHWIntrinsicNode(TYP_MASK, trueMask, lclVarNodeForFfr, NI_Sve_ConvertVectorToMask,
-            //                                   node->GetSimdBaseJitType(), node->GetSimdSize());
-            //BlockRange().InsertAfter(trueMask, ffrCvt);
-
-            //GenTree* ffrResult = comp->gtNewStoreLclVarNode(lclNum, ffrCvt); // 29
-            //BlockRange().InsertAfter(ffrCvt, ffrResult);
-
-
-            //// V03 = V01
-            //// V05 = V03
-            //GenTree* lclVarNodeForResult = comp->gtNewLclvNode(tmpNum, node->TypeGet()); // 26
-            //BlockRange().InsertAfter(ffrResult, lclVarNodeForResult);
-
-            //if (foundUse && use.User()->IsLocal())
-            //{
-            //    unsigned consumingLclNum = use.User()->AsLclVarCommon()->GetLclNum();
-            //    GenTree* opResult       = comp->gtNewStoreLclVarNode(consumingLclNum, lclVarNodeForResult); // 29
-            //    BlockRange().InsertAfter(lclVarNodeForResult, opResult);
-            //    BlockRange().Remove(use.User());
-            //}
-
-            //// 1.
-            //unsigned tmpNum = comp->lvaGrabTemp(true DEBUGARG("Return value result/FFR"));
-            //LclVarDsc* tmpVarDsc = comp->lvaGetDesc(tmpNum);
-            //tmpVarDsc->lvType    = TYP_STRUCT;
-            //tmpVarDsc->lvDoNotEnregister = true;
-
-            //LIR::Use use;
-            //bool     foundUse = BlockRange().TryGetUse(node, &use);
-            //unsigned consumingLclNum = BAD_VAR_NUM;
-            //if (foundUse && use.User()->IsLocal())
-            //{
-            //    consumingLclNum = use.User()->AsLclVarCommon()->GetLclNum();
-            //}
-
-            //comp->lvaSetStruct(tmpNum, comp->typGetBlkLayout(comp->getVectorTByteLength() * 2), false);
-            //GenTree* storeLclVar = comp->gtNewStoreLclVarNode(tmpNum, node);
-            //BlockRange().InsertAfter(node, storeLclVar);
-
-
-
-            //// Set the result
-            //GenTree* opResult = comp->gtNewLclFldNode(tmpNum, node->TypeGet(), 0);
-            ////GenTree* opResult = comp->gtNewLclVarNode(tmpNum, node->TypeGet());
-            //BlockRange().InsertAfter(storeLclVar, opResult);
-
-            //if (consumingLclNum != BAD_VAR_NUM)
-            //{
-            //    GenTree* stOpResult = comp->gtNewStoreLclVarNode(consumingLclNum, opResult); // 29
-            //    BlockRange().InsertAfter(opResult, stOpResult);
-            //    BlockRange().Remove(use.User());
-            //    opResult = stOpResult;
-
-            //}
-          
-            //// Set the ffr
-            //GenTree* ffrResult = comp->gtNewLclFldNode(tmpNum, TYP_MASK, node->GetSimdSize());
-            ////GenTree* ffrResult = comp->gtNewLclVarNode(tmpNum, node->TypeGet());
-            //ffrResult->gtType  = TYP_MASK;
-            //BlockRange().InsertAfter(opResult, ffrResult);
-
-            //storeLclVar = comp->gtNewStoreLclVarNode(lclNum, ffrResult);
-            //BlockRange().InsertAfter(ffrResult, storeLclVar);
-
-            //JITDUMP("lowering Load*FirstFaulting HWIntrinisic (after):\n");
-            //DISPTREERANGE(BlockRange(), node);
-            //JITDUMP("\n");
-#endif
             break;
         }
         default:

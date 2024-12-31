@@ -9363,6 +9363,10 @@ public:
             return XMM_REGSIZE_BYTES;
         }
 #elif defined(TARGET_ARM64)
+        if (compExactlyDependsOn(InstructionSet_Sve_Arm64))
+        {
+            return 32; // This should call GetSveLengthFromOS()
+        }
         if (compExactlyDependsOn(InstructionSet_VectorT128))
         {
             return FP_REGSIZE_BYTES;

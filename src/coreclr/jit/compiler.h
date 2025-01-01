@@ -9326,7 +9326,11 @@ public:
             return XMM_REGSIZE_BYTES;
         }
 #elif defined(TARGET_ARM64)
-        if (compOpportunisticallyDependsOn(InstructionSet_AdvSimd))
+        if (compExactlyDependsOn(InstructionSet_Sve_Arm64))
+        {
+            return 32; // This should call GetSveLengthFromOS()
+        }
+        else if (compOpportunisticallyDependsOn(InstructionSet_AdvSimd))
         {
             return FP_REGSIZE_BYTES;
         }
@@ -9475,7 +9479,11 @@ public:
 #endif // TARGET_XARCH
         else
         {
+#if defined(TARGET_ARM64)
+            return TYP_SIMD;
+#else
             noway_assert(!"Unexpected size for SIMD type");
+#endif            
         }
         return simdType;
     }

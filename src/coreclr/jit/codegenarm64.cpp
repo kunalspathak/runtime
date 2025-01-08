@@ -2432,6 +2432,7 @@ void CodeGen::genSetRegToConst(regNumber targetReg, var_types targetType, GenTre
                     }
                     else
                     {
+                        //TODO-VL
                         simd16_t val = vecCon->gtSimd16Val;
                         if (ElementsAreSame(val.i32, is8 ? 2 : 4) &&
                             emitter::emitIns_valid_imm_for_movi(val.i32[0], EA_4BYTE))

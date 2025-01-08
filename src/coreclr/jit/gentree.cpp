@@ -18512,7 +18512,8 @@ bool Compiler::IsValidForShuffle(GenTreeVecCon* vecCon, unsigned simdSize, var_t
 //
 void GenTreeVecCon::EvaluateUnaryInPlace(genTreeOps oper, bool scalar, var_types baseType)
 {
-    switch (gtType)
+    var_types vecType = GenTree::getActualVectorType(gtType);
+    switch (vecType)
     {
         case TYP_SIMD8:
         {
@@ -18538,7 +18539,7 @@ void GenTreeVecCon::EvaluateUnaryInPlace(genTreeOps oper, bool scalar, var_types
             break;
         }
 
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
         case TYP_SIMD32:
         {
             simd32_t result = {};
@@ -18546,7 +18547,9 @@ void GenTreeVecCon::EvaluateUnaryInPlace(genTreeOps oper, bool scalar, var_types
             gtSimd32Val = result;
             break;
         }
+#endif // TARGET_XARCH || TARGET_ARM64
 
+#if defined(TARGET_XARCH)
         case TYP_SIMD64:
         {
             simd64_t result = {};
@@ -18555,7 +18558,6 @@ void GenTreeVecCon::EvaluateUnaryInPlace(genTreeOps oper, bool scalar, var_types
             break;
         }
 #endif // TARGET_XARCH
-
         default:
         {
             unreached();
@@ -18574,7 +18576,8 @@ void GenTreeVecCon::EvaluateUnaryInPlace(genTreeOps oper, bool scalar, var_types
 //
 void GenTreeVecCon::EvaluateBinaryInPlace(genTreeOps oper, bool scalar, var_types baseType, GenTreeVecCon* other)
 {
-    switch (gtType)
+    var_types vecType = GenTree::getActualVectorType(gtType);
+    switch (vecType)
     {
         case TYP_SIMD8:
         {
@@ -18600,7 +18603,7 @@ void GenTreeVecCon::EvaluateBinaryInPlace(genTreeOps oper, bool scalar, var_type
             break;
         }
 
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
         case TYP_SIMD32:
         {
             simd32_t result = {};
@@ -18608,6 +18611,9 @@ void GenTreeVecCon::EvaluateBinaryInPlace(genTreeOps oper, bool scalar, var_type
             gtSimd32Val = result;
             break;
         }
+#endif // TARGET_XARCH || TARGET_ARM64
+
+#if defined(TARGET_XARCH)
 
         case TYP_SIMD64:
         {
@@ -18811,7 +18817,13 @@ bool GenTreeVecCon::IsNaN(var_types simdBaseType) const
 bool GenTreeVecCon::IsNegativeZero(var_types simdBaseType) const
 {
     assert(varTypeIsFloating(simdBaseType));
+#if defined (TARGET_ARM64)
+    unsigned vectorLength = genTypeSize(gtType);
+    uint32_t elementCount = ElementCount(vectorLength > 0 ? vectorLength : 32, simdBaseType);
+#else
     uint32_t elementCount = ElementCount(genTypeSize(gtType), simdBaseType);
+#endif
+    
 
     for (uint32_t i = 0; i < elementCount; i++)
     {
@@ -25108,6 +25120,7 @@ GenTree* Compiler::gtNewSimdShuffleNode(
             GenTree* op1Dup   = fgMakeMultiUse(&op1);
             GenTree* op1Lower = gtNewSimdGetLowerNode(TYP_SIMD16, op1, simdBaseJitType, simdSize);
 
+            //TODO-VL
             op2                          = gtNewVconNode(TYP_SIMD16);
             op2->AsVecCon()->gtSimd16Val = vecCns.v128[0];
 
@@ -30912,8 +30925,8 @@ GenTree* Compiler::gtFoldExprHWIntrinsic(GenTreeHWIntrinsic* tree)
         {
             GenTreeVecCon* vecCon = cnsNode->AsVecCon();
             GenTreeMskCon* mskCon = gtNewMskConNode(retType);
-
-            switch (vecCon->TypeGet())
+            var_types vecType = GenTree::getActualVectorType(vecCon->TypeGet());
+            switch (vecType)
             {
                 case TYP_SIMD8:
                 {
@@ -30933,13 +30946,15 @@ GenTree* Compiler::gtFoldExprHWIntrinsic(GenTreeHWIntrinsic* tree)
                     break;
                 }
 
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
                 case TYP_SIMD32:
                 {
                     EvaluateSimdCvtVectorToMask<simd32_t>(simdBaseType, &mskCon->gtSimdMaskVal, vecCon->gtSimd32Val);
                     break;
                 }
+#endif //TARGET_XARCH || TARGET_ARM64
 
+#if defined(TARGET_XARCH)
                 case TYP_SIMD64:
                 {
                     EvaluateSimdCvtVectorToMask<simd64_t>(simdBaseType, &mskCon->gtSimdMaskVal, vecCon->gtSimd64Val);

@@ -192,7 +192,6 @@ struct simd16_t
 };
 static_assert_no_msg(sizeof(simd16_t) == 16);
 
-#if defined(TARGET_XARCH)
 struct simd32_t
 {
     union
@@ -247,6 +246,8 @@ struct simd32_t
     }
 };
 static_assert_no_msg(sizeof(simd32_t) == 32);
+
+#if defined(TARGET_XARCH)
 
 struct simd64_t
 {

@@ -1501,6 +1501,36 @@ public:
     bool isRMWHWIntrinsic(Compiler* comp);
     bool isEvexCompatibleHWIntrinsic(Compiler* comp) const;
     bool isEmbeddedMaskingCompatibleHWIntrinsic() const;
+
+#ifdef TARGET_ARM64
+    static unsigned vectorTLength;
+#endif // TARGET_ARM64
+
+    static var_types getActualVectorType(var_types type)
+    {
+#ifdef TARGET_ARM64
+        if (type == TYP_SIMD)
+        {
+            switch (vectorTLength)
+            {
+                case 16:
+                {
+                    return TYP_SIMD16;
+                }
+                case 32:
+                {
+                    return TYP_SIMD32;
+                }
+                default:
+                {
+                    break;
+                }
+            }
+        }
+#endif // TARGET_ARM64
+        return type;
+    }
+
 #else
     bool isCommutativeHWIntrinsic() const
     {
@@ -6621,11 +6651,10 @@ struct GenTreeVecCon : public GenTree
         simd8_t  gtSimd8Val;
         simd12_t gtSimd12Val;
         simd16_t gtSimd16Val;
-
-#if defined(TARGET_XARCH)
         simd32_t gtSimd32Val;
+#if defined(TARGET_XARCH)
         simd64_t gtSimd64Val;
-#endif // TARGET_XARCH
+#endif
 
         simd_t gtSimdVal;
     };
@@ -6844,6 +6873,7 @@ struct GenTreeVecCon : public GenTree
         return false;
     }
 
+
 #endif // FEATURE_HW_INTRINSICS
 
     void EvaluateUnaryInPlace(genTreeOps oper, bool scalar, var_types baseType);
@@ -6852,7 +6882,8 @@ struct GenTreeVecCon : public GenTree
     template <typename TBase>
     void EvaluateBroadcastInPlace(TBase scalar)
     {
-        switch (gtType)
+        var_types vecType = getActualVectorType(gtType);
+        switch (vecType)
         {
             case TYP_SIMD8:
             {
@@ -6878,7 +6909,7 @@ struct GenTreeVecCon : public GenTree
                 break;
             }
 
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
             case TYP_SIMD32:
             {
                 simd32_t result = {};
@@ -6886,6 +6917,9 @@ struct GenTreeVecCon : public GenTree
                 gtSimd32Val = result;
                 break;
             }
+#endif //TARGET_XARCH || TARGET_ARM64
+
+#if defined(TARGET_XARCH)
 
             case TYP_SIMD64:
             {
@@ -6934,15 +6968,17 @@ struct GenTreeVecCon : public GenTree
                 break;
             }
 
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
             case TYP_SIMD32:
             {
                 simd32_t result = {};
                 EvaluateWithElementFloating<simd32_t>(simdBaseType, &result, gtSimd32Val, index, value);
                 gtSimd32Val = result;
                 break;
-            }
+            }            
+#endif // TARGET_XARCH || TARGET_ARM64
 
+#if defined(TARGET_XARCH)
             case TYP_SIMD64:
             {
                 simd64_t result = {};
@@ -6961,7 +6997,8 @@ struct GenTreeVecCon : public GenTree
 
     void SetElementIntegral(var_types simdBaseType, int32_t index, int64_t value)
     {
-        switch (gtType)
+        var_types vecType = GenTree::getActualVectorType(gtType);
+        switch (vecType)
         {
             case TYP_SIMD8:
             {
@@ -6987,7 +7024,7 @@ struct GenTreeVecCon : public GenTree
                 break;
             }
 
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
             case TYP_SIMD32:
             {
                 simd32_t result = {};
@@ -6995,7 +7032,9 @@ struct GenTreeVecCon : public GenTree
                 gtSimd32Val = result;
                 break;
             }
+#endif // TARGET_XARCH || TARGET_ARM64
 
+#if defined(TARGET_XARCH)
             case TYP_SIMD64:
             {
                 simd64_t result = {};
@@ -7014,7 +7053,8 @@ struct GenTreeVecCon : public GenTree
 
     bool IsAllBitsSet() const
     {
-        switch (gtType)
+        var_types vecType = GenTree::getActualVectorType(gtType);
+        switch (vecType)
         {
             case TYP_SIMD8:
             {
@@ -7031,19 +7071,19 @@ struct GenTreeVecCon : public GenTree
                 return gtSimd16Val.IsAllBitsSet();
             }
 
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
             case TYP_SIMD32:
             {
                 return gtSimd32Val.IsAllBitsSet();
             }
+#endif // TARGET_XARCH || TARGET_ARM64
 
+#if defined(TARGET_XARCH)
             case TYP_SIMD64:
             {
                 return gtSimd64Val.IsAllBitsSet();
             }
-
 #endif // TARGET_XARCH
-
             default:
             {
                 unreached();
@@ -7062,7 +7102,8 @@ struct GenTreeVecCon : public GenTree
             return false;
         }
 
-        switch (gtType)
+        var_types vecType = GenTree::getActualVectorType(gtType);
+        switch (vecType)
         {
             case TYP_SIMD8:
             {
@@ -7079,11 +7120,14 @@ struct GenTreeVecCon : public GenTree
                 return left->gtSimd16Val == right->gtSimd16Val;
             }
 
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
             case TYP_SIMD32:
             {
                 return left->gtSimd32Val == right->gtSimd32Val;
             }
+#endif // TARGET_XARCH || TARGET_ARM64
+
+#if defined(TARGET_XARCH)
 
             case TYP_SIMD64:
             {
@@ -7105,7 +7149,8 @@ struct GenTreeVecCon : public GenTree
 
     bool IsZero() const
     {
-        switch (gtType)
+        var_types vecType = GenTree::getActualVectorType(gtType);
+        switch (vecType)
         {
             case TYP_SIMD8:
             {
@@ -7122,19 +7167,21 @@ struct GenTreeVecCon : public GenTree
                 return gtSimd16Val.IsZero();
             }
 
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)            
             case TYP_SIMD32:
             {
                 return gtSimd32Val.IsZero();
             }
 
+#endif // TARGET_XARCH || TARGET_ARM64
+
+#if defined(TARGET_XARCH)
             case TYP_SIMD64:
             {
                 return gtSimd64Val.IsZero();
             }
 
 #endif // TARGET_XARCH
-
             default:
             {
                 unreached();
@@ -7144,7 +7191,8 @@ struct GenTreeVecCon : public GenTree
 
     double GetElementFloating(var_types simdBaseType, int32_t index) const
     {
-        switch (gtType)
+        var_types vecType = GenTree::getActualVectorType(gtType);
+        switch (vecType)
         {
             case TYP_SIMD8:
             {
@@ -7161,12 +7209,15 @@ struct GenTreeVecCon : public GenTree
                 return EvaluateGetElementFloating<simd16_t>(simdBaseType, gtSimd16Val, index);
             }
 
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
             case TYP_SIMD32:
             {
                 return EvaluateGetElementFloating<simd32_t>(simdBaseType, gtSimd32Val, index);
             }
 
+#endif // TARGET_XARCH || TARGET_ARM64
+
+#if defined(TARGET_XARCH)
             case TYP_SIMD64:
             {
                 return EvaluateGetElementFloating<simd64_t>(simdBaseType, gtSimd64Val, index);
@@ -7182,7 +7233,8 @@ struct GenTreeVecCon : public GenTree
 
     int64_t GetElementIntegral(var_types simdBaseType, int32_t index) const
     {
-        switch (gtType)
+        var_types vecType = GenTree::getActualVectorType(gtType);
+        switch (vecType)
         {
             case TYP_SIMD8:
             {
@@ -7199,12 +7251,15 @@ struct GenTreeVecCon : public GenTree
                 return EvaluateGetElementIntegral<simd16_t>(simdBaseType, gtSimd16Val, index);
             }
 
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+            
             case TYP_SIMD32:
             {
                 return EvaluateGetElementIntegral<simd32_t>(simdBaseType, gtSimd32Val, index);
             }
-
+#endif
+#if defined(TARGET_XARCH)
+            
             case TYP_SIMD64:
             {
                 return EvaluateGetElementIntegral<simd64_t>(simdBaseType, gtSimd64Val, index);
@@ -9428,7 +9483,7 @@ struct GenTreeCCMP final : public GenTreeOpCC
     }
 #endif // DEBUGGABLE_GENTREE
 };
-#endif
+
 
 //------------------------------------------------------------------------
 // Deferred inline functions of GenTree -- these need the subtypes above to

@@ -3970,6 +3970,9 @@ public:
     bool gtHasCatchArg(GenTree* tree);
 
     typedef ArrayStack<GenTree*> GenTreeStack;
+#ifdef TARGET_ARM64
+    static unsigned vectorTLength;
+#endif
 
 //=========================================================================
 // BasicBlock functions

@@ -434,8 +434,10 @@ ValueNumStore::ValueNumStore(Compiler* comp, CompAllocator alloc)
     , m_simd8CnsMap(nullptr)
     , m_simd12CnsMap(nullptr)
     , m_simd16CnsMap(nullptr)
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
     , m_simd32CnsMap(nullptr)
+#endif // TARGET_XARCH || TARGET_ARM64
+#if defined(TARGET_XARCH)
     , m_simd64CnsMap(nullptr)
 #endif // TARGET_XARCH
 #if defined(FEATURE_MASKED_HW_INTRINSICS)
@@ -1664,6 +1666,7 @@ ValueNumStore::Chunk::Chunk(CompAllocator alloc, ValueNum* pNextBaseVN, var_type
     switch (attribs)
     {
         case CEA_Const:
+            //typ = GenTree::getActualVectorType(typ);
             switch (typ)
             {
                 case TYP_INT:
@@ -1706,13 +1709,15 @@ ValueNumStore::Chunk::Chunk(CompAllocator alloc, ValueNum* pNextBaseVN, var_type
                     break;
                 }
 
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
                 case TYP_SIMD32:
                 {
                     m_defs = new (alloc) Alloc<TYP_SIMD32>::Type[ChunkSize];
                     break;
                 }
 
+#endif // TARGET_XARCH || TARGET_ARM64
+#if defined(TARGET_XARCH)
                 case TYP_SIMD64:
                 {
                     m_defs = new (alloc) Alloc<TYP_SIMD64>::Type[ChunkSize];
@@ -1883,12 +1888,14 @@ ValueNum ValueNumStore::VNForSimd16Con(const simd16_t& cnsVal)
     return VnForConst(cnsVal, GetSimd16CnsMap(), TYP_SIMD16);
 }
 
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
 ValueNum ValueNumStore::VNForSimd32Con(const simd32_t& cnsVal)
 {
     return VnForConst(cnsVal, GetSimd32CnsMap(), TYP_SIMD32);
 }
+#endif // TARGET_XARCH || TARGET_ARM64
 
+#if defined(TARGET_XARCH)
 ValueNum ValueNumStore::VNForSimd64Con(const simd64_t& cnsVal)
 {
     return VnForConst(cnsVal, GetSimd64CnsMap(), TYP_SIMD64);
@@ -11591,9 +11598,8 @@ void Compiler::fgValueNumberRecordMemorySsa(MemoryKind memoryKind, GenTree* tree
 void Compiler::fgValueNumberTreeConst(GenTree* tree)
 {
     genTreeOps oper = tree->OperGet();
-    var_types  typ  = tree->TypeGet();
     assert(GenTree::OperIsConst(oper));
-
+    var_types typ = GenTree::getActualVectorType(tree->TypeGet());
     switch (typ)
     {
         case TYP_LONG:
@@ -11658,7 +11664,8 @@ void Compiler::fgValueNumberTreeConst(GenTree* tree)
             break;
         }
 
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+
         case TYP_SIMD32:
         {
             simd32_t simd32Val;
@@ -11667,6 +11674,9 @@ void Compiler::fgValueNumberTreeConst(GenTree* tree)
             tree->gtVNPair.SetBoth(vnStore->VNForSimd32Con(simd32Val));
             break;
         }
+#endif // TARGET_XARCH || TARGET_ARM64
+
+#if defined(TARGET_XARCH)
 
         case TYP_SIMD64:
         {

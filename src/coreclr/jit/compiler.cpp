@@ -2362,6 +2362,11 @@ unsigned ReinterpretHexAsDecimal(unsigned in)
     return result;
 }
 
+#ifdef TARGET_ARM64
+unsigned Compiler::compVectorTLength = 0;
+unsigned GenTree::gtVectorTLength = 0;
+#endif
+
 void Compiler::compInitOptions(JitFlags* jitFlags)
 {
     opts = {};

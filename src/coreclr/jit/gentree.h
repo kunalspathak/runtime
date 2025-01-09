@@ -1503,7 +1503,7 @@ public:
     bool isEmbeddedMaskingCompatibleHWIntrinsic() const;
 
 #ifdef TARGET_ARM64
-    static unsigned vectorTLength;
+    static unsigned gtVectorTLength;
 #endif // TARGET_ARM64
 
     static var_types getActualVectorType(var_types type)
@@ -1511,7 +1511,7 @@ public:
 #ifdef TARGET_ARM64
         if (type == TYP_SIMD)
         {
-            switch (vectorTLength)
+            switch (gtVectorTLength)
             {
                 case 16:
                 {
@@ -6810,10 +6810,12 @@ struct GenTreeVecCon : public GenTree
         simd8_t  gtSimd8Val;
         simd12_t gtSimd12Val;
         simd16_t gtSimd16Val;
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
         simd32_t gtSimd32Val;
+#endif // TARGET_XARCH || TARGET_ARM64
 #if defined(TARGET_XARCH)
         simd64_t gtSimd64Val;
-#endif
+#endif // TARGET_XARCH
 
         simd_t gtSimdVal;
     };
@@ -7031,7 +7033,6 @@ struct GenTreeVecCon : public GenTree
 
         return false;
     }
-
 
 #endif // FEATURE_HW_INTRINSICS
 
@@ -7497,10 +7498,16 @@ struct GenTreeVecCon : public GenTree
 
         // Some uses of GenTreeVecCon do not specify all bits in the vector they are using but failing to zero out the
         // buffer will cause determinism issues with the compiler.
+#ifdef TARGET_ARM64
+        memset(&gtSimdVal, 0, GenTree::gtVectorTLength);
+#else
         memset(&gtSimdVal, 0, sizeof(gtSimdVal));
+#endif // TARGET_ARM64
 
 #if defined(TARGET_XARCH)
         assert(sizeof(simd_t) == sizeof(simd64_t));
+#elif defined(TARGET_ARM64)
+        assert(sizeof(simd_t) == GenTree::gtVectorTLength);
 #else
         assert(sizeof(simd_t) == sizeof(simd16_t));
 #endif
@@ -9595,6 +9602,7 @@ struct GenTreeCCMP final : public GenTreeOpCC
     }
 #endif // DEBUGGABLE_GENTREE
 };
+#endif
 
 
 //------------------------------------------------------------------------

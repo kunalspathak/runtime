@@ -25120,7 +25120,6 @@ GenTree* Compiler::gtNewSimdShuffleNode(
             GenTree* op1Dup   = fgMakeMultiUse(&op1);
             GenTree* op1Lower = gtNewSimdGetLowerNode(TYP_SIMD16, op1, simdBaseJitType, simdSize);
 
-            //TODO-VL
             op2                          = gtNewVconNode(TYP_SIMD16);
             op2->AsVecCon()->gtSimd16Val = vecCns.v128[0];
 

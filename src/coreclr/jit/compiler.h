@@ -2760,6 +2760,9 @@ public:
 
     bool IsMultiRegReturnedType(CORINFO_CLASS_HANDLE hClass, CorInfoCallConvExtension callConv);
 
+#ifdef TARGET_ARM64
+    static unsigned compVectorTLength;
+#endif // TARGET_ARM64
     //-------------------------------------------------------------------------
     // The following is used for validating format of EH table
     //
@@ -3970,9 +3973,6 @@ public:
     bool gtHasCatchArg(GenTree* tree);
 
     typedef ArrayStack<GenTree*> GenTreeStack;
-#ifdef TARGET_ARM64
-    static unsigned vectorTLength;
-#endif
 
 //=========================================================================
 // BasicBlock functions
@@ -9368,6 +9368,8 @@ public:
 #elif defined(TARGET_ARM64)
         if (compExactlyDependsOn(InstructionSet_Sve_Arm64))
         {
+            GenTree::gtVectorTLength = 32;
+            Compiler::compVectorTLength = 32;
             return 32; // This should call GetSveLengthFromOS()
         }
         if (compExactlyDependsOn(InstructionSet_VectorT128))

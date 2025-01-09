@@ -1998,8 +1998,7 @@ GenTree* Compiler::impHWIntrinsic(NamedIntrinsic        intrinsic,
             }
 
 #if defined(TARGET_ARM64)
-            // TODO-VL: Need a check that it should be either 8/16 or equal to VL
-            if ((simdSize != 8) && (simdSize != 16) && (simdSize != 32))
+            if ((simdSize != 8) && (simdSize != 16) && (simdSize != compVectorTLength))
 #elif defined(TARGET_XARCH)
             if ((simdSize != 16) && (simdSize != 32) && (simdSize != 64))
 #endif // TARGET_*

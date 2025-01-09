@@ -468,8 +468,10 @@ public:
     ValueNum VNForSimd8Con(const simd8_t& cnsVal);
     ValueNum VNForSimd12Con(const simd12_t& cnsVal);
     ValueNum VNForSimd16Con(const simd16_t& cnsVal);
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
     ValueNum VNForSimd32Con(const simd32_t& cnsVal);
+#endif // TARGET_XARCH || TARGET_ARM64
+#if defined(TARGET_XARCH)
     ValueNum VNForSimd64Con(const simd64_t& cnsVal);
 #endif // TARGET_XARCH
 #if defined(FEATURE_MASKED_HW_INTRINSICS)
@@ -1868,7 +1870,7 @@ private:
         return m_simd16CnsMap;
     }
 
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
     struct Simd32PrimitiveKeyFuncs : public JitKeyFuncsDefEquals<simd32_t>
     {
         static bool Equals(const simd32_t& x, const simd32_t& y)
@@ -1903,7 +1905,9 @@ private:
         }
         return m_simd32CnsMap;
     }
+#endif // TARGET_XARCH || TARGET_ARM64
 
+#if defined(TARGET_XARCH)
     struct Simd64PrimitiveKeyFuncs : public JitKeyFuncsDefEquals<simd64_t>
     {
         static bool Equals(const simd64_t& x, const simd64_t& y)
@@ -2146,14 +2150,16 @@ struct ValueNumStore::VarTypConv<TYP_SIMD16>
     typedef simd16_t Type;
     typedef simd16_t Lang;
 };
-#if defined(TARGET_XARCH)
+#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
 template <>
 struct ValueNumStore::VarTypConv<TYP_SIMD32>
 {
     typedef simd32_t Type;
     typedef simd32_t Lang;
 };
+#endif // TARGET_XARCH || TARGET_ARM64
 
+#if defined(TARGET_XARCH)
 template <>
 struct ValueNumStore::VarTypConv<TYP_SIMD64>
 {

@@ -2745,7 +2745,9 @@ public:
 
 #ifdef TARGET_ARM64
     static unsigned compVectorTLength;
-#endif // TARGET_ARM64
+#endif
+
+    // TARGET_ARM64
     //-------------------------------------------------------------------------
     // The following is used for validating format of EH table
     //
@@ -3164,6 +3166,9 @@ public:
 #if defined(FEATURE_SIMD)
     GenTreeVecCon* gtNewVconNode(var_types type);
     GenTreeVecCon* gtNewVconNode(var_types type, void* data);
+#ifdef TARGET_ARM64
+    GenTreeVecCon* gtNewVconNode(var_types type, simdVL_t data);
+#endif // TARGET_ARM64
 #endif // FEATURE_SIMD
 
 #if defined(FEATURE_MASKED_HW_INTRINSICS)
@@ -9482,13 +9487,15 @@ public:
             simdType = TYP_SIMD64;
         }
 #endif // TARGET_XARCH
-        else
-        {
 #if defined(TARGET_ARM64)
+        else if (size == -1)
+        {
             return TYP_SIMD;
-#else
+        }
+#endif  // TARGET_ARM64 
+        else
+        {         
             noway_assert(!"Unexpected size for SIMD type");
-#endif            
         }
         return simdType;
     }

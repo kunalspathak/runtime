@@ -232,6 +232,8 @@ static const var_types TYP_MEM = TYP_UNDEF;
 // We will use this placeholder type for memory maps representing "the heap" (GcHeap/ByrefExposed).
 static const var_types TYP_HEAP = TYP_UNKNOWN;
 
+class Compiler;
+
 class ValueNumStore
 {
 
@@ -382,6 +384,9 @@ public:
     simd8_t  GetConstantSimd8(ValueNum argVN);
     simd12_t GetConstantSimd12(ValueNum argVN);
     simd16_t GetConstantSimd16(ValueNum argVN);
+#if defined(TARGET_ARM64)
+    simdVL_t GetConstantSimdVL(ValueNum argVN);
+#endif // TARGET_ARM64
 #if defined(TARGET_XARCH)
     simd32_t GetConstantSimd32(ValueNum argVN);
     simd64_t GetConstantSimd64(ValueNum argVN);
@@ -468,10 +473,11 @@ public:
     ValueNum VNForSimd8Con(const simd8_t& cnsVal);
     ValueNum VNForSimd12Con(const simd12_t& cnsVal);
     ValueNum VNForSimd16Con(const simd16_t& cnsVal);
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
-    ValueNum VNForSimd32Con(const simd32_t& cnsVal);
-#endif // TARGET_XARCH || TARGET_ARM64
+#if defined(TARGET_ARM64)
+    ValueNum VNForSimdVLCon(const simdVL_t& cnsVal);
+#endif // TARGET_ARM64
 #if defined(TARGET_XARCH)
+    ValueNum VNForSimd32Con(const simd32_t& cnsVal);
     ValueNum VNForSimd64Con(const simd64_t& cnsVal);
 #endif // TARGET_XARCH
 #if defined(FEATURE_MASKED_HW_INTRINSICS)
@@ -1864,9 +1870,43 @@ private:
             m_simd16CnsMap = new (m_alloc) Simd16ToValueNumMap(m_alloc);
         }
         return m_simd16CnsMap;
-    }
+    };
 
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+#ifdef TARGET_ARM64
+    struct SimdVLPrimitiveKeyFuncs : public JitKeyFuncsDefEquals<simdVL_t>
+    {
+        static bool Equals(const simdVL_t& x, const simdVL_t& y)
+        {
+            return x == y;
+        }
+
+        static unsigned GetHashCode(const simdVL_t& val)
+        {
+            unsigned hash = 0;
+
+            for (unsigned lane = 0; lane < val.vectorLength / 4; lane++)
+            {
+                hash = static_cast<unsigned>(hash ^ val.u32[lane]);
+            }
+
+            return hash;
+        }
+    };
+
+    typedef VNMap<simdVL_t, SimdVLPrimitiveKeyFuncs> SimdVLToValueNumMap;
+    SimdVLToValueNumMap*                             m_simdVLCnsMap;
+    SimdVLToValueNumMap*                             GetSimdVLCnsMap()
+    {
+        if (m_simdVLCnsMap == nullptr)
+        {
+            m_simdVLCnsMap = new (m_alloc) SimdVLToValueNumMap(m_alloc);
+        }
+        return m_simdVLCnsMap;
+    };
+#endif // TARGET_ARM64
+
+#if defined(TARGET_XARCH)
+
     struct Simd32PrimitiveKeyFuncs : public JitKeyFuncsDefEquals<simd32_t>
     {
         static bool Equals(const simd32_t& x, const simd32_t& y)
@@ -1901,9 +1941,7 @@ private:
         }
         return m_simd32CnsMap;
     }
-#endif // TARGET_XARCH || TARGET_ARM64
 
-#if defined(TARGET_XARCH)
     struct Simd64PrimitiveKeyFuncs : public JitKeyFuncsDefEquals<simd64_t>
     {
         static bool Equals(const simd64_t& x, const simd64_t& y)
@@ -2146,16 +2184,23 @@ struct ValueNumStore::VarTypConv<TYP_SIMD16>
     typedef simd16_t Type;
     typedef simd16_t Lang;
 };
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+#if defined(TARGET_ARM64)
+template <>
+struct ValueNumStore::VarTypConv<TYP_SIMD>
+{
+    typedef simdVL_t Type;
+    typedef simdVL_t Lang;
+};
+#endif // TARGET_ARM64
+
+#if defined(TARGET_XARCH)
 template <>
 struct ValueNumStore::VarTypConv<TYP_SIMD32>
 {
     typedef simd32_t Type;
     typedef simd32_t Lang;
 };
-#endif // TARGET_XARCH || TARGET_ARM64
 
-#if defined(TARGET_XARCH)
 template <>
 struct ValueNumStore::VarTypConv<TYP_SIMD64>
 {

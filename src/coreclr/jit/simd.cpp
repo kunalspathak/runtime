@@ -30,6 +30,73 @@
 #endif
 
 #ifdef FEATURE_SIMD
+
+simdVL_t::simdVL_t()
+{
+    vectorLength = 0;
+    m_simdVLCompiler = nullptr;
+}
+
+simdVL_t::simdVL_t(Compiler* comp)
+{
+    m_simdVLCompiler = comp;
+    vectorLength = Compiler::compVectorTLength;
+    int elementCount = vectorLength / sizeof(uint64_t);
+    u64 = new (comp, CMK_ASTNode) uint64_t[elementCount];
+    memset(u64, 0, elementCount);
+}
+
+bool simdVL_t::operator==(const simdVL_t & other) const
+{
+    for (int lane = 0; lane < Compiler::compVectorTLength / sizeof(uint64_t); lane++)
+    {
+        if (u64[lane] != other.u64[lane])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool simdVL_t::operator!=(const simdVL_t& other) const
+{
+    return !(*this == other);
+}
+
+/* static */ simdVL_t simdVL_t::AllBitsSet(Compiler* comp)
+{
+    simdVL_t result(comp);
+    for (int lane = 0; lane < Compiler::compVectorTLength / sizeof(uint64_t); lane++)
+    {
+       result.u64[lane] = 0xFFFFFFFFFFFFFFFF;
+    }
+    return result;
+}
+
+bool simdVL_t::IsAllBitsSet() const
+{
+    for (int lane = 0; lane < Compiler::compVectorTLength / sizeof(uint64_t); lane++)
+    {
+        if (u64[lane] != 0xFFFFFFFFFFFFFFFF)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool simdVL_t::IsZero() const
+{
+    return vectorLength == 0;
+}
+
+/* static */ simdVL_t simdVL_t::Zero()
+{
+    simdVL_t result = {}; // ctor already zeros out the vector contents
+    //return result;
+    return result;
+}
+
 //------------------------------------------------------------------------
 // getSIMDVectorLength: Get the length (number of elements of base type) of
 //                      SIMD Vector given its size and base (element) type.

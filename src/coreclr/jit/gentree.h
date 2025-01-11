@@ -1506,30 +1506,30 @@ public:
     static unsigned gtVectorTLength;
 #endif // TARGET_ARM64
 
-    static var_types getActualVectorType(var_types type)
-    {
-#ifdef TARGET_ARM64
-        if (type == TYP_SIMD)
-        {
-            switch (gtVectorTLength)
-            {
-                case 16:
-                {
-                    return TYP_SIMD16;
-                }
-                case 32:
-                {
-                    return TYP_SIMD32;
-                }
-                default:
-                {
-                    break;
-                }
-            }
-        }
-#endif // TARGET_ARM64
-        return type;
-    }
+//     static var_types getActualVectorType1(var_types type)
+//     {
+// #ifdef TARGET_ARM64
+//         if (type == TYP_SIMD)
+//         {
+//             switch (gtVectorTLength)
+//             {
+//                 case 16:
+//                 {
+//                     return TYP_SIMD16;
+//                 }
+//                 case 32:
+//                 {
+//                     return TYP_SIMD32;
+//                 }
+//                 default:
+//                 {
+//                     break;
+//                 }
+//             }
+//         }
+// #endif // TARGET_ARM64
+//         return type;
+//     }
 
 #else
     bool isCommutativeHWIntrinsic() const
@@ -6810,15 +6810,34 @@ struct GenTreeVecCon : public GenTree
         simd8_t  gtSimd8Val;
         simd12_t gtSimd12Val;
         simd16_t gtSimd16Val;
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
-        simd32_t gtSimd32Val;
-#endif // TARGET_XARCH || TARGET_ARM64
+//#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+//        simd32_t gtSimd32Val;
+//#endif // TARGET_XARCH || TARGET_ARM64
 #if defined(TARGET_XARCH)
+        simd32_t gtSimd32Val;
         simd64_t gtSimd64Val;
 #endif // TARGET_XARCH
+#if defined(TARGET_ARM64)
+
+        // There are 2 type of ctors...
+        // 1. The ones that zero out the contents using gtSimdVal = {}
+        // 2. Other, that set the value of all elements to something.
+        /*
+        * simdVL_t contains array pointers and we do not want to zero out them during #1. We do want to
+        * initialize them and set to zero(?), but in such case, should we just assume that if array pointers
+        * are zero that means the contents are zero. Only for #2, we will initialize the array, but that might
+        * lead to AVs in case we try to access the gtSimdVLVal.*. Additionally, when VL == 64 for eg, then we
+        * will end up checking just initial 16 bytes. So I think we need to allocate the array equal to VL size
+        * and at all the code places, inspect #1 and #2 depending on the type and do things accordingly. Even
+        * in GenTreeVecCon's ctor, we should do similar thing based upon the var_types type argument passed in.
+        */
+
+        simdVL_t gtSimdVLVal;
+#endif // TARGET_ARM64
 
         simd_t gtSimdVal;
     };
+    Compiler* m_comp;
 
 #if defined(FEATURE_HW_INTRINSICS)
     static unsigned ElementCount(unsigned simdSize, var_types simdBaseType);
@@ -7042,8 +7061,7 @@ struct GenTreeVecCon : public GenTree
     template <typename TBase>
     void EvaluateBroadcastInPlace(TBase scalar)
     {
-        var_types vecType = getActualVectorType(gtType);
-        switch (vecType)
+        switch (gtType)
         {
             case TYP_SIMD8:
             {
@@ -7068,8 +7086,17 @@ struct GenTreeVecCon : public GenTree
                 gtSimd16Val = result;
                 break;
             }
+#if defined(TARGET_ARM64)
+            case TYP_SIMD:
+            {
+                simdVL_t result(m_comp);
+                BroadcastConstantToSimd<TBase>(&result, scalar);
+                gtSimdVLVal = result;
+                break;
+            }
+#endif // TARGET_ARM64
 
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+#if defined(TARGET_XARCH)
             case TYP_SIMD32:
             {
                 simd32_t result = {};
@@ -7077,10 +7104,6 @@ struct GenTreeVecCon : public GenTree
                 gtSimd32Val = result;
                 break;
             }
-#endif //TARGET_XARCH || TARGET_ARM64
-
-#if defined(TARGET_XARCH)
-
             case TYP_SIMD64:
             {
                 simd64_t result = {};
@@ -7089,7 +7112,6 @@ struct GenTreeVecCon : public GenTree
                 break;
             }
 #endif // TARGET_XARCH
-
             default:
             {
                 unreached();
@@ -7128,17 +7150,24 @@ struct GenTreeVecCon : public GenTree
                 break;
             }
 
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+#if defined(TARGET_ARM64)
+            case TYP_SIMD:
+            {
+                simdVL_t result(m_comp);
+                EvaluateWithElementFloating<simdVL_t>(simdBaseType, &result, gtSimdVLVal, index, value);
+                gtSimdVLVal = result;
+                break;
+            }            
+#endif // TARGET_ARM64
+
+#if defined(TARGET_XARCH)
             case TYP_SIMD32:
             {
                 simd32_t result = {};
                 EvaluateWithElementFloating<simd32_t>(simdBaseType, &result, gtSimd32Val, index, value);
                 gtSimd32Val = result;
                 break;
-            }            
-#endif // TARGET_XARCH || TARGET_ARM64
-
-#if defined(TARGET_XARCH)
+            } 
             case TYP_SIMD64:
             {
                 simd64_t result = {};
@@ -7157,8 +7186,7 @@ struct GenTreeVecCon : public GenTree
 
     void SetElementIntegral(var_types simdBaseType, int32_t index, int64_t value)
     {
-        var_types vecType = GenTree::getActualVectorType(gtType);
-        switch (vecType)
+        switch (gtType)
         {
             case TYP_SIMD8:
             {
@@ -7184,7 +7212,17 @@ struct GenTreeVecCon : public GenTree
                 break;
             }
 
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+#if defined(TARGET_ARM64)
+            case TYP_SIMD:
+            {
+                simdVL_t result(m_comp);
+                EvaluateWithElementIntegral<simdVL_t>(simdBaseType, &result, gtSimdVLVal, index, value);
+                gtSimdVLVal = result;
+                break;
+            }
+#endif // TARGET_ARM64
+
+#if defined(TARGET_XARCH)
             case TYP_SIMD32:
             {
                 simd32_t result = {};
@@ -7192,9 +7230,7 @@ struct GenTreeVecCon : public GenTree
                 gtSimd32Val = result;
                 break;
             }
-#endif // TARGET_XARCH || TARGET_ARM64
 
-#if defined(TARGET_XARCH)
             case TYP_SIMD64:
             {
                 simd64_t result = {};
@@ -7213,8 +7249,7 @@ struct GenTreeVecCon : public GenTree
 
     bool IsAllBitsSet() const
     {
-        var_types vecType = GenTree::getActualVectorType(gtType);
-        switch (vecType)
+        switch (gtType)
         {
             case TYP_SIMD8:
             {
@@ -7231,14 +7266,19 @@ struct GenTreeVecCon : public GenTree
                 return gtSimd16Val.IsAllBitsSet();
             }
 
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+#if defined(TARGET_ARM64)
+            case TYP_SIMD:
+            {
+                return gtSimdVLVal.IsAllBitsSet();
+            }
+#endif // TARGET_ARM64
+
+#if defined(TARGET_XARCH)
             case TYP_SIMD32:
             {
                 return gtSimd32Val.IsAllBitsSet();
             }
-#endif // TARGET_XARCH || TARGET_ARM64
 
-#if defined(TARGET_XARCH)
             case TYP_SIMD64:
             {
                 return gtSimd64Val.IsAllBitsSet();
@@ -7262,8 +7302,7 @@ struct GenTreeVecCon : public GenTree
             return false;
         }
 
-        var_types vecType = GenTree::getActualVectorType(gtType);
-        switch (vecType)
+        switch (gtType)
         {
             case TYP_SIMD8:
             {
@@ -7280,15 +7319,19 @@ struct GenTreeVecCon : public GenTree
                 return left->gtSimd16Val == right->gtSimd16Val;
             }
 
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
-            case TYP_SIMD32:
+#if defined(TARGET_ARM64)
+            case TYP_SIMD:
             {
-                return left->gtSimd32Val == right->gtSimd32Val;
+                return left->gtSimdVLVal == right->gtSimdVLVal;
             }
 #endif // TARGET_XARCH || TARGET_ARM64
 
 #if defined(TARGET_XARCH)
 
+            case TYP_SIMD32:
+            {
+                return left->gtSimd32Val == right->gtSimd32Val;
+            }
             case TYP_SIMD64:
             {
                 return left->gtSimd64Val == right->gtSimd64Val;
@@ -7309,8 +7352,7 @@ struct GenTreeVecCon : public GenTree
 
     bool IsZero() const
     {
-        var_types vecType = GenTree::getActualVectorType(gtType);
-        switch (vecType)
+        switch (gtType)
         {
             case TYP_SIMD8:
             {
@@ -7327,15 +7369,21 @@ struct GenTreeVecCon : public GenTree
                 return gtSimd16Val.IsZero();
             }
 
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)            
+#if defined(TARGET_ARM64)            
+            case TYP_SIMD:
+            {
+                return gtSimdVLVal.IsZero();
+            }
+
+#endif // TARGET_ARM64
+
+#if defined(TARGET_XARCH)
+
             case TYP_SIMD32:
             {
                 return gtSimd32Val.IsZero();
             }
 
-#endif // TARGET_XARCH || TARGET_ARM64
-
-#if defined(TARGET_XARCH)
             case TYP_SIMD64:
             {
                 return gtSimd64Val.IsZero();
@@ -7351,8 +7399,7 @@ struct GenTreeVecCon : public GenTree
 
     double GetElementFloating(var_types simdBaseType, int32_t index) const
     {
-        var_types vecType = GenTree::getActualVectorType(gtType);
-        switch (vecType)
+        switch (gtType)
         {
             case TYP_SIMD8:
             {
@@ -7369,15 +7416,20 @@ struct GenTreeVecCon : public GenTree
                 return EvaluateGetElementFloating<simd16_t>(simdBaseType, gtSimd16Val, index);
             }
 
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+#if defined(TARGET_ARM64)
+            case TYP_SIMD:
+            {
+                return EvaluateGetElementFloating<simdVL_t>(simdBaseType, gtSimdVLVal, index);
+            }
+
+#endif // TARGET_ARM64
+
+#if defined(TARGET_XARCH)
             case TYP_SIMD32:
             {
                 return EvaluateGetElementFloating<simd32_t>(simdBaseType, gtSimd32Val, index);
             }
 
-#endif // TARGET_XARCH || TARGET_ARM64
-
-#if defined(TARGET_XARCH)
             case TYP_SIMD64:
             {
                 return EvaluateGetElementFloating<simd64_t>(simdBaseType, gtSimd64Val, index);
@@ -7393,8 +7445,7 @@ struct GenTreeVecCon : public GenTree
 
     int64_t GetElementIntegral(var_types simdBaseType, int32_t index) const
     {
-        var_types vecType = GenTree::getActualVectorType(gtType);
-        switch (vecType)
+        switch (gtType)
         {
             case TYP_SIMD8:
             {
@@ -7411,15 +7462,21 @@ struct GenTreeVecCon : public GenTree
                 return EvaluateGetElementIntegral<simd16_t>(simdBaseType, gtSimd16Val, index);
             }
 
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+#if defined(TARGET_ARM64)
             
+            case TYP_SIMD:
+            {
+                return EvaluateGetElementIntegral<simdVL_t>(simdBaseType, gtSimdVLVal, index);
+            }
+#endif // TARGET_ARM64
+
+#if defined(TARGET_XARCH)
+
             case TYP_SIMD32:
             {
                 return EvaluateGetElementIntegral<simd32_t>(simdBaseType, gtSimd32Val, index);
             }
-#endif
-#if defined(TARGET_XARCH)
-            
+
             case TYP_SIMD64:
             {
                 return EvaluateGetElementIntegral<simd64_t>(simdBaseType, gtSimd64Val, index);
@@ -7491,23 +7548,29 @@ struct GenTreeVecCon : public GenTree
         return IsElementOne(simdBaseType, 0);
     }
 
-    GenTreeVecCon(var_types type)
+    GenTreeVecCon(var_types type, Compiler* comp)
         : GenTree(GT_CNS_VEC, type)
     {
+        m_comp = comp;
         assert(varTypeIsSIMD(type));
 
         // Some uses of GenTreeVecCon do not specify all bits in the vector they are using but failing to zero out the
         // buffer will cause determinism issues with the compiler.
 #ifdef TARGET_ARM64
-        memset(&gtSimdVal, 0, GenTree::gtVectorTLength);
+        if (type != TYP_SIMD)
+        {
+            memset(&gtSimdVal, 0, sizeof(gtSimdVal));
+        }
+        else
+        {
+            gtSimdVLVal = simdVL_t(comp);
+        }
 #else
         memset(&gtSimdVal, 0, sizeof(gtSimdVal));
 #endif // TARGET_ARM64
 
 #if defined(TARGET_XARCH)
         assert(sizeof(simd_t) == sizeof(simd64_t));
-#elif defined(TARGET_ARM64)
-        assert(sizeof(simd_t) == GenTree::gtVectorTLength);
 #else
         assert(sizeof(simd_t) == sizeof(simd16_t));
 #endif
@@ -9936,6 +9999,61 @@ inline uint64_t GenTree::GetIntegralVectorConstElement(size_t index, var_types s
     {
         const GenTreeVecCon* node = AsVecCon();
 
+#ifdef TARGET_ARM64
+        if (node->TypeGet() == TYP_SIMD)
+        {
+            switch (simdBaseType)
+            {
+                case TYP_BYTE:
+                {
+                    return node->gtSimdVLVal.i8[index];
+                }
+
+                case TYP_UBYTE:
+                {
+                    return node->gtSimdVLVal.u8[index];
+                }
+
+                case TYP_SHORT:
+                {
+                    return node->gtSimdVLVal.i16[index];
+                }
+
+                case TYP_USHORT:
+                {
+                    return node->gtSimdVLVal.u16[index];
+                }
+
+                case TYP_INT:
+                case TYP_FLOAT:
+                {
+                    return node->gtSimdVLVal.i32[index];
+                }
+
+                case TYP_UINT:
+                {
+                    return node->gtSimdVLVal.u32[index];
+                }
+
+                case TYP_LONG:
+                case TYP_DOUBLE:
+                {
+                    return node->gtSimdVLVal.i64[index];
+                }
+
+                case TYP_ULONG:
+                {
+                    return node->gtSimdVLVal.u64[index];
+                }
+
+                default:
+                {
+                    unreached();
+                }
+            }
+            return false;
+        }
+#endif // TARGET_ARM64
         switch (simdBaseType)
         {
             case TYP_BYTE:

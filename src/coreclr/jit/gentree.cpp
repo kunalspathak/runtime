@@ -7903,13 +7903,27 @@ GenTree* Compiler::gtNewSconNode(int CPX, CORINFO_MODULE_HANDLE scpHandle)
 #if defined(FEATURE_SIMD)
 GenTreeVecCon* Compiler::gtNewVconNode(var_types type)
 {
-    GenTreeVecCon* vecCon = new (this, GT_CNS_VEC) GenTreeVecCon(type);
+    GenTreeVecCon* vecCon = new (this, GT_CNS_VEC) GenTreeVecCon(type, this);
     return vecCon;
 }
 
+#ifdef TARGET_ARM64
+GenTreeVecCon* Compiler::gtNewVconNode(var_types type, simdVL_t data)
+{
+    GenTreeVecCon* vecCon = new (this, GT_CNS_VEC) GenTreeVecCon(type, this);
+
+    const int bytesToCopyPerIter = 16;
+    for (unsigned lane = 0; lane < data.vectorLength / bytesToCopyPerIter; lane++)
+    {
+        memcpy(vecCon->gtSimdVLVal.i64 + lane, data.i64 + lane, bytesToCopyPerIter);
+    }
+    return vecCon;
+}
+#endif // TARGET_ARM64
+
 GenTreeVecCon* Compiler::gtNewVconNode(var_types type, void* data)
 {
-    GenTreeVecCon* vecCon = new (this, GT_CNS_VEC) GenTreeVecCon(type);
+    GenTreeVecCon* vecCon = new (this, GT_CNS_VEC) GenTreeVecCon(type, this);
     memcpy(&vecCon->gtSimdVal, data, genTypeSize(type));
     return vecCon;
 }
@@ -18512,8 +18526,7 @@ bool Compiler::IsValidForShuffle(GenTreeVecCon* vecCon, unsigned simdSize, var_t
 //
 void GenTreeVecCon::EvaluateUnaryInPlace(genTreeOps oper, bool scalar, var_types baseType)
 {
-    var_types vecType = GenTree::getActualVectorType(gtType);
-    switch (vecType)
+    switch (gtType)
     {
         case TYP_SIMD8:
         {
@@ -18539,7 +18552,17 @@ void GenTreeVecCon::EvaluateUnaryInPlace(genTreeOps oper, bool scalar, var_types
             break;
         }
 
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+#if defined(TARGET_ARM64)
+        case TYP_SIMD:
+        {
+            simdVL_t result (m_comp);
+            EvaluateUnarySimd<simdVL_t>(oper, scalar, baseType, &result, gtSimdVLVal);
+            gtSimdVLVal = result;
+            break;
+        }
+#endif // TARGET_ARM64
+
+#if defined(TARGET_XARCH)
         case TYP_SIMD32:
         {
             simd32_t result = {};
@@ -18547,9 +18570,7 @@ void GenTreeVecCon::EvaluateUnaryInPlace(genTreeOps oper, bool scalar, var_types
             gtSimd32Val = result;
             break;
         }
-#endif // TARGET_XARCH || TARGET_ARM64
 
-#if defined(TARGET_XARCH)
         case TYP_SIMD64:
         {
             simd64_t result = {};
@@ -18576,8 +18597,7 @@ void GenTreeVecCon::EvaluateUnaryInPlace(genTreeOps oper, bool scalar, var_types
 //
 void GenTreeVecCon::EvaluateBinaryInPlace(genTreeOps oper, bool scalar, var_types baseType, GenTreeVecCon* other)
 {
-    var_types vecType = GenTree::getActualVectorType(gtType);
-    switch (vecType)
+    switch (gtType)
     {
         case TYP_SIMD8:
         {
@@ -18604,6 +18624,16 @@ void GenTreeVecCon::EvaluateBinaryInPlace(genTreeOps oper, bool scalar, var_type
         }
 
 #if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+        case TYP_SIMD:
+        {
+            simdVL_t result(m_comp);
+            EvaluateBinarySimd<simdVL_t>(oper, scalar, baseType, &result, gtSimdVLVal, other->gtSimdVLVal);
+            gtSimdVLVal = result;
+            break;
+        }
+#endif // TARGET_XARCH || TARGET_ARM64
+
+#if defined(TARGET_XARCH)
         case TYP_SIMD32:
         {
             simd32_t result = {};
@@ -18611,9 +18641,6 @@ void GenTreeVecCon::EvaluateBinaryInPlace(genTreeOps oper, bool scalar, var_type
             gtSimd32Val = result;
             break;
         }
-#endif // TARGET_XARCH || TARGET_ARM64
-
-#if defined(TARGET_XARCH)
 
         case TYP_SIMD64:
         {
@@ -30924,8 +30951,7 @@ GenTree* Compiler::gtFoldExprHWIntrinsic(GenTreeHWIntrinsic* tree)
         {
             GenTreeVecCon* vecCon = cnsNode->AsVecCon();
             GenTreeMskCon* mskCon = gtNewMskConNode(retType);
-            var_types vecType = GenTree::getActualVectorType(vecCon->TypeGet());
-            switch (vecType)
+            switch (vecCon->TypeGet())
             {
                 case TYP_SIMD8:
                 {
@@ -30946,14 +30972,20 @@ GenTree* Compiler::gtFoldExprHWIntrinsic(GenTreeHWIntrinsic* tree)
                 }
 
 #if defined(TARGET_XARCH) || defined(TARGET_ARM64)
-                case TYP_SIMD32:
+                case TYP_SIMD:
                 {
-                    EvaluateSimdCvtVectorToMask<simd32_t>(simdBaseType, &mskCon->gtSimdMaskVal, vecCon->gtSimd32Val);
+                    EvaluateSimdCvtVectorToMask<simdVL_t>(simdBaseType, &mskCon->gtSimdMaskVal, vecCon->gtSimdVLVal);
                     break;
                 }
 #endif //TARGET_XARCH || TARGET_ARM64
 
 #if defined(TARGET_XARCH)
+                case TYP_SIMD32:
+                {
+                    EvaluateSimdCvtVectorToMask<simd32_t>(simdBaseType, &mskCon->gtSimdMaskVal, vecCon->gtSimd32Val);
+                    break;
+                }
+
                 case TYP_SIMD64:
                 {
                     EvaluateSimdCvtVectorToMask<simd64_t>(simdBaseType, &mskCon->gtSimdMaskVal, vecCon->gtSimd64Val);

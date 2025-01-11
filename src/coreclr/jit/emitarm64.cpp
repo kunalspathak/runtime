@@ -2363,7 +2363,7 @@ emitter::code_t emitter::emitInsCode(instruction ins, insFormat fmt)
     return code;
 }
 
-/*static*/ bool emitIns_valid_imm_for_sve_mov(INT64 imm, emitAttr elemsize)
+/*static*/ bool emitter::emitIns_valid_imm_for_sve_mov(INT64 imm, emitAttr elemsize)
 {
     switch (elemsize)
     {

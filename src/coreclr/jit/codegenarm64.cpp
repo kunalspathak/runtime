@@ -2520,67 +2520,66 @@ void CodeGen::genSetRegToConst(regNumber targetReg, var_types targetType, GenTre
                     }
                     else
                     {
-                        // TODO-VL
-                        var_types vectorType   = GenTree::getActualVectorType(targetType);
-                        switch (vectorType)
-                        {
-                            case TYP_SIMD32:
-                            {
-                                simd32_t val = vecCon->gtSimd32Val;
-                                if (ElementsAreSame(val.i64, 4) &&
-                                    emitter::emitIns_valid_imm_for_sve_mov(val.i64[0], EA_8BYTE))
-                                {
-                                    emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, val.i64[0],
-                                                      INS_OPTS_SCALABLE_Q,
-                                                      INS_SCALABLE_OPTS_IMM_BITMASK);
-                                }
-                                else if (ElementsAreSame(val.i32, 8) &&
-                                         emitter::emitIns_valid_imm_for_movi(val.i32[0], EA_4BYTE))
-                                {
-                                    emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, val.i32[0],
-                                                      INS_OPTS_SCALABLE_D, INS_SCALABLE_OPTS_IMM_BITMASK);
-                                }
-                                else if (ElementsAreSame(val.i16, 16) &&
-                                         emitter::emitIns_valid_imm_for_movi(val.i16[0], EA_2BYTE))
-                                {
-                                    emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, val.i16[0],
-                                                      INS_OPTS_SCALABLE_H, INS_SCALABLE_OPTS_IMM_BITMASK);
-                                }
-                                else if (ElementsAreSame(val.i8, 32) &&
-                                         emitter::emitIns_valid_imm_for_movi(val.i8[0], EA_1BYTE))
-                                {
-                                    emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, val.i8[0],
-                                                      INS_OPTS_SCALABLE_B, INS_SCALABLE_OPTS_IMM_BITMASK);
-                                }
-                            }
-                            case TYP_SIMD16:
-                            {
-                                simd16_t val = vecCon->gtSimd16Val;
-                                if (ElementsAreSame(val.i32, 4) &&
-                                    emitter::emitIns_valid_imm_for_movi(val.i32[0], EA_4BYTE))
-                                {
-                                    emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, val.i32[0],
-                                                      INS_OPTS_SCALABLE_D, INS_SCALABLE_OPTS_IMM_BITMASK);
-                                }
-                                else if (ElementsAreSame(val.i16, 8) &&
-                                         emitter::emitIns_valid_imm_for_movi(val.i16[0], EA_2BYTE))
-                                {
-                                    emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, val.i16[0],
-                                                      INS_OPTS_SCALABLE_H, INS_SCALABLE_OPTS_IMM_BITMASK);
-                                }
-                                else if (ElementsAreSame(val.i8, 16) &&
-                                         emitter::emitIns_valid_imm_for_movi(val.i8[0], EA_1BYTE))
-                                {
-                                    emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, val.i8[0],
-                                                      INS_OPTS_SCALABLE_B, INS_SCALABLE_OPTS_IMM_BITMASK);
-                                }
-                            }
-                            default:
-                            {
-                                unreached();
-                            }
+                        //// TODO-VL
+                        //switch (targetType)
+                        //{
+                        //    case TYP_SIMD:
+                        //    {
+                        //        simd32_t val = vecCon->gtSimd32Val;
+                        //        if (ElementsAreSame(val.i64, 4) &&
+                        //            emitter::emitIns_valid_imm_for_sve_mov(val.i64[0], EA_8BYTE))
+                        //        {
+                        //            emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, val.i64[0],
+                        //                              INS_OPTS_SCALABLE_Q,
+                        //                              INS_SCALABLE_OPTS_IMM_BITMASK);
+                        //        }
+                        //        else if (ElementsAreSame(val.i32, 8) &&
+                        //                 emitter::emitIns_valid_imm_for_movi(val.i32[0], EA_4BYTE))
+                        //        {
+                        //            emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, val.i32[0],
+                        //                              INS_OPTS_SCALABLE_D, INS_SCALABLE_OPTS_IMM_BITMASK);
+                        //        }
+                        //        else if (ElementsAreSame(val.i16, 16) &&
+                        //                 emitter::emitIns_valid_imm_for_movi(val.i16[0], EA_2BYTE))
+                        //        {
+                        //            emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, val.i16[0],
+                        //                              INS_OPTS_SCALABLE_H, INS_SCALABLE_OPTS_IMM_BITMASK);
+                        //        }
+                        //        else if (ElementsAreSame(val.i8, 32) &&
+                        //                 emitter::emitIns_valid_imm_for_movi(val.i8[0], EA_1BYTE))
+                        //        {
+                        //            emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, val.i8[0],
+                        //                              INS_OPTS_SCALABLE_B, INS_SCALABLE_OPTS_IMM_BITMASK);
+                        //        }
+                        //    }
+                        //    case TYP_SIMD16:
+                        //    {
+                        //        simd16_t val = vecCon->gtSimd16Val;
+                        //        if (ElementsAreSame(val.i32, 4) &&
+                        //            emitter::emitIns_valid_imm_for_movi(val.i32[0], EA_4BYTE))
+                        //        {
+                        //            emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, val.i32[0],
+                        //                              INS_OPTS_SCALABLE_D, INS_SCALABLE_OPTS_IMM_BITMASK);
+                        //        }
+                        //        else if (ElementsAreSame(val.i16, 8) &&
+                        //                 emitter::emitIns_valid_imm_for_movi(val.i16[0], EA_2BYTE))
+                        //        {
+                        //            emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, val.i16[0],
+                        //                              INS_OPTS_SCALABLE_H, INS_SCALABLE_OPTS_IMM_BITMASK);
+                        //        }
+                        //        else if (ElementsAreSame(val.i8, 16) &&
+                        //                 emitter::emitIns_valid_imm_for_movi(val.i8[0], EA_1BYTE))
+                        //        {
+                        //            emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, val.i8[0],
+                        //                              INS_OPTS_SCALABLE_B, INS_SCALABLE_OPTS_IMM_BITMASK);
+                        //        }
+                        //    }
+                        //    default:
+                        //    {
+                        //        unreached();
+                        //    }
 
-                        }
+                        //}
                         bool allElementsSame = false;
                         if (allElementsSame)
                         {

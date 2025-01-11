@@ -2272,7 +2272,7 @@ GenTree* Lowering::LowerHWIntrinsicCreate(GenTreeHWIntrinsic* node)
 
         GenTreeVecCon* vecCon = comp->gtNewVconNode(simdType);
 
-        vecCon->gtSimdVal = simdVal;
+        //vecCon->gtSimdVal = simdVal; //TODO-VL: Since we already zero out gtSimdVal, is this needed too?
         BlockRange().InsertBefore(node, vecCon);
 
         LIR::Use use;

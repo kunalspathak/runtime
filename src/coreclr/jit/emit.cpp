@@ -8164,6 +8164,17 @@ CORINFO_FIELD_HANDLE emitter::emitSimd16Const(simd16_t constValue)
     return emitComp->eeFindJitDataOffs(cnum);
 }
 
+#if defined(TARGET_ARM64)
+CORINFO_FIELD_HANDLE emitter::emitSimdVLConst(simdVL_t constValue)
+{
+    unsigned cnsSize  = constValue.vectorLength;
+    unsigned cnsAlign = cnsSize;
+
+    UNATIVE_OFFSET cnum = emitDataConst(&constValue, cnsSize, cnsAlign, TYP_SIMD);
+    return emitComp->eeFindJitDataOffs(cnum);
+}
+#endif // TARGET_ARM64
+
 #if defined(TARGET_XARCH)
 CORINFO_FIELD_HANDLE emitter::emitSimd32Const(simd32_t constValue)
 {

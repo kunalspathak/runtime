@@ -3154,6 +3154,17 @@ GenTree* Compiler::optVNBasedFoldConstExpr(BasicBlock* block, GenTree* parent, G
             conValTree = vecCon;
             break;
         }
+#if defined(TARGET_ARM64)
+        case TYP_SIMD:
+        {
+            simdVL_t value = vnStore->ConstantValue<simdVL_t>(vnCns);
+
+            GenTreeVecCon* vecCon = gtNewVconNode(tree->TypeGet(), value);
+
+            conValTree = vecCon;
+            break;
+        }
+#endif
 
 #if defined(TARGET_XARCH)
         case TYP_SIMD32:

@@ -866,6 +866,7 @@ static const HWIntrinsicIsaRange hwintrinsicIsaRangeArray[] = {
     { NI_Illegal, NI_Illegal },                         // Sha1_Arm64
     { NI_Illegal, NI_Illegal },                         // Sha256_Arm64
     { NI_Illegal, NI_Illegal },                         // Sve_Arm64
+    { FIRST_NI_Vector, LAST_NI_Vector },
 #else
 #error Unsupported platform
 #endif
@@ -1142,6 +1143,13 @@ NamedIntrinsic HWIntrinsicInfo::lookupId(Compiler*         comp,
     }
 #elif defined(TARGET_ARM64)
     else if (isa == InstructionSet_Vector64)
+    {
+        if (!comp->IsBaselineSimdIsaSupported())
+        {
+            return NI_Illegal;
+        }
+    }
+    else if (isa == InstructionSet_Vector)
     {
         if (!comp->IsBaselineSimdIsaSupported())
         {

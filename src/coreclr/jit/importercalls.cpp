@@ -10644,6 +10644,14 @@ NamedIntrinsic Compiler::lookupNamedIntrinsic(CORINFO_METHOD_HANDLE method)
                                 }
                             }
 
+#ifdef TARGET_ARM64
+                            if (compExactlyDependsOn(InstructionSet_Sve_Arm64) && (size != 8) && (size != 16))
+                            {
+                                // this is SVE.
+                                lookupClassName = className;
+                            }
+#endif // TARGET_ARM64
+
                             const char* lookupMethodName = methodName;
 
                             if ((strncmp(methodName, "As", 2) == 0) && (methodName[2] != '\0'))

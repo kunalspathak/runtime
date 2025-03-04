@@ -6932,7 +6932,8 @@ struct GenTreeVecCon : public GenTree
             {
                 simdVL_t result(m_comp);
                 BroadcastConstantToSimd<TBase>(&result, scalar);
-                gtSimdVLVal = result;
+                //memcpy(gtSimdVal, &result, sizeof(simdVL_t));
+                //gtSimdVLVal = result;
                 break;
             }
 #endif // TARGET_ARM64
@@ -6994,9 +6995,10 @@ struct GenTreeVecCon : public GenTree
 #if defined(TARGET_ARM64)
             case TYP_SIMD:
             {
-                simdVL_t result(m_comp);
+                simdVL_t result(m_comp, false);
                 EvaluateWithElementFloating<simdVL_t>(simdBaseType, &result, gtSimdVLVal, index, value);
-                gtSimdVLVal = result;
+                memcpy(&gtSimdVLVal, &result, sizeof(result));
+                //gtSimdVLVal = result;
                 break;
             }            
 #endif // TARGET_ARM64
@@ -7056,9 +7058,10 @@ struct GenTreeVecCon : public GenTree
 #if defined(TARGET_ARM64)
             case TYP_SIMD:
             {
-                simdVL_t result(m_comp);
+                simdVL_t result(m_comp, false);
                 EvaluateWithElementIntegral<simdVL_t>(simdBaseType, &result, gtSimdVLVal, index, value);
-                gtSimdVLVal = result;
+                memcpy(&gtSimdVLVal, &result, sizeof(result));
+                //gtSimdVLVal = result;
                 break;
             }
 #endif // TARGET_ARM64
@@ -7389,33 +7392,33 @@ struct GenTreeVecCon : public GenTree
         return IsElementOne(simdBaseType, 0);
     }
 
-    GenTreeVecCon(var_types type, Compiler* comp)
-        : GenTree(GT_CNS_VEC, type)
-    {
-        m_comp = comp;
-        assert(varTypeIsSIMD(type));
-
-        // Some uses of GenTreeVecCon do not specify all bits in the vector they are using but failing to zero out the
-        // buffer will cause determinism issues with the compiler.
-#ifdef TARGET_ARM64
-        if (type != TYP_SIMD)
-        {
-            memset(&gtSimdVal, 0, sizeof(gtSimdVal));
-        }
-        else
-        {
-            gtSimdVLVal = simdVL_t(comp);
-        }
-#else
-        memset(&gtSimdVal, 0, sizeof(gtSimdVal));
-#endif // TARGET_ARM64
-
-#if defined(TARGET_XARCH)
-        assert(sizeof(simd_t) == sizeof(simd64_t));
-#else
-        assert(sizeof(simd_t) == sizeof(simd16_t));
-#endif
-    }
+    GenTreeVecCon(var_types type, Compiler* comp);
+//        : GenTree(GT_CNS_VEC, type)
+//    {
+//        m_comp = comp;
+//        assert(varTypeIsSIMD(type));
+//
+//        // Some uses of GenTreeVecCon do not specify all bits in the vector they are using but failing to zero out the
+//        // buffer will cause determinism issues with the compiler.
+//#ifdef TARGET_ARM64
+//        if (type != TYP_SIMD)
+//        {
+//            memset(&gtSimdVal, 0, sizeof(gtSimdVal));
+//        }
+//        else
+//        {
+//            gtSimdVLVal = new (comp) simdVL_t(comp);
+//        }
+//#else
+//        memset(&gtSimdVal, 0, sizeof(gtSimdVal));
+//#endif // TARGET_ARM64
+//
+//#if defined(TARGET_XARCH)
+//        assert(sizeof(simd_t) == sizeof(simd64_t));
+//#else
+//        assert(sizeof(simd_t) == sizeof(simd16_t));
+//#endif
+//    }
 
 #if DEBUGGABLE_GENTREE
     GenTreeVecCon()

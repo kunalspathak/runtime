@@ -9578,7 +9578,7 @@ public:
         }
 #endif // TARGET_XARCH
 #if defined(TARGET_ARM64)
-        else if (size == -1)
+        else if (size == compVectorTLength)
         {
             return TYP_SIMD;
         }

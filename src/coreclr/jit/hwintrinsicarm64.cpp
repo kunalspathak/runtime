@@ -114,6 +114,14 @@ static CORINFO_InstructionSet lookupInstructionSet(const char* className)
         {
             return InstructionSet_Vector128;
         }
+        else if (strncmp(className, "Vector`1", 8) == 0)
+        {
+            return InstructionSet_Vector;
+        }
+        else if (strncmp(className, "Vector", 6) == 0)
+        {
+            return InstructionSet_Vector;
+        }
     }
 
     return InstructionSet_ILLEGAL;
@@ -214,6 +222,7 @@ bool HWIntrinsicInfo::isFullyImplementedIsa(CORINFO_InstructionSet isa)
         case InstructionSet_Sve_Arm64:
         case InstructionSet_Vector64:
         case InstructionSet_Vector128:
+        case InstructionSet_Vector:
             return true;
 
         default:
@@ -745,6 +754,7 @@ GenTree* Compiler::impSpecialIntrinsic(NamedIntrinsic        intrinsic,
             break;
         }
 
+        case NI_Vector_As:
         case NI_Vector64_As:
         case NI_Vector64_AsByte:
         case NI_Vector64_AsDouble:
@@ -1590,6 +1600,7 @@ GenTree* Compiler::impSpecialIntrinsic(NamedIntrinsic        intrinsic,
             break;
         }
 
+        case NI_Vector_get_Zero:
         case NI_Vector64_get_Zero:
         case NI_Vector128_get_Zero:
         {

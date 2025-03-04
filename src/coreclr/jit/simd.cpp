@@ -33,22 +33,34 @@
 
 simdVL_t::simdVL_t()
 {
-    vectorLength = 0;
+    _vectorLength = (uint8_t)Compiler::compVectorTLength;
     m_simdVLCompiler = nullptr;
+    _isZero = 0;
+    u64              = nullptr;
 }
 
 simdVL_t::simdVL_t(Compiler* comp)
 {
     m_simdVLCompiler = comp;
-    vectorLength = Compiler::compVectorTLength;
-    int elementCount = vectorLength / sizeof(uint64_t);
+    _vectorLength    = (uint16_t)Compiler::compVectorTLength;
+    int elementCount = _vectorLength / sizeof(uint64_t);
     u64 = new (comp, CMK_ASTNode) uint64_t[elementCount];
-    memset(u64, 0, elementCount);
+    memset(u64, 0, _vectorLength); // TODO-VL: See if we should use different ctor that needs this zero.
+    _isZero = false;
 }
+
+simdVL_t::simdVL_t(Compiler* comp, bool zero)
+{
+    m_simdVLCompiler = comp;
+    _vectorLength    = (uint8_t)Compiler::compVectorTLength;
+    _isZero          = 1;
+    u64 = nullptr;
+}
+
 
 bool simdVL_t::operator==(const simdVL_t & other) const
 {
-    for (int lane = 0; lane < Compiler::compVectorTLength / sizeof(uint64_t); lane++)
+    for (int lane = 0; lane < _vectorLength / sizeof(uint64_t); lane++)
     {
         if (u64[lane] != other.u64[lane])
         {
@@ -75,7 +87,10 @@ bool simdVL_t::operator!=(const simdVL_t& other) const
 
 bool simdVL_t::IsAllBitsSet() const
 {
-    for (int lane = 0; lane < Compiler::compVectorTLength / sizeof(uint64_t); lane++)
+    if (_isZero)
+        return false;
+
+    for (int lane = 0; lane < _vectorLength / sizeof(uint64_t); lane++)
     {
         if (u64[lane] != 0xFFFFFFFFFFFFFFFF)
         {
@@ -87,15 +102,13 @@ bool simdVL_t::IsAllBitsSet() const
 
 bool simdVL_t::IsZero() const
 {
-    return vectorLength == 0;
+    return _isZero;
 }
 
-/* static */ simdVL_t simdVL_t::Zero()
-{
-    simdVL_t result = {}; // ctor already zeros out the vector contents
-    //return result;
-    return result;
-}
+///* static */ void simdVL_t::SetZero(simdVL_t* value)
+//{
+//    value->_isZero = true;
+//}
 
 //------------------------------------------------------------------------
 // getSIMDVectorLength: Get the length (number of elements of base type) of
@@ -217,6 +230,276 @@ unsigned Compiler::getFFRegisterVarNum()
         lvaTable[lvaFfrRegister].lvUsedInSIMDIntrinsic = true;
     }
     return lvaFfrRegister;
+}
+
+void EvaluateUnarySimdVL(genTreeOps oper, bool scalar, var_types baseType, simdVL_t* result, const simdVL_t& arg0)
+{
+    switch (baseType)
+    {
+        case TYP_FLOAT:
+        {
+            // Some operations are bitwise and we want to ensure inputs like
+            // sNaN are preserved rather than being converted to a qNaN when
+            // the CPU encounters them. So we check for and handle that early
+            // prior to extracting the element out of the vector value.
+
+            if (IsUnaryBitwiseOperation(oper))
+            {
+                EvaluateUnarySimdVL<int32_t>(oper, scalar, result, arg0);
+            }
+            else
+            {
+                EvaluateUnarySimdVL<float>(oper, scalar, result, arg0);
+            }
+            break;
+        }
+
+        case TYP_DOUBLE:
+        {
+            // Some operations are bitwise and we want to ensure inputs like
+            // sNaN are preserved rather than being converted to a qNaN when
+            // the CPU encounters them. So we check for and handle that early
+            // prior to extracting the element out of the vector value.
+
+            if (IsUnaryBitwiseOperation(oper))
+            {
+                EvaluateUnarySimdVL<int64_t>(oper, scalar, result, arg0);
+            }
+            else
+            {
+                EvaluateUnarySimdVL<double>(oper, scalar, result, arg0);
+            }
+            break;
+        }
+
+        case TYP_BYTE:
+        {
+            EvaluateUnarySimdVL<int8_t>(oper, scalar, result, arg0);
+            break;
+        }
+
+        case TYP_SHORT:
+        {
+            EvaluateUnarySimdVL<int16_t>(oper, scalar, result, arg0);
+            break;
+        }
+
+        case TYP_INT:
+        {
+            EvaluateUnarySimdVL<int32_t>(oper, scalar, result, arg0);
+            break;
+        }
+
+        case TYP_LONG:
+        {
+            EvaluateUnarySimdVL<int64_t>(oper, scalar, result, arg0);
+            break;
+        }
+
+        case TYP_UBYTE:
+        {
+            EvaluateUnarySimdVL<uint8_t>(oper, scalar, result, arg0);
+            break;
+        }
+
+        case TYP_USHORT:
+        {
+            EvaluateUnarySimdVL<uint16_t>(oper, scalar, result, arg0);
+            break;
+        }
+
+        case TYP_UINT:
+        {
+            EvaluateUnarySimdVL<uint32_t>(oper, scalar, result, arg0);
+            break;
+        }
+
+        case TYP_ULONG:
+        {
+            EvaluateUnarySimdVL<uint64_t>(oper, scalar, result, arg0);
+            break;
+        }
+
+        default:
+        {
+            unreached();
+        }
+    }
+}
+
+void EvaluateBinarySimdVL(
+    genTreeOps oper, bool scalar, var_types baseType, simdVL_t* result, const simdVL_t& arg0, const simdVL_t& arg1)
+{
+    switch (baseType)
+    {
+        case TYP_FLOAT:
+        {
+            // Some operations are bitwise and we want to ensure inputs like
+            // sNaN are preserved rather than being converted to a qNaN when
+            // the CPU encounters them. So we check for and handle that early
+            // prior to extracting the element out of the vector value.
+
+            if (IsBinaryBitwiseOperation(oper))
+            {
+                EvaluateBinarySimdVL<int32_t>(oper, scalar, result, arg0, arg1);
+            }
+            else
+            {
+                EvaluateBinarySimdVL<float>(oper, scalar, result, arg0, arg1);
+            }
+            break;
+        }
+
+        case TYP_DOUBLE:
+        {
+            // Some operations are bitwise and we want to ensure inputs like
+            // sNaN are preserved rather than being converted to a qNaN when
+            // the CPU encounters them. So we check for and handle that early
+            // prior to extracting the element out of the vector value.
+
+            if (IsBinaryBitwiseOperation(oper))
+            {
+                EvaluateBinarySimdVL<int64_t>(oper, scalar, result, arg0, arg1);
+            }
+            else
+            {
+                EvaluateBinarySimdVL<double>(oper, scalar, result, arg0, arg1);
+            }
+            break;
+        }
+
+        case TYP_BYTE:
+        {
+            EvaluateBinarySimdVL<int8_t>(oper, scalar, result, arg0, arg1);
+            break;
+        }
+
+        case TYP_SHORT:
+        {
+            EvaluateBinarySimdVL<int16_t>(oper, scalar, result, arg0, arg1);
+            break;
+        }
+
+        case TYP_INT:
+        {
+            EvaluateBinarySimdVL<int32_t>(oper, scalar, result, arg0, arg1);
+            break;
+        }
+
+        case TYP_LONG:
+        {
+            EvaluateBinarySimdVL<int64_t>(oper, scalar, result, arg0, arg1);
+            break;
+        }
+
+        case TYP_UBYTE:
+        {
+            EvaluateBinarySimdVL<uint8_t>(oper, scalar, result, arg0, arg1);
+            break;
+        }
+
+        case TYP_USHORT:
+        {
+            EvaluateBinarySimdVL<uint16_t>(oper, scalar, result, arg0, arg1);
+            break;
+        }
+
+        case TYP_UINT:
+        {
+            EvaluateBinarySimdVL<uint32_t>(oper, scalar, result, arg0, arg1);
+            break;
+        }
+
+        case TYP_ULONG:
+        {
+            EvaluateBinarySimdVL<uint64_t>(oper, scalar, result, arg0, arg1);
+            break;
+        }
+
+        default:
+        {
+            unreached();
+        }
+    }
+}
+
+
+template <typename TBase>
+void EvaluateSimdCvtVectorToMaskVL(simdmask_t* result, simdVL_t arg0)
+{
+    uint32_t count = arg0.getVectorLength()  / sizeof(TBase);
+    uint64_t mask  = 0;
+
+    TBase mostSignificantBit = static_cast<TBase>(1) << ((sizeof(TBase) * 8) - 1);
+
+    for (uint32_t i = 0; i < count; i++)
+    {
+        TBase input0;
+        memcpy(&input0, &arg0.u8[i * sizeof(TBase)], sizeof(TBase));
+
+        if ((input0 & mostSignificantBit) != 0)
+        {
+#if defined(TARGET_XARCH)
+            // For xarch we have count sequential bits to write
+            // depending on if the corresponding the input element
+            // has its most significant bit set
+
+            mask |= static_cast<uint64_t>(1) << i;
+#elif defined(TARGET_ARM64)
+            // For Arm64 we have count total bits to write, but
+            // they are sizeof(TBase) bits apart. We still set
+            // depending on if the corresponding input element
+            // has its most significant bit set
+
+            mask |= static_cast<uint64_t>(1) << (i * sizeof(TBase));
+#else
+            unreached();
+#endif
+        }
+    }
+
+    memcpy(&result->u8[0], &mask, sizeof(uint64_t));
+}
+
+void EvaluateSimdCvtVectorToMaskVL(var_types baseType, simdmask_t* result, simdVL_t arg0)
+{
+    switch (baseType)
+    {
+        case TYP_FLOAT:
+        case TYP_INT:
+        case TYP_UINT:
+        {
+            EvaluateSimdCvtVectorToMaskVL<uint32_t>(result, arg0);
+            break;
+        }
+
+        case TYP_DOUBLE:
+        case TYP_LONG:
+        case TYP_ULONG:
+        {
+            EvaluateSimdCvtVectorToMaskVL<uint64_t>(result, arg0);
+            break;
+        }
+
+        case TYP_BYTE:
+        case TYP_UBYTE:
+        {
+            EvaluateSimdCvtVectorToMaskVL<uint8_t>(result, arg0);
+            break;
+        }
+
+        case TYP_SHORT:
+        case TYP_USHORT:
+        {
+            EvaluateSimdCvtVectorToMaskVL<uint16_t>(result, arg0);
+            break;
+        }
+
+        default:
+        {
+            unreached();
+        }
+    }
 }
 #endif
 

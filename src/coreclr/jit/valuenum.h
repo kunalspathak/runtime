@@ -429,6 +429,13 @@ public:
     // Initialize an empty ValueNumStore.
     ValueNumStore(Compiler* comp, CompAllocator allocator);
 
+#ifdef TARGET_ARM64
+    Compiler* VNGetCompiler()
+    {
+        return m_pComp;
+    }
+#endif
+
     // Returns "true" iff "vnf" (which may have been created by a cast from an integral value) represents
     // a legal value number function.
     // (Requires InitValueNumStoreStatics to have been run.)
@@ -1589,7 +1596,7 @@ private:
 
         // Initialize a chunk, starting at "*baseVN", for the given "typ", and "attribs", using "alloc" for allocations.
         // (Increments "*baseVN" by ChunkSize.)
-        Chunk(CompAllocator alloc, ValueNum* baseVN, var_types typ, ChunkExtraAttribs attribs);
+        Chunk(Compiler* compiler, CompAllocator alloc, ValueNum* baseVN, var_types typ, ChunkExtraAttribs attribs);
 
         // Requires that "m_numUsed < ChunkSize."  Returns the offset of the allocated VN within the chunk; the
         // actual VN is this added to the "m_baseVN" of the chunk.
@@ -1884,11 +1891,15 @@ private:
             return x == y;
         }
 
-        static unsigned GetHashCode(const simdVL_t& val)
+        static unsigned GetHashCode(simdVL_t& val)
         {
-            unsigned hash = 0;
+            if (val.IsZero())
+            {
+                return 0;
+            }
 
-            for (unsigned lane = 0; lane < val.vectorLength / 4; lane++)
+            unsigned hash = 0;
+            for (unsigned lane = 0; lane < val.getVectorLength() / 4; lane++)
             {
                 hash = static_cast<unsigned>(hash ^ val.u32[lane]);
             }
@@ -2282,6 +2293,15 @@ FORCEINLINE simd16_t ValueNumStore::SafeGetConstantValue<simd16_t>(Chunk* c, uns
     return reinterpret_cast<VarTypConv<TYP_SIMD16>::Lang*>(c->m_defs)[offset];
 }
 
+#if defined(TARGET_ARM64)
+template <>
+FORCEINLINE simdVL_t ValueNumStore::SafeGetConstantValue<simdVL_t>(Chunk* c, unsigned offset)
+{
+    assert(c->m_typ == TYP_SIMD);
+    return reinterpret_cast<VarTypConv<TYP_SIMD>::Lang*>(c->m_defs)[offset];
+}
+#endif // TARGET_ARM64
+
 #if defined(TARGET_XARCH)
 template <>
 FORCEINLINE simd32_t ValueNumStore::SafeGetConstantValue<simd32_t>(Chunk* c, unsigned offset)
@@ -2348,6 +2368,22 @@ FORCEINLINE simd16_t ValueNumStore::ConstantValueInternal<simd16_t>(ValueNum vn 
 
     return SafeGetConstantValue<simd16_t>(c, offset);
 }
+
+#if defined(TARGET_ARM64)
+template <>
+FORCEINLINE simdVL_t ValueNumStore::ConstantValueInternal<simdVL_t>(ValueNum vn DEBUGARG(bool coerce))
+{
+    Chunk* c = m_chunks.GetNoExpand(GetChunkNum(vn));
+    assert(c->m_attribs == CEA_Const);
+
+    unsigned offset = ChunkOffset(vn);
+
+    assert(c->m_typ == TYP_SIMD);
+    assert(!coerce);
+
+    return SafeGetConstantValue<simdVL_t>(c, offset);
+}
+#endif // TARGET_ARM64
 
 #if defined(TARGET_XARCH)
 template <>

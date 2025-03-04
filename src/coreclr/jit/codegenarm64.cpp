@@ -2515,8 +2515,7 @@ void CodeGen::genSetRegToConst(regNumber targetReg, var_types targetType, GenTre
                     else if (vecCon->IsZero())
                     {
                         // Use Scalable_D because for Zero, it doesn't matter.
-                        emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, 0, INS_OPTS_SCALABLE_D,
-                                            INS_SCALABLE_OPTS_IMM_BITMASK);
+                        emit->emitIns_R_I(INS_sve_mov, EA_SCALABLE, targetReg, 0, INS_OPTS_SCALABLE_D);
                     }
                     else
                     {
@@ -2590,6 +2589,7 @@ void CodeGen::genSetRegToConst(regNumber targetReg, var_types targetType, GenTre
 
                         }
                     }
+                    break;
                 }
 #endif
                 default:

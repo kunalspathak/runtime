@@ -468,7 +468,7 @@ ValueNumStore::ValueNumStore(Compiler* comp, CompAllocator alloc)
         m_VNsForSmallIntConsts[i] = NoVN;
     }
     // We will reserve chunk 0 to hold some special constants.
-    Chunk* specialConstChunk = new (m_alloc) Chunk(m_alloc, &m_nextChunkBase, TYP_REF, CEA_Const);
+    Chunk* specialConstChunk = new (m_alloc) Chunk(m_pComp, m_alloc, &m_nextChunkBase, TYP_REF, CEA_Const);
     specialConstChunk->m_numUsed += SRC_NumSpecialRefConsts;
     ChunkNum cn = m_chunks.Push(specialConstChunk);
     assert(cn == 0);
@@ -1656,7 +1656,7 @@ bool ValueNumStore::IsSharedStatic(ValueNum vn)
     return GetVNFunc(vn, &funcAttr) && (s_vnfOpAttribs[funcAttr.m_func] & VNFOA_SharedStatic) != 0;
 }
 
-ValueNumStore::Chunk::Chunk(CompAllocator alloc, ValueNum* pNextBaseVN, var_types typ, ChunkExtraAttribs attribs)
+ValueNumStore::Chunk::Chunk(Compiler* compiler, CompAllocator alloc, ValueNum* pNextBaseVN, var_types typ, ChunkExtraAttribs attribs)
     : m_defs(nullptr)
     , m_numUsed(0)
     , m_baseVN(*pNextBaseVN)
@@ -1712,7 +1712,27 @@ ValueNumStore::Chunk::Chunk(CompAllocator alloc, ValueNum* pNextBaseVN, var_type
 #if defined(TARGET_ARM64)
                 case TYP_SIMD:
                 {
+
                     m_defs = new (alloc) Alloc<TYP_SIMD>::Type[ChunkSize];
+                    for (int i = 0; i < ChunkSize; i++)
+                    {
+                        ((Alloc<TYP_SIMD>::Type*)m_defs)[i] = simdVL_t(compiler);
+                    }
+                    printf("hello");
+                    //m_defs = new (ChunkSize, compiler, CMK_ValueNumber) simdVL_t(compiler);
+                    //simdVL_t[ChunkSize];
+
+                    //m_defs = new (alloc) Alloc<TYP_SIMD>::Type[ChunkSize];
+                    //m_defs = new (alloc) Alloc<TYP_SIMD>::Type[ChunkSize];
+
+
+                    //MyClass* arr = new MyClass[size]; // Allocate memory for 10 objects
+
+                    //// Use placement new to call the non-default constructor for each object
+                    //for (int i = 0; i < size; ++i)
+                    //{
+                    //    new (&arr[i]) MyClass(i * 10); // Call the non-default constructor
+                    //}
                     break;
                 }
 
@@ -1793,7 +1813,7 @@ ValueNumStore::Chunk* ValueNumStore::GetAllocChunk(var_types typ, ChunkExtraAttr
         }
     }
     // Otherwise, must allocate a new one.
-    res                         = new (m_alloc) Chunk(m_alloc, &m_nextChunkBase, typ, attribs);
+    res                         = new (m_alloc) Chunk(m_pComp, m_alloc, &m_nextChunkBase, typ, attribs);
     cn                          = m_chunks.Push(res);
     m_curAllocChunk[typ][index] = cn;
     return res;
@@ -2129,7 +2149,14 @@ ValueNum ValueNumStore::VNZeroForType(var_types typ)
         {
             return VNForSimd16Con(simd16_t::Zero());
         }
-
+#if defined(TARGET_ARM64)
+        case TYP_SIMD:
+        {
+            simdVL_t zeroVal = simdVL_t(m_pComp, true);
+            //return VNForSimdVLCon(zeroVal);
+            return VNForSimdVLCon(zeroVal);
+        }
+#endif
 #if defined(TARGET_XARCH)
         case TYP_SIMD32:
         {
@@ -2321,12 +2348,12 @@ TSimd BroadcastConstantToSimd(ValueNumStore* vns, var_types baseType, ValueNum a
 }
 
 #if defined(TARGET_ARM64)
-simdVL_t BroadcastConstantToSimd(ValueNumStore* vns, var_types baseType, ValueNum argVN)
+simdVL_t BroadcastConstantToSimdVL(ValueNumStore* vns, var_types baseType, ValueNum argVN)
 {
     assert(vns->IsVNConstant(argVN));
     assert(!varTypeIsSIMD(vns->TypeOfVN(argVN)));
 
-    simdVL_t result = {};
+    simdVL_t result(vns->VNGetCompiler());
 
     switch (baseType)
     {
@@ -2424,6 +2451,7 @@ ValueNum ValueNumStore::VNBroadcastForSimdType(var_types simdType, var_types sim
         }
 
 #endif // TARGET_XARCH
+        //TODO-VL: Need to add more here for BroadcastConstantToSimd
 
         default:
         {
@@ -7627,7 +7655,7 @@ simdVL_t GetConstantSimdVL(ValueNumStore* vns, var_types baseType, ValueNum argV
         return vns->GetConstantSimdVL(argVN);
     }
 
-    return BroadcastConstantToSimd<simdVL_t>(vns, baseType, argVN);
+    return BroadcastConstantToSimdVL(vns, baseType, argVN);
 }
 #endif // TARGET_ARM64
 
@@ -7694,8 +7722,8 @@ ValueNum EvaluateUnarySimd(
         {
             simdVL_t arg0 = GetConstantSimdVL(vns, baseType, arg0VN);
 
-            simdVL_t result = {};
-            EvaluateUnarySimd<simdVL_t>(oper, scalar, baseType, &result, arg0);
+            simdVL_t result(vns->VNGetCompiler());
+            EvaluateUnarySimdVL(oper, scalar, baseType, &result, arg0);
             return vns->VNForSimdVLCon(result);
         }
 #endif // TARGET_ARM64
@@ -7766,6 +7794,19 @@ ValueNum EvaluateBinarySimd(ValueNumStore* vns,
             EvaluateBinarySimd<simd16_t>(oper, scalar, baseType, &result, arg0, arg1);
             return vns->VNForSimd16Con(result);
         }
+
+#if defined(TARGET_ARM64)
+//TODO-VL: Complete for EvaluateBinary* methods
+        case TYP_SIMD:
+        {
+            simdVL_t arg0 = GetConstantSimdVL(vns, baseType, arg0VN);
+            simdVL_t arg1 = GetConstantSimdVL(vns, baseType, arg1VN);
+
+            simdVL_t result(vns->VNGetCompiler());
+            EvaluateBinarySimdVL(oper, scalar, baseType, &result, arg0, arg1);
+            return vns->VNForSimdVLCon(result);
+        }
+#endif // TARGET_ARM64
 
 #if defined(TARGET_XARCH)
         case TYP_SIMD32:
@@ -10211,7 +10252,31 @@ void ValueNumStore::vnDump(Compiler* comp, ValueNum vn, bool isPtr)
                        cnsVal.u32[3]);
                 break;
             }
-
+#if defined(TARGET_ARM64)
+            case TYP_SIMD:
+            {
+                simdVL_t cnsVal = GetConstantSimdVL(vn);
+                printf("SimdVLCns[");
+                int vl = cnsVal.getVectorLength() / 4; // since we are displaying 4-bytes values.
+                if (cnsVal.IsZero())
+                {
+                    for (int i = 0; i < vl - 1; i++)
+                    {
+                        printf("0x%08x, ", 0);
+                    }
+                    printf("0x%08x]", 0);
+                }
+                else
+                {
+                    for (int i = 0; i < vl - 1; i++)
+                    {
+                        printf("0x%08x, ", cnsVal.u32[i]);
+                    }
+                    printf("0x%08x]", cnsVal.u32[vl - 1]);
+                }
+                break;
+            }
+#endif // TARGET_ARM64
 #if defined(TARGET_XARCH)
             case TYP_SIMD32:
             {
@@ -11810,7 +11875,7 @@ void Compiler::fgValueNumberTreeConst(GenTree* tree)
         case TYP_SIMD:
         {
             simdVL_t simdVLVal(this);
-            memcpy(&simdVLVal, &tree->AsVecCon()->gtSimdVal, sizeof(simdVL_t));
+            memcpy(&simdVLVal, &tree->AsVecCon()->gtSimdVLVal, sizeof(simdVL_t));
 
             tree->gtVNPair.SetBoth(vnStore->VNForSimdVLCon(simdVLVal));
             break;

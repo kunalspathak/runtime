@@ -3208,7 +3208,6 @@ AGAIN:
                         FALLTHROUGH;
                     }
 #endif // TARGET_XARCH
-
                     case TYP_SIMD16:
                     {
                         add = genTreeHashAdd(ulo32(add), vecCon->gtSimdVal.u32[3]);
@@ -3227,7 +3226,17 @@ AGAIN:
                         add = genTreeHashAdd(ulo32(add), vecCon->gtSimdVal.u32[0]);
                         break;
                     }
-
+#if defined(TARGET_ARM64)
+                    case TYP_SIMD:
+                    {
+                        int vl = vecCon->gtSimdVLVal.getVectorLength() / 4; // 4-byte elements
+                        for (int i = 0; i < vl; i++)
+                        {
+                            add = genTreeHashAdd(ulo32(add), vecCon->gtSimdVLVal.IsZero() ? 0 : vecCon->gtSimdVLVal.u32[i]);
+                        }
+                        break;
+                    }
+#endif // TARGET_ARM64
                     default:
                     {
                         unreached();
@@ -7803,6 +7812,34 @@ GenTree* Compiler::gtNewSconNode(int CPX, CORINFO_MODULE_HANDLE scpHandle)
 }
 
 #if defined(FEATURE_SIMD)
+GenTreeVecCon::GenTreeVecCon(var_types type, Compiler* comp)
+    : GenTree(GT_CNS_VEC, type)
+{
+    m_comp = comp;
+    assert(varTypeIsSIMD(type));
+
+    // Some uses of GenTreeVecCon do not specify all bits in the vector they are using but failing to zero out the
+    // buffer will cause determinism issues with the compiler.
+#ifdef TARGET_ARM64
+    if (type != TYP_SIMD)
+    {
+        memset(&gtSimdVal, 0, sizeof(gtSimdVal));
+    }
+    else
+    {
+        gtSimdVLVal = simdVL_t(comp);
+    }
+#else
+    memset(&gtSimdVal, 0, sizeof(gtSimdVal));
+#endif // TARGET_ARM64
+
+#if defined(TARGET_XARCH)
+    assert(sizeof(simd_t) == sizeof(simd64_t));
+#else
+    assert(sizeof(simd_t) == sizeof(simd16_t));
+#endif
+}
+
 GenTreeVecCon* Compiler::gtNewVconNode(var_types type)
 {
     GenTreeVecCon* vecCon = new (this, GT_CNS_VEC) GenTreeVecCon(type, this);
@@ -7815,7 +7852,7 @@ GenTreeVecCon* Compiler::gtNewVconNode(var_types type, simdVL_t data)
     GenTreeVecCon* vecCon = new (this, GT_CNS_VEC) GenTreeVecCon(type, this);
 
     const int bytesToCopyPerIter = 16;
-    for (unsigned lane = 0; lane < data.vectorLength / bytesToCopyPerIter; lane++)
+    for (unsigned lane = 0; lane < data.getVectorLength() / bytesToCopyPerIter; lane++)
     {
         memcpy(vecCon->gtSimdVLVal.i64 + lane, data.i64 + lane, bytesToCopyPerIter);
     }
@@ -7889,7 +7926,7 @@ GenTree* Compiler::gtNewZeroConNode(var_types type)
     if (varTypeIsSIMD(type))
     {
         GenTreeVecCon* vecCon = gtNewVconNode(type);
-        vecCon->gtSimdVal     = simd_t::Zero();
+        vecCon->gtSimdVLVal = simdVL_t(this, true);
         return vecCon;
     }
 #endif // FEATURE_SIMD
@@ -12207,7 +12244,31 @@ void Compiler::gtDispConst(GenTree* tree)
                            vecCon->gtSimdVal.u32[2], vecCon->gtSimdVal.u32[3]);
                     break;
                 }
+#if defined(TARGET_ARM64)
+                case TYP_SIMD:
+                {
+                    int vl = vecCon->gtSimdVLVal.getVectorLength() / 4; // since we are displaying 4-bytes values.
+                    printf("<");
 
+                    if (vecCon->gtSimdVLVal.IsZero())
+                    {
+                        for (int i = 0; i < vl - 1; i++)
+                        {
+                            printf("0x%08x, ", 0);
+                        }
+                        printf("0x%08x>", 0);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < vl - 1; i++)
+                        {
+                            printf("0x%08x, ", vecCon->gtSimdVLVal.u32[i]);
+                        }
+                        printf("0x%08x>",vecCon->gtSimdVLVal.u32[vl - 1]);
+                    }
+                    break;
+                }
+#endif // TARGET_ARM64
 #if defined(TARGET_XARCH)
                 case TYP_SIMD32:
                 {
@@ -18516,9 +18577,9 @@ void GenTreeVecCon::EvaluateUnaryInPlace(genTreeOps oper, bool scalar, var_types
 #if defined(TARGET_ARM64)
         case TYP_SIMD:
         {
-            simdVL_t result (m_comp);
-            EvaluateUnarySimd<simdVL_t>(oper, scalar, baseType, &result, gtSimdVLVal);
-            gtSimdVLVal = result;
+            simdVL_t result = simdVL_t(m_comp, false);
+            EvaluateUnarySimdVL(oper, scalar, baseType, &result, gtSimdVLVal);
+            memcpy(&gtSimdVLVal, &result, sizeof(simdVL_t));
             break;
         }
 #endif // TARGET_ARM64
@@ -18588,8 +18649,10 @@ void GenTreeVecCon::EvaluateBinaryInPlace(genTreeOps oper, bool scalar, var_type
         case TYP_SIMD:
         {
             simdVL_t result(m_comp);
-            EvaluateBinarySimd<simdVL_t>(oper, scalar, baseType, &result, gtSimdVLVal, other->gtSimdVLVal);
-            gtSimdVLVal = result;
+             // TODO-VL: If we should pass by value or just pass reference here and in other methods instead of copying from result -> gtSimdVLVal
+            EvaluateBinarySimdVL(oper, scalar, baseType, &result, gtSimdVLVal, other->gtSimdVLVal);
+            memcpy(&gtSimdVLVal, &result, sizeof(simdVL_t));
+            //gtSimdVLVal = result;
             break;
         }
 #endif // TARGET_XARCH || TARGET_ARM64
@@ -31460,7 +31523,7 @@ GenTree* Compiler::gtFoldExprHWIntrinsic(GenTreeHWIntrinsic* tree)
 #if defined(TARGET_XARCH) || defined(TARGET_ARM64)
                 case TYP_SIMD:
                 {
-                    EvaluateSimdCvtVectorToMask<simdVL_t>(simdBaseType, &mskCon->gtSimdMaskVal, vecCon->gtSimdVLVal);
+                    EvaluateSimdCvtVectorToMaskVL(simdBaseType, &mskCon->gtSimdMaskVal, vecCon->gtSimdVLVal);
                     break;
                 }
 #endif //TARGET_XARCH || TARGET_ARM64

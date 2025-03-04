@@ -197,7 +197,6 @@ static_assert_no_msg(sizeof(simd16_t) == 16);
 struct simdVL_t
 {
 public:
-    simdVL_t();
 
     union
     {
@@ -215,17 +214,26 @@ public:
         //simd16_t v128[2];
     };
     Compiler* m_simdVLCompiler;
-    unsigned vectorLength;
-
+    
+    //simdVL_t(Compiler* comp);
+    simdVL_t();
     simdVL_t(Compiler* comp);
+    simdVL_t(Compiler* comp, bool zero);
     bool operator==(const simdVL_t& other) const;
     bool operator!=(const simdVL_t& other) const;
     static simdVL_t AllBitsSet(Compiler* comp);
     bool IsAllBitsSet() const;
     bool IsZero() const;
-    static simdVL_t Zero();
+    //static void SetZero(simdVL_t* value);
+    unsigned getVectorLength()
+    {
+        return _vectorLength;
+    }
 
-//private:
+private:
+    //simdVL_t();
+    uint16_t _vectorLength;
+    bool _isZero;
 };
 
 static_assert_no_msg(sizeof(simdVL_t) == 24);
@@ -618,34 +626,33 @@ inline void EvaluateUnaryMask(
 
 #if defined(TARGET_ARM64)
 template <typename TBase>
-void EvaluateUnarySimd(genTreeOps      oper,
+void EvaluateUnarySimdVL(genTreeOps      oper,
                        bool            scalar,
-                       simdVL_t*       result,
+                       simdVL_t* result,
                        const simdVL_t& arg0)
 {
-    uint32_t count = result->vectorLength / sizeof(TBase);
+    assert(result->getVectorLength() != 0);
     if (scalar)
     {
-        count = 1;
-
-#if defined(TARGET_XARCH)
-        // scalar operations on xarch copy the upper bits from arg0
-        *result = arg0;
-#elif defined(TARGET_ARM64)
-        // scalar operations on arm64 zero the upper bits
-        *result = {};
-#endif
-    }
-
-    for (uint32_t i = 0; i < count; i++)
-    {
-        // Safely execute `result[i] = oper(arg0[i])`
-
         TBase input0;
-        memcpy(&input0, &arg0.u8[i * sizeof(TBase)], sizeof(TBase));
+        memcpy(&input0, &arg0.u8[0], sizeof(TBase));
 
         TBase output = EvaluateUnaryScalar<TBase>(oper, input0);
-        memcpy(&result->u8[i * sizeof(TBase)], &output, sizeof(TBase));
+        memcpy(&result->u8[0], &output, sizeof(TBase));
+    }
+    else
+    {
+        uint32_t count = result->getVectorLength() / sizeof(TBase);
+        for (uint32_t i = 0; i < count; i++)
+        {
+            // Safely execute `result[i] = oper(arg0[i])`
+
+            TBase input0;
+            memcpy(&input0, &arg0.u8[i * sizeof(TBase)], sizeof(TBase));
+
+            TBase output = EvaluateUnaryScalar<TBase>(oper, input0);
+            memcpy(&result->u8[i * sizeof(TBase)], &output, sizeof(TBase));
+        }
     }
 }
 #endif // TARGET_ARM64
@@ -678,103 +685,6 @@ void EvaluateUnarySimd(genTreeOps oper, bool scalar, TSimd* result, const TSimd&
         memcpy(&result->u8[i * sizeof(TBase)], &output, sizeof(TBase));
     }
 }
-
-#if defined(TARGET_ARM64)
-void EvaluateUnarySimd(genTreeOps oper, bool scalar, var_types baseType, simdVL_t* result, const simdVL_t& arg0)
-{
-    switch (baseType)
-    {
-        case TYP_FLOAT:
-        {
-            // Some operations are bitwise and we want to ensure inputs like
-            // sNaN are preserved rather than being converted to a qNaN when
-            // the CPU encounters them. So we check for and handle that early
-            // prior to extracting the element out of the vector value.
-
-            if (IsUnaryBitwiseOperation(oper))
-            {
-                EvaluateUnarySimd<int32_t>(oper, scalar, result, arg0);
-            }
-            else
-            {
-                EvaluateUnarySimd<float>(oper, scalar, result, arg0);
-            }
-            break;
-        }
-
-        case TYP_DOUBLE:
-        {
-            // Some operations are bitwise and we want to ensure inputs like
-            // sNaN are preserved rather than being converted to a qNaN when
-            // the CPU encounters them. So we check for and handle that early
-            // prior to extracting the element out of the vector value.
-
-            if (IsUnaryBitwiseOperation(oper))
-            {
-                EvaluateUnarySimd<int64_t>(oper, scalar, result, arg0);
-            }
-            else
-            {
-                EvaluateUnarySimd<double>(oper, scalar, result, arg0);
-            }
-            break;
-        }
-
-        case TYP_BYTE:
-        {
-            EvaluateUnarySimd<int8_t>(oper, scalar, result, arg0);
-            break;
-        }
-
-        case TYP_SHORT:
-        {
-            EvaluateUnarySimd<int16_t>(oper, scalar, result, arg0);
-            break;
-        }
-
-        case TYP_INT:
-        {
-            EvaluateUnarySimd<int32_t>(oper, scalar, result, arg0);
-            break;
-        }
-
-        case TYP_LONG:
-        {
-            EvaluateUnarySimd<int64_t>(oper, scalar, result, arg0);
-            break;
-        }
-
-        case TYP_UBYTE:
-        {
-            EvaluateUnarySimd<uint8_t>(oper, scalar, result, arg0);
-            break;
-        }
-
-        case TYP_USHORT:
-        {
-            EvaluateUnarySimd<uint16_t>(oper, scalar, result, arg0);
-            break;
-        }
-
-        case TYP_UINT:
-        {
-            EvaluateUnarySimd<uint32_t>(oper, scalar, result, arg0);
-            break;
-        }
-
-        case TYP_ULONG:
-        {
-            EvaluateUnarySimd<uint64_t>(oper, scalar, result, arg0);
-            break;
-        }
-
-        default:
-        {
-            unreached();
-        }
-    }
-}
-#endif // TARGET_ARM64
 
 template <typename TSimd>
 void EvaluateUnarySimd(genTreeOps oper, bool scalar, var_types baseType, TSimd* result, const TSimd& arg0)
@@ -1396,6 +1306,43 @@ void EvaluateBinarySimd(genTreeOps oper, bool scalar, TSimd* result, const TSimd
     }
 }
 
+#if defined (TARGET_ARM64)
+template <typename TBase>
+void EvaluateBinarySimdVL(genTreeOps oper, bool scalar, simdVL_t* result, const simdVL_t& arg0, const simdVL_t& arg1)
+{
+
+    assert(result->getVectorLength() != 0);
+    if (scalar)
+    {
+        TBase input0;
+        memcpy(&input0, &arg0.u8[0], sizeof(TBase));
+
+        TBase input1;
+        memcpy(&input1, &arg1.u8[0], sizeof(TBase));
+
+        TBase output = EvaluateBinaryScalar<TBase>(oper, input0, input1);
+        memcpy(&result->u8[0], &output, sizeof(TBase));
+    }
+    else
+    {
+        uint32_t count = result->getVectorLength() / sizeof(TBase);
+        for (uint32_t i = 0; i < count; i++)
+        {
+            // Safely execute `result[i] = oper(arg0[i], arg1[i])`
+
+            TBase input0;
+            memcpy(&input0, &arg0.u8[i * sizeof(TBase)], sizeof(TBase));
+
+            TBase input1;
+            memcpy(&input1, &arg1.u8[i * sizeof(TBase)], sizeof(TBase));
+
+            TBase output = EvaluateBinaryScalar<TBase>(oper, input0, input1);
+            memcpy(&result->u8[i * sizeof(TBase)], &output, sizeof(TBase));
+        }
+    }
+}
+#endif // TARGET_ARM64
+
 template <typename TSimd>
 void EvaluateBinarySimd(
     genTreeOps oper, bool scalar, var_types baseType, TSimd* result, const TSimd& arg0, const TSimd& arg1)
@@ -1492,6 +1439,14 @@ void EvaluateBinarySimd(
         }
     }
 }
+
+#if defined(TARGET_ARM64)
+
+void EvaluateUnarySimdVL(genTreeOps oper, bool scalar, var_types baseType, simdVL_t* result, const simdVL_t& arg0);
+void EvaluateBinarySimdVL(
+    genTreeOps oper, bool scalar, var_types baseType, simdVL_t* result, const simdVL_t& arg0, const simdVL_t& arg1);
+
+#endif // TARGET_ARM64
 
 template <typename TSimd>
 double EvaluateGetElementFloating(var_types simdBaseType, const TSimd& arg0, int32_t arg1)
@@ -1670,7 +1625,7 @@ void BroadcastConstantToSimd(TSimd* result, TBase arg0)
 template <typename TBase>
 void BroadcastConstantToSimd(simdVL_t* result, TBase arg0)
 {
-    uint32_t count = result->vectorLength / sizeof(TBase);
+    uint32_t count = result->getVectorLength() / sizeof(TBase);
 
     for (uint32_t i = 0; i < count; i++)
     {
@@ -1766,6 +1721,12 @@ void EvaluateSimdCvtMaskToVector(var_types baseType, TSimd* result, simdmask_t a
     }
 }
 
+#ifdef TARGET_ARM64
+template <typename TBase>
+void EvaluateSimdCvtVectorToMaskVL(simdmask_t* result, simdVL_t arg0);
+void EvaluateSimdCvtVectorToMaskVL(var_types baseType, simdmask_t* result, simdVL_t arg0);
+
+#endif // TARGET_ARM64
 template <typename TSimd, typename TBase>
 void EvaluateSimdCvtVectorToMask(simdmask_t* result, TSimd arg0)
 {

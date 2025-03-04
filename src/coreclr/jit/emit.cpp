@@ -8167,7 +8167,7 @@ CORINFO_FIELD_HANDLE emitter::emitSimd16Const(simd16_t constValue)
 #if defined(TARGET_ARM64)
 CORINFO_FIELD_HANDLE emitter::emitSimdVLConst(simdVL_t constValue)
 {
-    unsigned cnsSize  = constValue.vectorLength;
+    unsigned cnsSize  = constValue.getVectorLength();
     unsigned cnsAlign = cnsSize;
 
     UNATIVE_OFFSET cnum = emitDataConst(&constValue, cnsSize, cnsAlign, TYP_SIMD);

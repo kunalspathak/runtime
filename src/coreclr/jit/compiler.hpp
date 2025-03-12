@@ -1120,9 +1120,18 @@ extern const BYTE genTypeSizes[TYP_COUNT];
 template <class T>
 inline unsigned genTypeSize(T value)
 {
-    assert((unsigned)TypeGet(value) < ArrLen(genTypeSizes));
+    var_types valType = TypeGet(value);
+    assert((unsigned) valType < ArrLen(genTypeSizes));
 
-    return genTypeSizes[TypeGet(value)];
+    //TODO-VL: Fix this
+#ifdef TARGET_ARM64
+    if (valType == TYP_SIMD)
+    {
+        return Compiler::compVectorTLength;
+    }
+#endif
+
+    return genTypeSizes[valType];
 }
 
 /*****************************************************************************
@@ -1136,9 +1145,18 @@ extern const BYTE genTypeStSzs[TYP_COUNT];
 template <class T>
 inline unsigned genTypeStSz(T value)
 {
-    assert((unsigned)TypeGet(value) < ArrLen(genTypeStSzs));
+    var_types valType = TypeGet(value);
 
-    return genTypeStSzs[TypeGet(value)];
+    assert((unsigned)valType < ArrLen(genTypeStSzs));
+#ifdef TARGET_ARM64
+    //TODO-VL: Need to see how this is used
+    if (valType == TYP_SIMD)
+    {
+        return Compiler::compVectorTLength / sizeof(int);
+    }
+#endif
+
+    return genTypeStSzs[valType];
 }
 
 /*****************************************************************************

@@ -1622,6 +1622,7 @@ void BroadcastConstantToSimd(TSimd* result, TBase arg0)
     }
 }
 
+#ifdef TARGET_ARM64
 template <typename TBase>
 void BroadcastConstantToSimd(simdVL_t* result, TBase arg0)
 {
@@ -1633,6 +1634,7 @@ void BroadcastConstantToSimd(simdVL_t* result, TBase arg0)
         memcpy(&result->u8[i * sizeof(TBase)], &arg0, sizeof(TBase));
     }
 }
+#endif
 
 #if defined(FEATURE_MASKED_HW_INTRINSICS)
 template <typename TSimd, typename TBase>

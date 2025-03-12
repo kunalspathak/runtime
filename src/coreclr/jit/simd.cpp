@@ -31,6 +31,8 @@
 
 #ifdef FEATURE_SIMD
 
+#ifdef TARGET_ARM64
+
 simdVL_t::simdVL_t()
 {
     _vectorLength = (uint8_t)Compiler::compVectorTLength;
@@ -104,6 +106,7 @@ bool simdVL_t::IsZero() const
 {
     return _isZero;
 }
+#endif // TARGET_ARM64
 
 ///* static */ void simdVL_t::SetZero(simdVL_t* value)
 //{

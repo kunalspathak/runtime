@@ -3715,9 +3715,16 @@ extern const unsigned short emitTypeSizes[TYP_COUNT];
 template <class T>
 inline emitAttr emitTypeSize(T type)
 {
-    assert(TypeGet(type) < TYP_COUNT);
-    assert(emitTypeSizes[TypeGet(type)] > 0);
-    return (emitAttr)emitTypeSizes[TypeGet(type)];
+    var_types valType = TypeGet(type);
+    assert(valType < TYP_COUNT);
+    assert(emitTypeSizes[valType] > 0);
+#ifdef TARGET_ARM64
+    if (valType == TYP_SIMD)
+    {
+        return EA_SCALABLE;
+    }
+#endif
+    return (emitAttr)emitTypeSizes[valType];
 }
 
 extern const unsigned short emitTypeActSz[TYP_COUNT];
@@ -3725,9 +3732,16 @@ extern const unsigned short emitTypeActSz[TYP_COUNT];
 template <class T>
 inline emitAttr emitActualTypeSize(T type)
 {
-    assert(TypeGet(type) < TYP_COUNT);
-    assert(emitTypeActSz[TypeGet(type)] > 0);
-    return (emitAttr)emitTypeActSz[TypeGet(type)];
+    var_types valType = TypeGet(type);
+    assert(valType < TYP_COUNT);
+    assert(emitTypeActSz[valType] > 0);
+#ifdef TARGET_ARM64
+    if (valType == TYP_SIMD)
+    {
+        return EA_SCALABLE;
+    }
+#endif
+    return (emitAttr)emitTypeActSz[valType];
 }
 
 /*****************************************************************************

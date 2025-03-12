@@ -1712,7 +1712,9 @@ ValueNumStore::Chunk::Chunk(Compiler* compiler, CompAllocator alloc, ValueNum* p
 #if defined(TARGET_ARM64)
                 case TYP_SIMD:
                 {
-
+                    //TODO-VL: A general comment for GenTree* that we create elsewhere:
+                    // we should be using TYP_SIMD only if SVE is present and VL > 16. Otherwise
+                    // continue to use TYP_SIMD16 or TYP_SIMD8
                     m_defs = new (alloc) Alloc<TYP_SIMD>::Type[ChunkSize];
                     for (int i = 0; i < ChunkSize; i++)
                     {
@@ -1914,12 +1916,12 @@ ValueNum ValueNumStore::VNForSimd16Con(const simd16_t& cnsVal)
     return VnForConst(cnsVal, GetSimd16CnsMap(), TYP_SIMD16);
 }
 
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+#if defined(TARGET_ARM64)
 ValueNum ValueNumStore::VNForSimdVLCon(const simdVL_t& cnsVal)
 {
     return VnForConst(cnsVal, GetSimdVLCnsMap(), TYP_SIMD);
 }
-#endif // TARGET_XARCH || TARGET_ARM64
+#endif // TARGET_ARM64
 
 #if defined(TARGET_XARCH)
 ValueNum ValueNumStore::VNForSimd32Con(const simd32_t& cnsVal)
@@ -11870,7 +11872,7 @@ void Compiler::fgValueNumberTreeConst(GenTree* tree)
             break;
         }
 
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+#if defined(TARGET_ARM64)
 
         case TYP_SIMD:
         {
@@ -11880,7 +11882,7 @@ void Compiler::fgValueNumberTreeConst(GenTree* tree)
             tree->gtVNPair.SetBoth(vnStore->VNForSimdVLCon(simdVLVal));
             break;
         }
-#endif // TARGET_XARCH || TARGET_ARM64
+#endif // TARGET_ARM64
 
 #if defined(TARGET_XARCH)
         case TYP_SIMD32:

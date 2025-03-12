@@ -3352,15 +3352,10 @@ void Compiler::lvaSetStruct(unsigned varNum, ClassLayout* layout, bool unsafeVal
                     // hfa variables can never contain GC pointers
                     assert(!layout->HasGCPtr());
 
-#ifdef TARGET_ARM64
-                    if (varDsc->lvExactSize() != 0xFF)
-#endif
-                    {                    
-                        // The size of this struct should be evenly divisible by 4 or 8
-                        assert((varDsc->lvExactSize() % genTypeSize(hfaType)) == 0);
-                        // The number of elements in the HFA should fit into our MAX_ARG_REG_COUNT limit
-                        assert((varDsc->lvExactSize() / genTypeSize(hfaType)) <= MAX_ARG_REG_COUNT);
-                    }
+                    // The size of this struct should be evenly divisible by 4 or 8
+                    assert((varDsc->lvExactSize() % genTypeSize(hfaType)) == 0);
+                    // The number of elements in the HFA should fit into our MAX_ARG_REG_COUNT limit
+                    assert((varDsc->lvExactSize() / genTypeSize(hfaType)) <= MAX_ARG_REG_COUNT);
                 }
             }
         }
@@ -3742,6 +3737,12 @@ unsigned Compiler::lvaLclSize(unsigned varNum)
         noway_assert(lvaTable[varNum].IsAddressExposed());
         return genTypeStSz(TYP_LONG) * sizeof(int); // return 8  (2 * 4)
     }
+#if defined(TARGET_ARM64)
+    if (varType == TYP_SIMD)
+    {
+        return compVectorTLength;
+    }
+#endif // TARGET_ARM64
 #endif
     return genTypeStSz(varType) * sizeof(int);
 }

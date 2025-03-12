@@ -1582,6 +1582,9 @@ GenTree* Lowering::LowerHWIntrinsic(GenTreeHWIntrinsic* node)
 
     switch (intrinsicId)
     {
+#ifdef TARGET_ARM64
+        case NI_Vector_Create:
+#endif // TARGET_ARM64
         case NI_Vector64_Create:
         case NI_Vector128_Create:
         case NI_Vector64_CreateScalar:

@@ -303,6 +303,9 @@ void CodeGenInterface::siVarLoc::siFillStackVarLoc(
 #endif // TARGET_64BIT
 #if defined(FEATURE_MASKED_HW_INTRINSICS)
         case TYP_MASK:
+#ifdef TARGET_ARM64
+        case TYP_SIMD:
+#endif
 #endif // FEATURE_MASKED_HW_INTRINSICS
 #if FEATURE_IMPLICIT_BYREFS
             // In the AMD64 ABI we are supposed to pass a struct by reference when its
@@ -432,6 +435,9 @@ void CodeGenInterface::siVarLoc::siFillRegisterVarLoc(
         case TYP_SIMD8:
         case TYP_SIMD12:
         case TYP_SIMD16:
+#if defined(TARGET_ARM64)
+        case TYP_SIMD:
+#endif // TARGET_ARM64
 #if defined(TARGET_XARCH)
         case TYP_SIMD32:
         case TYP_SIMD64:

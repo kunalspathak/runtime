@@ -10644,17 +10644,21 @@ NamedIntrinsic Compiler::lookupNamedIntrinsic(CORINFO_METHOD_HANDLE method)
                                 }
                             }
 
+                            bool useAgnosticVL = false; //TODO-VL: Cleanup
 #ifdef TARGET_ARM64
-                            if (compExactlyDependsOn(InstructionSet_Sve_Arm64) && (size != 8) && (size != 16))
+                            if (compExactlyDependsOn(InstructionSet_Sve_Arm64) && (size > 16))
                             {
-                                // this is SVE.
+                                // If SVE is supported and the VL > 16bytes, then use scalable vectors.
+                                // If SVE is supported, but VL is 8 bytes or 16 bytes, continue to use
+                                // NEON i.e. Vector128 
                                 lookupClassName = className;
+                                useAgnosticVL   = true;
                             }
 #endif // TARGET_ARM64
 
                             const char* lookupMethodName = methodName;
 
-                            if ((strncmp(methodName, "As", 2) == 0) && (methodName[2] != '\0'))
+                            if (!useAgnosticVL && (strncmp(methodName, "As", 2) == 0) && (methodName[2] != '\0'))
                             {
                                 if (strncmp(methodName + 2, "Vector", 6) == 0)
                                 {
@@ -10724,6 +10728,18 @@ NamedIntrinsic Compiler::lookupNamedIntrinsic(CORINFO_METHOD_HANDLE method)
 
                                 result = HWIntrinsicInfo::lookupId(this, &sig, lookupClassName, lookupMethodName,
                                                                    enclosingClassNames[0], enclosingClassNames[1]);
+#ifdef TARGET_ARM64
+                                if (useAgnosticVL)
+                                {
+                                    switch (result)
+                                    {
+                                        case NI_Vector_op_Addition:
+                                            result = NI_Sve_Add;
+                                        default:
+                                            break;
+                                    }
+                                }
+#endif
                             }
                         }
 #endif // FEATURE_HW_INTRINSICS

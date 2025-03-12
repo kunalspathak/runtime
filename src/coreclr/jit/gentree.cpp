@@ -3901,6 +3901,7 @@ unsigned Compiler::gtSetMultiOpOrder(GenTreeMultiOp* multiOp)
             case NI_Vector512_CreateScalar:
             case NI_Vector512_CreateScalarUnsafe:
 #elif defined(TARGET_ARM64)
+            case NI_Vector_Create:
             case NI_Vector64_Create:
             case NI_Vector64_CreateScalar:
             case NI_Vector64_CreateScalarUnsafe:
@@ -7926,7 +7927,16 @@ GenTree* Compiler::gtNewZeroConNode(var_types type)
     if (varTypeIsSIMD(type))
     {
         GenTreeVecCon* vecCon = gtNewVconNode(type);
-        vecCon->gtSimdVLVal = simdVL_t(this, true);
+#ifdef TARGET_ARM64
+        if (type == TYP_SIMD)
+        {
+            vecCon->gtSimdVLVal = simdVL_t(this, true);
+        }
+        else
+#endif
+        {
+            vecCon->gtSimdVal     = simd_t::Zero();
+        }
         return vecCon;
     }
 #endif // FEATURE_SIMD
@@ -18645,7 +18655,7 @@ void GenTreeVecCon::EvaluateBinaryInPlace(genTreeOps oper, bool scalar, var_type
             break;
         }
 
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+#if defined(TARGET_ARM64)
         case TYP_SIMD:
         {
             simdVL_t result(m_comp);
@@ -18655,7 +18665,7 @@ void GenTreeVecCon::EvaluateBinaryInPlace(genTreeOps oper, bool scalar, var_type
             //gtSimdVLVal = result;
             break;
         }
-#endif // TARGET_XARCH || TARGET_ARM64
+#endif // TARGET_ARM64
 
 #if defined(TARGET_XARCH)
         case TYP_SIMD32:
@@ -22047,6 +22057,7 @@ GenTree* Compiler::gtNewSimdCvtNativeNode(var_types   type,
 }
 
 #if defined(FEATURE_MASKED_HW_INTRINSICS)
+
 //------------------------------------------------------------------------
 // gtNewSimdCvtVectorToMaskNode: Convert a HW instrinsic vector node to a mask
 //
@@ -22696,6 +22707,105 @@ GenTree* Compiler::gtNewSimdCndSelNode(
 #endif // !TARGET_XARCH && !TARGET_ARM64
 }
 
+#ifdef TARGET_ARM64
+GenTree* Compiler::gtNewSimdVLCreateBroadcastNode(
+    var_types type, GenTree* op1, CorInfoType simdBaseJitType, unsigned simdSize)
+{
+    assert(type == TYP_SIMD);
+
+    NamedIntrinsic hwIntrinsicID = NI_Vector_Create;
+    var_types      simdBaseType  = JitType2PreciseVarType(simdBaseJitType);
+
+    if (op1->IsIntegralConst() || op1->IsCnsFltOrDbl())
+    {
+        GenTreeVecCon* vecCon = gtNewVconNode(type);
+        assert(vecCon->gtSimdVLVal.getVectorLength() == simdSize);
+
+        switch (simdBaseType)
+        {
+            case TYP_BYTE:
+            case TYP_UBYTE:
+            {
+                uint8_t cnsVal = static_cast<uint8_t>(op1->AsIntConCommon()->IntegralValue());
+
+                for (unsigned i = 0; i < simdSize; i++)
+                {
+                    vecCon->gtSimdVLVal.u8[i] = cnsVal;
+                }
+                break;
+            }
+
+            case TYP_SHORT:
+            case TYP_USHORT:
+            {
+                uint16_t cnsVal = static_cast<uint16_t>(op1->AsIntConCommon()->IntegralValue());
+
+                for (unsigned i = 0; i < (simdSize / 2); i++)
+                {
+                    vecCon->gtSimdVLVal.u16[i] = cnsVal;
+                }
+                break;
+            }
+
+            case TYP_INT:
+            case TYP_UINT:
+            {
+                uint32_t cnsVal = static_cast<uint32_t>(op1->AsIntConCommon()->IntegralValue());
+
+                for (unsigned i = 0; i < (simdSize / 4); i++)
+                {
+                    vecCon->gtSimdVLVal.u32[i] = cnsVal;
+                }
+                break;
+            }
+
+            case TYP_LONG:
+            case TYP_ULONG:
+            {
+                uint64_t cnsVal = static_cast<uint64_t>(op1->AsIntConCommon()->IntegralValue());
+
+                for (unsigned i = 0; i < (simdSize / 8); i++)
+                {
+                    vecCon->gtSimdVLVal.u64[i] = cnsVal;
+                }
+                break;
+            }
+
+            case TYP_FLOAT:
+            {
+                float cnsVal = static_cast<float>(op1->AsDblCon()->DconValue());
+
+                for (unsigned i = 0; i < (simdSize / 4); i++)
+                {
+                    vecCon->gtSimdVLVal.f32[i] = cnsVal;
+                }
+                break;
+            }
+
+            case TYP_DOUBLE:
+            {
+                double cnsVal = static_cast<double>(op1->AsDblCon()->DconValue());
+
+                for (unsigned i = 0; i < (simdSize / 8); i++)
+                {
+                    vecCon->gtSimdVLVal.f64[i] = cnsVal;
+                }
+                break;
+            }
+
+            default:
+            {
+                unreached();
+            }
+        }
+
+        return vecCon;
+    }
+
+    return gtNewSimdHWIntrinsicNode(type, op1, hwIntrinsicID, simdBaseJitType, simdSize);
+}
+#endif
+
 //----------------------------------------------------------------------------------------------
 // Compiler::gtNewSimdCreateBroadcastNode: Creates a new simd CreateBroadcast node
 //
@@ -22713,6 +22823,12 @@ GenTree* Compiler::gtNewSimdCreateBroadcastNode(var_types   type,
                                                 CorInfoType simdBaseJitType,
                                                 unsigned    simdSize)
 {
+#ifdef TARGET_ARM64
+    if (type == TYP_SIMD)
+    {
+        return gtNewSimdVLCreateBroadcastNode(type, op1, simdBaseJitType, simdSize);
+    }
+#endif
     NamedIntrinsic hwIntrinsicID = NI_Vector128_Create;
     var_types      simdBaseType  = JitType2PreciseVarType(simdBaseJitType);
 
@@ -31520,13 +31636,13 @@ GenTree* Compiler::gtFoldExprHWIntrinsic(GenTreeHWIntrinsic* tree)
                     break;
                 }
 
-#if defined(TARGET_XARCH) || defined(TARGET_ARM64)
+#if defined(TARGET_ARM64)
                 case TYP_SIMD:
                 {
                     EvaluateSimdCvtVectorToMaskVL(simdBaseType, &mskCon->gtSimdMaskVal, vecCon->gtSimdVLVal);
                     break;
                 }
-#endif //TARGET_XARCH || TARGET_ARM64
+#endif // TARGET_ARM64
 
 #if defined(TARGET_XARCH)
                 case TYP_SIMD32:

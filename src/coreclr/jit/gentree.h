@@ -6707,6 +6707,7 @@ struct GenTreeVecCon : public GenTree
             case NI_Vector256_CreateScalarUnsafe:
             case NI_Vector512_CreateScalarUnsafe:
 #elif defined(TARGET_ARM64)
+            case NI_Vector_Create:
             case NI_Vector64_Create:
             case NI_Vector64_CreateScalar:
             case NI_Vector64_CreateScalarUnsafe:
@@ -9777,6 +9778,7 @@ inline bool GenTree::IsVectorCreate() const
             case NI_Vector256_Create:
             case NI_Vector512_Create:
 #elif defined(TARGET_ARMARCH)
+            case NI_Vector_Create:
             case NI_Vector64_Create:
 #endif
                 return true;

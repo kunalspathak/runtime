@@ -161,6 +161,10 @@ Interval* LinearScan::newInterval(RegisterType theRegisterType)
 #endif // DEBUG
 
     DBEXEC(VERBOSE, newInt->dump(this->compiler));
+    if (newInt->intervalIndex == 8)
+    {
+        printf("");
+    }
     return newInt;
 }
 
@@ -1478,6 +1482,13 @@ void LinearScan::buildUpperVectorSaveRefPositions(GenTree*                tree,
         }
     }
 
+    bool forceRegOptional = false;
+#ifdef TARGET_XARCH
+    forceRegOptional = true;
+#elif TARGET_ARM64
+    forceRegOptional = tree->TypeGet() == TYP_SIMD;
+#endif
+
     if (enregisterLocalVars && !VarSetOps::IsEmpty(compiler, largeVectorVars))
     {
         // We assume that the kill set includes at least some callee-trash registers, but
@@ -1519,9 +1530,7 @@ void LinearScan::buildUpperVectorSaveRefPositions(GenTree*                tree,
                 varInterval->isPartiallySpilled = true;
                 pos->skipSaveRestore            = blockAlwaysReturn;
                 pos->liveVarUpperSave           = VarSetOps::IsMember(compiler, liveLargeVectors, varIndex);
-#ifdef TARGET_XARCH
-                pos->regOptional = true;
-#endif
+                pos->regOptional                = forceRegOptional;
             }
         }
     }

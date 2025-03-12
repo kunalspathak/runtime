@@ -400,6 +400,10 @@ struct HeapList
 
 };
 
+#ifdef TARGET_ARM64
+extern uint64_t g_sve_length;
+#endif
+
 //-----------------------------------------------------------------------------
 // Implementation of the standard CodeHeap.
 // Use the ExplicitControlLoaderHeap for allocations

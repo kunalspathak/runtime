@@ -97,6 +97,9 @@ class Lowering; // defined in lower.h
 
 class Compiler;
 
+//extern const BYTE genTypeSizes[TYP_COUNT];
+//extern const BYTE genTypeStSzs[TYP_COUNT];
+
 /*****************************************************************************
  *                  Unwind info
  */
@@ -156,6 +159,10 @@ inline var_types HfaTypeFromElemKind(CorInfoHFAElemType kind)
             return TYP_SIMD8;
         case CORINFO_HFA_ELEM_VECTOR128:
             return TYP_SIMD16;
+#ifdef TARGET_ARM64
+        case CORINFO_HFA_ELEM_VECTOR_VL:
+            return TYP_SIMD;
+#endif            
 #endif
         case CORINFO_HFA_ELEM_NONE:
             return TYP_UNDEF;
@@ -177,6 +184,10 @@ inline CorInfoHFAElemType HfaElemKindFromType(var_types type)
             return CORINFO_HFA_ELEM_VECTOR64;
         case TYP_SIMD16:
             return CORINFO_HFA_ELEM_VECTOR128;
+#ifdef TARGET_ARM64
+        case TYP_SIMD:
+            return CORINFO_HFA_ELEM_VECTOR_VL;
+#endif                
 #endif
         case TYP_UNDEF:
             return CORINFO_HFA_ELEM_NONE;
@@ -3353,6 +3364,10 @@ public:
                                     CorInfoType simdSourceBaseJitType,
                                     unsigned    simdSize);
 
+#ifdef TARGET_ARM64
+    GenTree* gtNewSimdVLCreateBroadcastNode(
+        var_types type, GenTree* op1, CorInfoType simdBaseJitType, unsigned simdSize);
+#endif
 #if defined(FEATURE_MASKED_HW_INTRINSICS)
     GenTree* gtNewSimdCvtVectorToMaskNode(var_types type, GenTree* op1, CorInfoType simdBaseJitType, unsigned simdSize);
 #endif // FEATURE_MASKED_HW_INTRINSICS
@@ -8402,7 +8417,7 @@ public:
         assert(type != TYP_STRUCT);
         // ARM64 ABI FP Callee save registers only require Callee to save lower 8 Bytes
         // For SIMD types longer than 8 bytes Caller is responsible for saving and restoring Upper bytes.
-        return ((type == TYP_SIMD16) || (type == TYP_SIMD12));
+        return ((type == TYP_SIMD16) || (type == TYP_SIMD12) || (type == TYP_SIMD));
     }
 #else // !defined(TARGET_AMD64) && !defined(TARGET_ARM64)
 #error("Unknown target architecture for FEATURE_PARTIAL_SIMD_CALLEE_SAVE")
@@ -9338,6 +9353,7 @@ private:
     // Get preferred alignment of SIMD type.
     int getSIMDTypeAlignment(var_types simdType);
 
+
 public:
     // Get the number of bytes in a System.Numeric.Vector<T> for the current compilation.
     // Note - cannot be used for System.Runtime.Intrinsic
@@ -9375,7 +9391,17 @@ public:
         {
             GenTree::gtVectorTLength = 32;
             Compiler::compVectorTLength = 32;
-            return 32; // This should call GetSveLengthFromOS()
+            ////(((BYTE*)genTypeSizes) + TYP_SIMD) = 1;
+            //BYTE* _genTypeSizes = const_cast<BYTE*>(genTypeSizes);
+            //unsigned short* _emitTypeSizes = const_cast<unsigned short*>(emitTypeSizes);
+            //unsigned short* _emitTypeActSz = const_cast<unsigned short*>(emitTypeActSz);
+            //BYTE* _genTypeStSzs = const_cast<BYTE*>(genTypeStSzs);
+
+            //_genTypeSizes[TYP_SIMD] = (BYTE)Compiler::compVectorTLength;
+            //_emitTypeSizes[TYP_SIMD] = (unsigned short)Compiler::compVectorTLength;
+            //_emitTypeActSz[TYP_SIMD] = (unsigned short)Compiler::compVectorTLength;
+            //_genTypeStSzs[TYP_SIMD] = (BYTE)Compiler::compVectorTLength / sizeof(int);
+            return Compiler::compVectorTLength; // This should call GetSveLengthFromOS()
         }
         if (compExactlyDependsOn(InstructionSet_VectorT128))
         {
@@ -9580,6 +9606,8 @@ public:
 #if defined(TARGET_ARM64)
         else if (size == compVectorTLength)
         {
+            //TODO-VL: Only do this if SVE is supported and compVectorTLength > 16.
+            // Double check here if SVE is supported.
             return TYP_SIMD;
         }
 #endif  // TARGET_ARM64 

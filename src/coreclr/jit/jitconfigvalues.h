@@ -382,6 +382,7 @@ CONFIG_INTEGER(JitStressEvexEncoding, "JitStressEvexEncoding", 0)
 #endif
 
 RELEASE_CONFIG_INTEGER(PreferredVectorBitWidth,     "PreferredVectorBitWidth",   0) // The preferred decimal width, in bits, to use for any implicit vectorization emitted. A value less than 128 is treated as the system default.
+RELEASE_CONFIG_INTEGER(VariableVectorLength,     "VariableVectorLength",   16) // The preferred decimal bytes for VL
 
 //
 // Hardware Intrinsic ISAs; keep in sync with clrconfigvalues.h

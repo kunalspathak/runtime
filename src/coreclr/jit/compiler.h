@@ -9394,7 +9394,7 @@ public:
 #elif defined(TARGET_ARM64)
         if (compExactlyDependsOn(InstructionSet_Sve_Arm64))
         {
-            Compiler::compVectorTLength = 32;
+            Compiler::compVectorTLength = ReinterpretHexAsDecimal(JitConfig.VariableVectorLength());
             GenTree::gtVectorTLength = Compiler::compVectorTLength;
             ////(((BYTE*)genTypeSizes) + TYP_SIMD) = 1;
             //BYTE* _genTypeSizes = const_cast<BYTE*>(genTypeSizes);
@@ -9459,6 +9459,7 @@ public:
 #elif defined(TARGET_ARM64)
         if (compExactlyDependsOn(InstructionSet_Sve_Arm64))
         {
+            Compiler::compVectorTLength = ReinterpretHexAsDecimal(JitConfig.VariableVectorLength());
             return 32; // This should call GetSveLengthFromOS()
         }
         else if (compOpportunisticallyDependsOn(InstructionSet_AdvSimd))

@@ -3531,8 +3531,11 @@ void CodeGen::genHomeRegisterParams(regNumber initReg, bool* initRegStillZeroed)
             busyRegs |= genRegMask(node->copiedReg);
 
             instruction ins = ins_Copy(node->reg, copyType);
+#ifdef TARGET_ARM64
+            insOpts opts = copyType == TYP_SIMD ? INS_OPTS_SCALABLE_D : INS_OPTS_NONE;
+#endif
             GetEmitter()->emitIns_Mov(ins, emitActualTypeSize(copyType), node->copiedReg, node->reg,
-                                      /* canSkip */ false);
+                                      /* canSkip */ false, opts);
             if (node->copiedReg == initReg)
             {
                 *initRegStillZeroed = false;
@@ -3549,8 +3552,12 @@ void CodeGen::genHomeRegisterParams(regNumber initReg, bool* initRegStillZeroed)
 
             regNumber   sourceReg = edge->from->copiedReg != REG_NA ? edge->from->copiedReg : edge->from->reg;
             instruction ins       = ins_Copy(sourceReg, genActualType(edge->type));
+            insOpts           opts = INS_OPTS_NONE;
+#ifdef TARGET_ARM64
+            opts = edge->type == TYP_SIMD ? INS_OPTS_SCALABLE_D : INS_OPTS_NONE;
+#endif
             GetEmitter()->emitIns_Mov(ins, emitActualTypeSize(edge->type), node->reg, sourceReg,
-                                      /* canSkip */ true);
+                                      /* canSkip */ true, opts);
             break;
         }
 

@@ -806,6 +806,11 @@ public:
                 assert((lvExactSize() % 16) == 0);
                 slots = lvExactSize() >> 4;
                 break;
+            case CORINFO_HFA_ELEM_VECTOR_VL:
+                assert((lvExactSize() % 16) == 0);
+                slots = 1;
+                break;
+
             default:
                 unreached();
         }
@@ -9389,8 +9394,8 @@ public:
 #elif defined(TARGET_ARM64)
         if (compExactlyDependsOn(InstructionSet_Sve_Arm64))
         {
-            GenTree::gtVectorTLength = 32;
             Compiler::compVectorTLength = 32;
+            GenTree::gtVectorTLength = Compiler::compVectorTLength;
             ////(((BYTE*)genTypeSizes) + TYP_SIMD) = 1;
             //BYTE* _genTypeSizes = const_cast<BYTE*>(genTypeSizes);
             //unsigned short* _emitTypeSizes = const_cast<unsigned short*>(emitTypeSizes);

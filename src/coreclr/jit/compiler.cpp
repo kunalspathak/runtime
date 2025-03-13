@@ -817,7 +817,10 @@ var_types Compiler::getArgTypeForStruct(CORINFO_CLASS_HANDLE clsHnd,
         // so we can skip calling getPrimitiveTypeForStruct when we
         // have a struct that is larger than that.
         //
-        if (structSize <= MAX_PASS_SINGLEREG_BYTES)
+        if ((structSize <= MAX_PASS_SINGLEREG_BYTES)
+#ifdef TARGET_ARM64
+            || ((GetHfaType(clsHnd) == TYP_SIMD) && (structSize == compVectorTLength)))
+#endif
         {
             // We set the "primitive" useType based upon the structSize
             // and also examine the clsHnd to see if it is an HFA of count one

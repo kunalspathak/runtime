@@ -62,6 +62,14 @@ simdVL_t::simdVL_t(Compiler* comp, bool zero)
 
 bool simdVL_t::operator==(const simdVL_t & other) const
 {
+    if (IsZero() != other.IsZero())
+    {
+        return false;
+    }
+    else if (IsZero() && IsZero())
+    {
+        return true;
+    }
     for (int lane = 0; lane < _vectorLength / sizeof(uint64_t); lane++)
     {
         if (u64[lane] != other.u64[lane])

@@ -7848,17 +7848,36 @@ GenTreeVecCon* Compiler::gtNewVconNode(var_types type)
 }
 
 #ifdef TARGET_ARM64
-GenTreeVecCon* Compiler::gtNewVconNode(var_types type, simdVL_t data)
+GenTreeVecCon* Compiler::gtNewVconNode(simdVL_t data DEBUG_ARG(var_types type))
 {
-    GenTreeVecCon* vecCon = new (this, GT_CNS_VEC) GenTreeVecCon(type, this);
+    assert(type == TYP_SIMD);
+    assert(data.getVectorLength() == Compiler::compVectorTLength);
+    GenTreeVecCon* vecCon = new (this, GT_CNS_VEC) GenTreeVecCon(TYP_SIMD, this);
 
-    const int bytesToCopyPerIter = 16;
-    for (unsigned lane = 0; lane < data.getVectorLength() / bytesToCopyPerIter; lane++)
-    {
-        memcpy(vecCon->gtSimdVLVal.i64 + lane, data.i64 + lane, bytesToCopyPerIter);
-    }
+    //const int bytesToCopyPerIter = 16;
+    //for (unsigned lane = 0; lane < data.getVectorLength() / bytesToCopyPerIter; lane++)
+    //{
+    //    memcpy(vecCon->gtSimdVLVal.i64 + lane, data.i64 + lane, bytesToCopyPerIter);
+    //}
+    memcpy(vecCon->gtSimdVLVal.i64, data.i64, Compiler::compVectorTLength);
     return vecCon;
 }
+
+GenTreeVecCon* Compiler::gtNewVconNode(void* data DEBUG_ARG(var_types type))
+{
+    assert(type == TYP_SIMD);
+    GenTreeVecCon* vecCon = new (this, GT_CNS_VEC) GenTreeVecCon(TYP_SIMD, this);
+
+    //const int bytesToCopyPerIter = 16;
+    //for (unsigned lane = 0; lane < data.getVectorLength() / bytesToCopyPerIter; lane++)
+    //{
+    //    memcpy(vecCon->gtSimdVLVal.i64 + lane, data.i64 + lane, bytesToCopyPerIter);
+    //}
+    memcpy(vecCon->gtSimdVLVal.i64, data, Compiler::compVectorTLength);
+    return vecCon;
+}
+
+
 #endif // TARGET_ARM64
 
 GenTreeVecCon* Compiler::gtNewVconNode(var_types type, void* data)
@@ -8164,6 +8183,12 @@ GenTree* Compiler::gtNewGenericCon(var_types type, uint8_t* cnsVal)
             return gtNewVconNode(type, cnsVal);
         }
 #endif // FEATURE_SIMD
+#ifdef TARGET_ARM64
+        case TYP_SIMD:
+        {
+            return gtNewVconNode(cnsVal DEBUG_ARG(type));
+        }
+#endif
         default:
             unreached();
 

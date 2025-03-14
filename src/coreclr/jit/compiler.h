@@ -3201,7 +3201,8 @@ public:
     GenTreeVecCon* gtNewVconNode(var_types type);
     GenTreeVecCon* gtNewVconNode(var_types type, void* data);
 #ifdef TARGET_ARM64
-    GenTreeVecCon* gtNewVconNode(var_types type, simdVL_t data);
+    GenTreeVecCon* gtNewVconNode(simdVL_t data DEBUG_ARG(var_types type));
+    GenTreeVecCon* gtNewVconNode(void* data DEBUG_ARG(var_types type));
 #endif // TARGET_ARM64
 #endif // FEATURE_SIMD
 

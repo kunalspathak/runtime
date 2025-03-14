@@ -3159,7 +3159,7 @@ GenTree* Compiler::optVNBasedFoldConstExpr(BasicBlock* block, GenTree* parent, G
         {
             simdVL_t value = vnStore->ConstantValue<simdVL_t>(vnCns);
 
-            GenTreeVecCon* vecCon = gtNewVconNode(tree->TypeGet(), value);
+            GenTreeVecCon* vecCon = gtNewVconNode(value DEBUG_ARG(tree->TypeGet()));
 
             conValTree = vecCon;
             break;

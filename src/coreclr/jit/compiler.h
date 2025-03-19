@@ -3371,16 +3371,21 @@ public:
                                     unsigned    simdSize);
 
 #ifdef TARGET_ARM64
-    GenTree* gtNewSimdVLCreateBroadcastNode(
-        var_types type, GenTree* op1, CorInfoType simdBaseJitType, unsigned simdSize);
-#endif
+    GenTree* gtNewSimdVLCreateScalarNode(var_types   type,
+                                             GenTree*    op1,
+                                             CorInfoType simdBaseJitType,
+                                             unsigned    simdSize);
+#endif // TARGET_ARM64
+
 #if defined(FEATURE_MASKED_HW_INTRINSICS)
     GenTree* gtNewSimdCvtVectorToMaskNode(var_types type, GenTree* op1, CorInfoType simdBaseJitType, unsigned simdSize);
 #endif // FEATURE_MASKED_HW_INTRINSICS
 
+    template <bool isSimdVL = false>
     GenTree* gtNewSimdCreateBroadcastNode(
         var_types type, GenTree* op1, CorInfoType simdBaseJitType, unsigned simdSize);
 
+    template <bool isSimdVL = false>
     GenTree* gtNewSimdCreateScalarNode(
         var_types type, GenTree* op1, CorInfoType simdBaseJitType, unsigned simdSize);
 
@@ -9571,6 +9576,10 @@ public:
         // Return 0 if size is even less than XMM, otherwise - XMM
         return (size >= XMM_REGSIZE_BYTES) ? XMM_REGSIZE_BYTES : 0;
 #elif defined(TARGET_ARM64)
+        if (FP_REGSIZE_BYTES < Compiler::compVectorTLength)
+        {
+            return (size >= Compiler::compVectorTLength) ? Compiler::compVectorTLength : 0;
+        }
         assert(getMaxVectorByteLength() == FP_REGSIZE_BYTES);
         return (size >= FP_REGSIZE_BYTES) ? FP_REGSIZE_BYTES : 0;
 #else

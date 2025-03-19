@@ -2082,8 +2082,8 @@ GenTree* Lowering::LowerHWIntrinsicCmpOp(GenTreeHWIntrinsic* node, genTreeOps cm
             GenTree* opClone = comp->gtClone(op);
             BlockRange().InsertAfter(op, opClone);
 
-            cmp = comp->gtNewSimdHWIntrinsicNode(simdType, op, opClone, NI_AdvSimd_Arm64_MaxPairwise, CORINFO_TYPE_UINT,
-                                                 simdSize);
+            cmp = comp->gtNewSimdHWIntrinsicNode(simdType, op, opClone, simdType == TYP_SIMD ? NI_Sve_Max : NI_AdvSimd_Arm64_MaxPairwise, CORINFO_TYPE_UINT,
+                                                 simdSize); //TODO-VL: This should be NI_Sve_MaxPairwise, once we implement it
             BlockRange().InsertBefore(node, cmp);
             LowerNode(cmp);
         }
